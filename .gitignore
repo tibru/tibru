@@ -26,3 +26,5 @@
 *.exe
 *.out
 *.app
+
+.c4droid
