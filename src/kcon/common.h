@@ -28,4 +28,18 @@ void assert( int test, const char* fmt, ... )
 	exit(1);
 }
 
+template<bool>
+struct ASSERT_FAILED;
+
+template<>
+struct ASSERT_FAILED< true > {};
+
+template< size_t n >
+struct assert_test {};
+
+#define APPLY(fn,x,y) fn(x,y)
+#define CONCAT(x,y) x##y
+#define ASSERT( cond ) typedef assert_test< sizeof( ASSERT_FAILED< ( cond ) > ) > APPLY( CONCAT, assert_test_type, __COUNTER__ )
+
+
 #endif
