@@ -16,8 +16,8 @@ ASSERT( sizeof(slot_t) == sizeof(void*) );
 template<class H, class T>
 struct Node
 {
-	H head;
-	T tail;
+	const H head;
+	const T tail;
 	
 	static const short TYPECODE = (Tag<H>::CODE << 1) | Tag<T>::CODE;
 	
@@ -27,7 +27,7 @@ struct Node
 
 class pnode_t
 {
-	uintptr_t _addr_and_type;
+	const uintptr_t _addr_and_type;
 public:
 	template<class H, class T>
 	pnode_t( const Node<H,T>* pnode )
