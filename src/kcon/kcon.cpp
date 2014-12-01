@@ -1,4 +1,4 @@
-#include <stdio.h>
+#include <iostream>
 #include "common.h"
 
 template<class T> struct Tag;
@@ -54,7 +54,7 @@ ASSERT( sizeof(value_t) == sizeof(slot_t) );
 template<> struct Tag<pnode_t> { enum { CODE = 0 }; };
 template<> struct Tag<value_t> { enum { CODE = 1 }; };
 
-struct KConInterpreter
+struct Allocator
 {
 	template<class H, class T>
 	const Node<H,T>* alloc( H head, T tail )
@@ -63,10 +63,30 @@ struct KConInterpreter
 	}
 };
 
+void pprint( std::ostream& os, const Node<value_t,value_t>& node, bool istail=false )
+{
+	if( !istail ) os << '[';
+	os << node.head << ' ' << node.tail;
+	if( !istail ) os << ']';
+}
+
+std::ostream& operator<<( std::ostream& os, pnode_t pnode )
+{
+	switch( pnode.typecode() )
+	{
+		case Node<value_t,value_t>::TYPECODE:
+			pprint( os, *pnode.cast<value_t,value_t>() );
+			break;
+		default:
+			error( "<< dispatch failed" );
+	}
+	
+	return os;
+}
+
 int main( int argc, const char* argv[] )
 {
-	KConInterpreter kcon;
-	pnode_t p = kcon.alloc<value_t,value_t>( 0, 0 );
-	p.cast<value_t,value_t>();
-	printf( "kcon %lx", ADDR_MASK );
+	Allocator a;
+	pnode_t p = a.alloc<value_t,value_t>( 0, 0 );
+	std::cout << p;
 }
