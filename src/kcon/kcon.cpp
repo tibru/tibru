@@ -138,10 +138,21 @@ void Printer::_print( pnode_t pnode )
 	}
 }
 
-int main( int argc, const char* argv[] )
+#include <sstream>
+
+void test_printer()
 {
 	Allocator a;
-	pnode_t p = a.alloc<value_t,pnode_t>( 0, a.alloc<value_t,value_t>( 1, 2 ) );
-	Printer( std::cout ) << p << '\n';
-	Printer( std::cout, false ) << p << '\n';
+	pnode_t p = a.alloc<value_t,pnode_t>( 0, a.alloc<pnode_t,value_t>( a.alloc<value_t,value_t>(3,3), 2 ) );
+	
+	std::ostringstream os;
+	Printer( os ) << p;
+	Printer( os, false ) << p;
+	assert( os.str() == "[0 [3 3] 2][0 [[3 3] 2]]", "Incorrect printing" );
+}
+
+int main( int argc, const char* argv[] )
+{
+	test_printer();
+	std::cout << "** All tests passed **\n";
 }
