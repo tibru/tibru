@@ -63,30 +63,85 @@ struct Allocator
 	}
 };
 
-void pprint( std::ostream& os, const Node<value_t,value_t>& node, bool istail=false )
+class Printer
 {
-	if( !istail ) os << '[';
-	os << node.head << ' ' << node.tail;
-	if( !istail ) os << ']';
+	std::ostream& _os;
+	bool _flatten;
+	
+	void _print( const Node<pnode_t,pnode_t>* pnode );
+	void _print( const Node<pnode_t,value_t>* pnode );
+	void _print( const Node<value_t,pnode_t>* pnode );
+	void _print( const Node<value_t,value_t>* pnode );
+	void _print( pnode_t pnode );
+public:
+	Printer( std::ostream& os, bool flatten=true )
+		: _os( os ), _flatten( flatten ) {}
+
+	std::ostream& operator<<( pnode_t pnode );
+};
+
+std::ostream& Printer::operator<<( pnode_t pnode )
+{
+	_os << '[';
+	_print( pnode );
+	return _os << ']';
 }
 
-std::ostream& operator<<( std::ostream& os, pnode_t pnode )
+void Printer::_print( const Node<pnode_t,pnode_t>* pnode )
+{
+	_os << '[';
+	_print( pnode->head );
+	_os << "] ";
+	if( !_flatten ) _os << '[';
+	_print( pnode->tail );
+	if( !_flatten ) _os << ']';
+}
+
+void Printer::_print( const Node<pnode_t,value_t>* pnode )
+{
+	_os << '[';
+	_print( pnode->head );
+	_os << "] " << pnode->tail;
+}
+
+void Printer::_print( const Node<value_t,pnode_t>* pnode )
+{
+	_os << pnode->head << ' ';
+	if( !_flatten ) _os << '[';
+	_print( pnode->tail );
+	if( !_flatten ) _os << ']';
+}
+
+void Printer::_print( const Node<value_t,value_t>* pnode )
+{
+	_os << pnode->head << ' ' << pnode->tail;
+}
+
+void Printer::_print( pnode_t pnode )
 {
 	switch( pnode.typecode() )
 	{
+		case Node<pnode_t,pnode_t>::TYPECODE:
+			_print( pnode.cast<pnode_t,pnode_t>() );
+			break;
+		case Node<pnode_t,value_t>::TYPECODE:
+			_print( pnode.cast<pnode_t,value_t>() );
+			break;
+		case Node<value_t,pnode_t>::TYPECODE:
+			_print( pnode.cast<value_t,pnode_t>() );
+			break;
 		case Node<value_t,value_t>::TYPECODE:
-			pprint( os, *pnode.cast<value_t,value_t>() );
+			_print( pnode.cast<value_t,value_t>() );
 			break;
 		default:
 			error( "<< dispatch failed" );
 	}
-	
-	return os;
 }
 
 int main( int argc, const char* argv[] )
 {
 	Allocator a;
-	pnode_t p = a.alloc<value_t,value_t>( 0, 0 );
-	std::cout << p;
+	pnode_t p = a.alloc<value_t,pnode_t>( 0, a.alloc<value_t,value_t>( 1, 2 ) );
+	Printer( std::cout ) << p << '\n';
+	Printer( std::cout, false ) << p << '\n';
 }
