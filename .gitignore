@@ -1,3 +1,6 @@
+bin/
+obj/
+
 # Compiled Object files
 *.slo
 *.lo
@@ -28,3 +31,4 @@
 *.app
 
 .c4droid
+.depend
