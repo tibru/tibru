@@ -1,6 +1,8 @@
 #ifndef KCON_TYPES_H
 #define KCON_TYPES_H
 
+#include <cstdint>
+
 template<class T> struct Tag;
 
 typedef uintptr_t slot_t;
@@ -18,9 +20,9 @@ struct Node
 {
 	const H head;
 	const T tail;
-	
+
 	static const short TYPECODE = (Tag<H>::CODE << 1) | Tag<T>::CODE;
-	
+
 	ASSERT( sizeof(H) == sizeof(slot_t) );
 	ASSERT( sizeof(T) == sizeof(slot_t) );
 };
@@ -32,17 +34,17 @@ public:
 	template<class H, class T>
 	pnode_t( const Node<H,T>* pnode )
 		: _addr_and_type( reinterpret_cast<uintptr_t>( pnode ) | (Tag<H>::CODE << 1) | Tag<T>::CODE ) {}
-		
+
 	short typecode() const
 	{
 		return _addr_and_type & TYPE_MASK;
 	}
-	
+
 	template<class H, class T>
 	const Node<H,T>* cast() const
 	{
 		assert( typecode() == Node<H,T>::TYPECODE, "Invalid cast" );
-		return reinterpret_cast<const Node<H,T>*>( _addr_and_type & ADDR_MASK ); 
+		return reinterpret_cast<const Node<H,T>*>( _addr_and_type & ADDR_MASK );
 	}
 };
 
