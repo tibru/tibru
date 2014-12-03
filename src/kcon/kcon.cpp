@@ -3,12 +3,12 @@
 
 struct Allocator
 {
-	template<class H, class T>
-	const Node<H,T>* alloc( H head, T tail )
-	{
-		return new Node<H,T>{ head, tail };
-	}
 };
+
+void* operator new( size_t size, Allocator& alloc )
+{
+	return new char[size];
+}
 
 
 #include "Printer.cpp"
@@ -18,7 +18,11 @@ struct Allocator
 void test_printer()
 {
 	Allocator a;
-	pnode_t p = a.alloc<value_t,pnode_t>( 0, a.alloc<pnode_t,value_t>( a.alloc<value_t,value_t>(3,3), 2 ) );
+	pnode_t p = new (a) Node<value_t,pnode_t>{ 
+					0,
+					new (a) Node<pnode_t,value_t>{ 
+						new (a) Node<value_t,value_t>{3,3}, 
+						2 } };
 	
 	std::ostringstream os;
 	Printer( os ) << p;
