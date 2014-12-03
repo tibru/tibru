@@ -30,5 +30,7 @@ obj/
 *.out
 *.app
 
+# Project temporary files
 .c4droid
-.depend
+*.depend
+*.layout
