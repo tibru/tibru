@@ -30,10 +30,17 @@ struct Node
 class pnode_t
 {
 	const uintptr_t _addr_and_type;
+	
+	pnode_t()
+		: _addr_and_type( 0 ) {}
 public:
 	template<class H, class T>
 	pnode_t( const Node<H,T>* pnode )
 		: _addr_and_type( reinterpret_cast<uintptr_t>( pnode ) | (Tag<H>::CODE << 1) | Tag<T>::CODE ) {}
+		
+	static pnode_t null() { return pnode_t(); }
+	
+	bool is_null() const { return _addr_and_type == 0; }
 
 	short typecode() const
 	{

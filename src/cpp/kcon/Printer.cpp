@@ -39,6 +39,12 @@ void Printer::_print( const Node<value_t,value_t>* pnode )
 
 void Printer::_print( pnode_t pnode )
 {
+	if( pnode.is_null() )
+	{
+		_os << "null";
+		return;
+	}
+
 	switch( pnode.typecode() )
 	{
 		case Node<pnode_t,pnode_t>::TYPECODE:
