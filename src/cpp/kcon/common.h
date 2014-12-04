@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <stdarg.h>
 
-void error( const char* fmt, ... )
+inline void error( const char* fmt, ... )
 {
 	va_list argptr;
 	va_start( argptr, fmt );
@@ -15,7 +15,7 @@ void error( const char* fmt, ... )
 	exit(-1);
 }
 
-void assert( int test, const char* fmt, ... )
+inline void assert( int test, const char* fmt, ... )
 {
 	if( test )
 		return;

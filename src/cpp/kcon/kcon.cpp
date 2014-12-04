@@ -1,6 +1,6 @@
 #include "common.h"
 #include "types.h"
-#include <iostream>
+#include "Printer.h"
 
 struct Allocator
 {
@@ -74,7 +74,7 @@ pnode_t Parser::parse( std::istream& is )
 	return pnode_t::null();
 }
 
-#include "Printer.cpp"
+//#include "Printer.cpp"
 #include <iostream>
 #include <sstream>
 

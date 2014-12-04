@@ -2,6 +2,7 @@
 #define KCON_TYPES_H
 
 #include <cstdint>
+#include "common.h"
 
 template<class T> struct Tag;
 
