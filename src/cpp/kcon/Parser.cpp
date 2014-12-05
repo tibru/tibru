@@ -12,12 +12,13 @@ pnode_t Parser::_parse_elems( std::istream& is )
 	{
 		if( c == ']' )
 		{
+			if( tails.empty() )
+				return tail;
+				
 			pnode_t elems = tail;
 			tail = tails.top();
 			tails.pop();
 			tail = new (_alloc) Node<pnode_t,pnode_t>{ elems, tail };
-			if( tails.empty() )
-				return tail;
 		}
 		else if( c == '[' )
 		{
