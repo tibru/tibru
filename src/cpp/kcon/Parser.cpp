@@ -1,21 +1,28 @@
 #include "Parser.h"
 
+#include <stack>
 
 pnode_t Parser::_parse_elems( std::istream& is )
 {
 	pnode_t tail = pnode_t::null();
+	std::stack<pnode_t> tails;
 	
 	char c;
 	while( is >> c )
 	{
 		if( c == ']' )
 		{
-			return tail;
+			pnode_t elems = tail;
+			tail = tails.top();
+			tails.pop();
+			tail = new (_alloc) Node<pnode_t,pnode_t>{ elems, tail };
+			if( tails.empty() )
+				return tail;
 		}
 		else if( c == '[' )
 		{
-			pnode_t elems = _parse_elems( is );
-			tail = new (_alloc) Node<pnode_t,pnode_t>{ elems, tail };
+			tails.push( tail );
+			tail = pnode_t::null();
 		}
 		else if( isdigit( c ) )
 		{
