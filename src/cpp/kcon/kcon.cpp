@@ -23,7 +23,7 @@ void test_printer()
 void test_parser()
 {
 	Allocator a;
-	std::istringstream iss("[0 1]");
+	std::istringstream iss("[0 [1 [2 3] 4] 5 6]");
 	Printer( std::cout ) << Parser( a ).parse( iss );
 }
 

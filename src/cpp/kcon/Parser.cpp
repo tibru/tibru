@@ -3,33 +3,31 @@
 
 pnode_t Parser::_parse_elems( std::istream& is )
 {
+	pnode_t tail = pnode_t::null();
+	
 	char c;
-	if( is >> c )
+	while( is >> c )
 	{
 		if( c == ']' )
 		{
-			return pnode_t::null();
+			return tail;
 		}
 		else if( c == '[' )
 		{
 			pnode_t elems = _parse_elems( is );
-			pnode_t tail = _parse_elems( is );
-			return new (_alloc) Node<pnode_t,pnode_t>{ elems, tail };
+			tail = new (_alloc) Node<pnode_t,pnode_t>{ elems, tail };
 		}
 		else if( isdigit( c ) )
 		{
 			is.putback( c );
 			value_t value;
-			if( (is >> value) && (value < 256) )
-			{
-				pnode_t tail = _parse_elems( is );
-				return new (_alloc) Node<value_t,pnode_t>{ value, tail };
-			}
+			if( !(is >> value) || (value >= 256) )
+				error( "Malformed byte" );
 			
-			error( "Malformed byte" );	
+			tail = new (_alloc) Node<value_t,pnode_t>{ value, tail };
 		}
-		
-		error( "Unexpected '%c'", c );
+		else
+			error( "Unexpected '%c'", c );
 	}
 	
 	error( "Unexpected end of input" );

@@ -30,7 +30,7 @@ struct Node
 
 class pnode_t
 {
-	const uintptr_t _addr_and_type;
+	uintptr_t _addr_and_type;
 	
 	pnode_t()
 		: _addr_and_type( 0 ) {}
