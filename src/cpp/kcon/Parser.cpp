@@ -44,37 +44,50 @@ pcell_t Parser::_parse_elems( std::istream& is )
 
 pcell_t Parser::_reverse_and_reduce( pcell_t pcell )
 {
-	switch( pcell.typecode() )
-	{
-		case Cell<pcell_t,pcell_t>::TYPECODE:
-		{
-            const Cell<pcell_t,pcell_t>* pcc = pcell.cast<pcell_t,pcell_t>();
-			return new (_alloc) Cell<pcell_t,pcell_t>{ pcc->head, pcc->tail };
-			break;
-		}
-		case Cell<pcell_t,value_t>::TYPECODE:
-		{
-            const Cell<pcell_t,value_t>* pcv = pcell.cast<pcell_t,value_t>();
-			return new (_alloc) Cell<pcell_t,value_t>{ pcv->head, pcv->tail };
-			break;
-		}
-		case Cell<value_t,pcell_t>::TYPECODE:
-		{
-            const Cell<value_t,pcell_t>* pvc = pcell.cast<value_t,pcell_t>();
-			return new (_alloc) Cell<value_t,pcell_t>{ pvc->head, pvc->tail };
-			break;
-		}
-		case Cell<value_t,value_t>::TYPECODE:
-		{
-            const Cell<value_t,value_t>* pvv = pcell.cast<value_t,value_t>();
-			return new (_alloc) Cell<value_t,value_t>{ pvv->head, pvv->tail };
-			break;
-		}
-		default:
-			error( "dispatch failed" );
-	}
+    pcell_t tail = pcell_t::null();
+	std::stack<pcell_t> tails;
+	std::stack<pcell_t> pcells;
 
-	return pcell_t::null();
+    while( !pcell.is_null() || !pcells.empty() )
+    {
+        if( pcell.is_null() )
+        {
+            pcell_t rhead = tail;
+
+            pcell = pcells.top(); pcells.pop();
+            tail = tails.top(); tails.pop();
+
+            tail = new (_alloc) Cell<pcell_t,pcell_t>{ rhead, tail };
+        }
+
+        switch( pcell.typecode() )
+        {
+            case Cell<pcell_t,pcell_t>::TYPECODE:
+            {
+                const Cell<pcell_t,pcell_t>* pcc = pcell.cast<pcell_t,pcell_t>();
+
+                pcells.push( pcc->tail );
+                tails.push( tail );
+
+                pcell = pcc->head;
+                tail = pcell_t::null();
+                break;
+            }
+            case Cell<value_t,pcell_t>::TYPECODE:
+            {
+                const Cell<value_t,pcell_t>* pvc = pcell.cast<value_t,pcell_t>();
+                tail = new (_alloc) Cell<value_t,pcell_t>{ pvc->head, tail };
+                pcell = pvc->tail;
+                break;
+            }
+            default:
+                error( "Dispatch failed in reverse and reduce" );
+        }
+    }
+
+    assert( tails.empty(), "Cell and tail stack mismatch" );
+
+	return tail;
 }
 
 pcell_t Parser::parse( std::istream& is )
