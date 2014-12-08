@@ -1,11 +1,11 @@
 #include "common.h"
 #include "types.h"
-#include "Printer.h"
+#include "stream.h"
 #include "Parser.h"
 #include <iostream>
 #include <sstream>
 
-void test_printer()
+void test_ostream()
 {
 	Allocator a;
 	pcell_t p = new (a) Node<value_t,pcell_t>{
@@ -15,21 +15,21 @@ void test_printer()
 						2 } };
 
 	std::ostringstream os;
-	Printer( os ) << p;
-	Printer( os, false ) << p;
-	assert( os.str() == "[0 [3 3] 2][0 [[3 3] 2]]", "Incorrect printing found '%s'", os.str().c_str()  );
+	KConOStream( os ) << "flat = " << p;
+	KConOStream( os ) << "deep = " << deep << p;
+	assert( os.str() == "flat = [0 [3 3] 2]deep = [0 [[3 3] 2]]", "Incorrect printing found '%s'", os.str().c_str()  );
 }
 
 void test_parser()
 {
 	Allocator a;
 	std::istringstream iss("[0 [1 [2 3] 4] 5 6]");
-	Printer( std::cout ) << Parser( a ).parse( iss );
+	KConOStream( std::cout ) << Parser( a ).parse( iss );
 }
 
 int main( int argc, const char* argv[] )
 {
-	test_printer();
+	test_ostream();
 	test_parser();
 	std::cout << "** All tests passed **\n";
 }
