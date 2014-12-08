@@ -107,4 +107,61 @@ inline void pcell_t::dispatch( CellVisitor& visitor )
 	}
 }
 
+struct elem_t
+{
+	union
+	{
+		value_t value;
+		pcell_t pcell;
+	};
+	bool is_cell;
+	
+	elem_t( value_t v )
+		: value( v ), is_cell( false ) {}
+		
+	elem_t( pcell_t p )
+		: pcell( p ), is_cell( true ) {}
+		
+	template<class H,class T>
+	elem_t( const Cell<H,T>* p )
+		: pcell( p ), is_cell( true ) {}
+		
+	bool is_null() const { return is_cell && pcell.is_null(); }
+};
+
+inline elem_t head( pcell_t pcell )
+{
+	switch( pcell.typecode() )
+	{
+		case Cell<pcell_t,pcell_t>::TYPECODE:
+			return pcell.cast<pcell_t,pcell_t>()->head;
+		case Cell<pcell_t,value_t>::TYPECODE:
+			return pcell.cast<pcell_t,value_t>()->head;
+		case Cell<value_t,pcell_t>::TYPECODE:
+			return pcell.cast<value_t,pcell_t>()->head;
+		case Cell<value_t,value_t>::TYPECODE:
+			return pcell.cast<value_t,value_t>()->head;
+		default:
+			error( "head dispatch failed" );
+	}
+}
+
+inline elem_t tail( pcell_t pcell )
+{
+	switch( pcell.typecode() )
+	{
+		case Cell<pcell_t,pcell_t>::TYPECODE:
+			return pcell.cast<pcell_t,pcell_t>()->tail;
+		case Cell<pcell_t,value_t>::TYPECODE:
+			return pcell.cast<pcell_t,value_t>()->tail;
+		case Cell<value_t,pcell_t>::TYPECODE:
+			return pcell.cast<value_t,pcell_t>()->tail;
+		case Cell<value_t,value_t>::TYPECODE:
+			return pcell.cast<value_t,value_t>()->tail;
+		default:
+			error( "head dispatch failed" );
+	}
+}
+
+
 #endif
