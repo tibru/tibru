@@ -28,19 +28,19 @@ struct Node
 	ASSERT( sizeof(T) == sizeof(slot_t) );
 };
 
-class pnode_t
+class pcell_t
 {
 	uintptr_t _addr_and_type;
-	
-	pnode_t()
+
+	pcell_t()
 		: _addr_and_type( 0 ) {}
 public:
 	template<class H, class T>
-	pnode_t( const Node<H,T>* pnode )
-		: _addr_and_type( reinterpret_cast<uintptr_t>( pnode ) | (Tag<H>::CODE << 1) | Tag<T>::CODE ) {}
-		
-	static pnode_t null() { return pnode_t(); }
-	
+	pcell_t( const Node<H,T>* pcell )
+		: _addr_and_type( reinterpret_cast<uintptr_t>( pcell ) | (Tag<H>::CODE << 1) | Tag<T>::CODE ) {}
+
+	static pcell_t null() { return pcell_t(); }
+
 	bool is_null() const { return _addr_and_type == 0; }
 
 	short typecode() const
@@ -58,10 +58,10 @@ public:
 
 typedef uintptr_t value_t;
 
-ASSERT( sizeof(pnode_t) == sizeof(slot_t) );
+ASSERT( sizeof(pcell_t) == sizeof(slot_t) );
 ASSERT( sizeof(value_t) == sizeof(slot_t) );
 
-template<> struct Tag<pnode_t> { enum { CODE = 0 }; };
+template<> struct Tag<pcell_t> { enum { CODE = 0 }; };
 template<> struct Tag<value_t> { enum { CODE = 1 }; };
 
 #endif

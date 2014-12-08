@@ -1,63 +1,63 @@
 #include "Printer.h"
 
-std::ostream& Printer::operator<<( pnode_t pnode )
+std::ostream& Printer::operator<<( pcell_t pcell )
 {
 	_os << '[';
-	_print( pnode );
+	_print( pcell );
 	return _os << ']';
 }
 
-void Printer::_print( const Node<pnode_t,pnode_t>* pnode )
+void Printer::_print( const Node<pcell_t,pcell_t>* pcell )
 {
 	_os << '[';
-	_print( pnode->head );
+	_print( pcell->head );
 	_os << "] ";
 	if( !_flatten ) _os << '[';
-	_print( pnode->tail );
+	_print( pcell->tail );
 	if( !_flatten ) _os << ']';
 }
 
-void Printer::_print( const Node<pnode_t,value_t>* pnode )
+void Printer::_print( const Node<pcell_t,value_t>* pcell )
 {
 	_os << '[';
-	_print( pnode->head );
-	_os << "] " << pnode->tail;
+	_print( pcell->head );
+	_os << "] " << pcell->tail;
 }
 
-void Printer::_print( const Node<value_t,pnode_t>* pnode )
+void Printer::_print( const Node<value_t,pcell_t>* pcell )
 {
-	_os << pnode->head << ' ';
+	_os << pcell->head << ' ';
 	if( !_flatten ) _os << '[';
-	_print( pnode->tail );
+	_print( pcell->tail );
 	if( !_flatten ) _os << ']';
 }
 
-void Printer::_print( const Node<value_t,value_t>* pnode )
+void Printer::_print( const Node<value_t,value_t>* pcell )
 {
-	_os << pnode->head << ' ' << pnode->tail;
+	_os << pcell->head << ' ' << pcell->tail;
 }
 
-void Printer::_print( pnode_t pnode )
+void Printer::_print( pcell_t pcell )
 {
-	if( pnode.is_null() )
+	if( pcell.is_null() )
 	{
 		_os << "null";
 		return;
 	}
 
-	switch( pnode.typecode() )
+	switch( pcell.typecode() )
 	{
-		case Node<pnode_t,pnode_t>::TYPECODE:
-			_print( pnode.cast<pnode_t,pnode_t>() );
+		case Node<pcell_t,pcell_t>::TYPECODE:
+			_print( pcell.cast<pcell_t,pcell_t>() );
 			break;
-		case Node<pnode_t,value_t>::TYPECODE:
-			_print( pnode.cast<pnode_t,value_t>() );
+		case Node<pcell_t,value_t>::TYPECODE:
+			_print( pcell.cast<pcell_t,value_t>() );
 			break;
-		case Node<value_t,pnode_t>::TYPECODE:
-			_print( pnode.cast<value_t,pnode_t>() );
+		case Node<value_t,pcell_t>::TYPECODE:
+			_print( pcell.cast<value_t,pcell_t>() );
 			break;
 		case Node<value_t,value_t>::TYPECODE:
-			_print( pnode.cast<value_t,value_t>() );
+			_print( pcell.cast<value_t,value_t>() );
 			break;
 		default:
 			error( "<< dispatch failed" );

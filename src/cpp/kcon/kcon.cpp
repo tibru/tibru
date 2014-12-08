@@ -8,12 +8,12 @@
 void test_printer()
 {
 	Allocator a;
-	pnode_t p = new (a) Node<value_t,pnode_t>{ 
+	pcell_t p = new (a) Node<value_t,pcell_t>{
 					0,
-					new (a) Node<pnode_t,value_t>{ 
-						new (a) Node<value_t,value_t>{3,3}, 
+					new (a) Node<pcell_t,value_t>{
+						new (a) Node<value_t,value_t>{3,3},
 						2 } };
-	
+
 	std::ostringstream os;
 	Printer( os ) << p;
 	Printer( os, false ) << p;

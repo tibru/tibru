@@ -2,27 +2,27 @@
 
 #include <stack>
 
-pnode_t Parser::_parse_elems( std::istream& is )
+pcell_t Parser::_parse_elems( std::istream& is )
 {
-	pnode_t tail = pnode_t::null();
-	std::stack<pnode_t> tails;
-	
+	pcell_t tail = pcell_t::null();
+	std::stack<pcell_t> tails;
+
 	char c;
 	while( is >> c )
 	{
 		if( c == ']' )
 		{
-			pnode_t elems = tail;
+			pcell_t elems = tail;
 			tail = tails.top();
 			tails.pop();
-			tail = new (_alloc) Node<pnode_t,pnode_t>{ elems, tail };
+			tail = new (_alloc) Node<pcell_t,pcell_t>{ elems, tail };
 			if( tails.empty() )
 				return tail;
 		}
 		else if( c == '[' )
 		{
 			tails.push( tail );
-			tail = pnode_t::null();
+			tail = pcell_t::null();
 		}
 		else if( isdigit( c ) )
 		{
@@ -30,18 +30,18 @@ pnode_t Parser::_parse_elems( std::istream& is )
 			value_t value;
 			if( !(is >> value) || (value >= 256) )
 				error( "Malformed byte" );
-			
-			tail = new (_alloc) Node<value_t,pnode_t>{ value, tail };
+
+			tail = new (_alloc) Node<value_t,pcell_t>{ value, tail };
 		}
 		else
 			error( "Unexpected '%c'", c );
 	}
-	
+
 	error( "Unexpected end of input" );
-	return pnode_t::null();
+	return pcell_t::null();
 }
 
-pnode_t Parser::parse( std::istream& is )
+pcell_t Parser::parse( std::istream& is )
 {
 	char c;
 	if( is >> c )
@@ -49,8 +49,8 @@ pnode_t Parser::parse( std::istream& is )
 		assert( c == '[', "Expected '['" );
 		return _parse_elems( is );
 	}
-	
+
 	error( "Unexpected end of input" );
-	
-	return pnode_t::null();
+
+	return pcell_t::null();
 }

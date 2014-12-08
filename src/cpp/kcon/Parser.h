@@ -7,13 +7,13 @@
 class Parser
 {
 	Allocator& _alloc;
-	
-	pnode_t _parse_elems( std::istream& is );
+
+	pcell_t _parse_elems( std::istream& is );
 public:
 	Parser( Allocator& alloc )
 		: _alloc( alloc ) {}
-		
-	pnode_t parse( std::istream& is );
+
+	pcell_t parse( std::istream& is );
 };
 
 #endif
