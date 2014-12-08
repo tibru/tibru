@@ -8,10 +8,10 @@
 void test_ostream()
 {
 	Allocator a;
-	pcell_t p = new (a) Node<value_t,pcell_t>{
+	pcell_t p = new (a) Cell<value_t,pcell_t>{
 					0,
-					new (a) Node<pcell_t,value_t>{
-						new (a) Node<value_t,value_t>{3,3},
+					new (a) Cell<pcell_t,value_t>{
+						new (a) Cell<value_t,value_t>{3,3},
 						2 } };
 
 	std::ostringstream os;

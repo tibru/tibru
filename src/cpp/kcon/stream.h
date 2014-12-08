@@ -4,21 +4,22 @@
 #include <ostream>
 #include "types.h"
 
-class KConOStream
+class KConOStream : public CellVisitor
 {
 	std::ostream& _os;
 	bool _flatten;
 
-	void _format( const Node<pcell_t,pcell_t>* pcell );
-	void _format( const Node<pcell_t,value_t>* pcell );
-	void _format( const Node<value_t,pcell_t>* pcell );
-	void _format( const Node<value_t,value_t>* pcell );
 	void _format( pcell_t pcell );
 public:
 	KConOStream( std::ostream& os, bool flatten=true )
 		: _os( os ), _flatten( flatten ) {}
 
     KConOStream& setflatten( bool b ) { _flatten = b; return *this; }
+
+	void visit( const Cell<pcell_t,pcell_t>* pcell );
+	void visit( const Cell<pcell_t,value_t>* pcell );
+	void visit( const Cell<value_t,pcell_t>* pcell );
+	void visit( const Cell<value_t,value_t>* pcell );
 
 	std::ostream& operator<<( pcell_t pcell );
 

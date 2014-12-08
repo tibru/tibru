@@ -18,7 +18,7 @@ pcell_t Parser::_parse_elems( std::istream& is )
 			pcell_t elems = tail;
 			tail = tails.top();
 			tails.pop();
-			tail = new (_alloc) Node<pcell_t,pcell_t>{ elems, tail };
+			tail = new (_alloc) Cell<pcell_t,pcell_t>{ elems, tail };
 		}
 		else if( c == '[' )
 		{
@@ -32,7 +32,7 @@ pcell_t Parser::_parse_elems( std::istream& is )
 			if( !(is >> value) || (value >= 256) )
 				error( "Malformed byte" );
 
-			tail = new (_alloc) Node<value_t,pcell_t>{ value, tail };
+			tail = new (_alloc) Cell<value_t,pcell_t>{ value, tail };
 		}
 		else
 			error( "Unexpected '%c'", c );
@@ -42,13 +42,18 @@ pcell_t Parser::_parse_elems( std::istream& is )
 	return pcell_t::null();
 }
 
+pcell_t Parser::_reverse_and_reduce( pcell_t p )
+{
+    return p;
+}
+
 pcell_t Parser::parse( std::istream& is )
 {
 	char c;
 	if( is >> c )
 	{
 		assert( c == '[', "Expected '['" );
-		return _parse_elems( is );
+		return _reverse_and_reduce( _parse_elems( is ) );
 	}
 
 	error( "Unexpected end of input" );
