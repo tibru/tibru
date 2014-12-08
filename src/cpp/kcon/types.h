@@ -9,7 +9,9 @@ template<class T> struct Tag;
 typedef uintptr_t slot_t;
 const slot_t TAG_MASK = 2 * sizeof(slot_t) - 1;
 const slot_t ADDR_MASK = ~TAG_MASK;
-const slot_t TYPE_MASK = 3;
+const slot_t TAIL_MASK = 1;
+const slot_t HEAD_MASK = 2;
+const slot_t TYPE_MASK = HEAD_MASK | TAIL_MASK;
 const slot_t MARK_ADDR_BIT = 1 << 2;
 const slot_t MARK_BYTE_BIT = 1 << 8;
 const slot_t MARK_MASK = MARK_BYTE_BIT | MARK_ADDR_BIT;
@@ -46,6 +48,16 @@ public:
 	short typecode() const
 	{
 		return _addr_and_type & TYPE_MASK;
+	}
+
+	short headcode() const
+	{
+		return _addr_and_type & HEAD_MASK;
+	}
+
+	short tailcode() const
+	{
+		return _addr_and_type & TAIL_MASK;
 	}
 
 	template<class H, class T>

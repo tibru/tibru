@@ -76,8 +76,23 @@ pcell_t Parser::_reverse_and_reduce( pcell_t pcell )
             case Cell<value_t,pcell_t>::TYPECODE:
             {
                 const Cell<value_t,pcell_t>* pvc = pcell.cast<value_t,pcell_t>();
-                tail = new (_alloc) Cell<value_t,pcell_t>{ pvc->head, tail };
-                pcell = pvc->tail;
+                /*pcell_t t = pvc->tail;
+                if( (t.typecode() == Cell<value_t,pcell_t>::TYPECODE) && t.cast<value_t,pcell_t>()->tail.is_null() )
+                {
+                    tail = new (_alloc) Cell<value_t,value_t>{ pvc->head, t.cast<value_t,pcell_t>()->head };
+                    pcell = pcell_t::null();
+                }
+                else if( (t.typecode() == Cell<pcell_t,pcell_t>::TYPECODE) && t.cast<pcell_t,pcell_t>()->tail.is_null() )
+                {
+                    tail = new (_alloc) Cell<value_t,pcell_t>{ pvc->head, t.cast<pcell_t,pcell_t>()->head };
+                    pcell = pcell_t::null();
+                }
+                else*/
+                {
+                    tail = new (_alloc) Cell<value_t,pcell_t>{ pvc->head, tail };
+                    pcell = pvc->tail;
+                }
+
                 break;
             }
             default:
