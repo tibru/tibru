@@ -78,35 +78,6 @@ ASSERT( sizeof(value_t) == sizeof(slot_t) );
 template<> struct Tag<pcell_t> { enum { CODE = 0 }; };
 template<> struct Tag<value_t> { enum { CODE = 1 }; };
 
-struct CellVisitor
-{
-    virtual void visit( const Cell<pcell_t,pcell_t>* ) = 0;
-    virtual void visit( const Cell<pcell_t,value_t>* ) = 0;
-    virtual void visit( const Cell<value_t,pcell_t>* ) = 0;
-    virtual void visit( const Cell<value_t,value_t>* ) = 0;
-};
-
-inline void pcell_t::dispatch( CellVisitor& visitor )
-{
-	switch( typecode() )
-	{
-		case Cell<pcell_t,pcell_t>::TYPECODE:
-			visitor.visit( cast<pcell_t,pcell_t>() );
-			break;
-		case Cell<pcell_t,value_t>::TYPECODE:
-			visitor.visit( cast<pcell_t,value_t>() );
-			break;
-		case Cell<value_t,pcell_t>::TYPECODE:
-			visitor.visit( cast<value_t,pcell_t>() );
-			break;
-		case Cell<value_t,value_t>::TYPECODE:
-			visitor.visit( cast<value_t,value_t>() );
-			break;
-		default:
-			error( "CellVisitor dispatch failed" );
-	}
-}
-
 struct elem_t
 {
 	union
@@ -115,17 +86,17 @@ struct elem_t
 		pcell_t pcell;
 	};
 	bool is_cell;
-	
+
 	elem_t( value_t v )
 		: value( v ), is_cell( false ) {}
-		
+
 	elem_t( pcell_t p )
 		: pcell( p ), is_cell( true ) {}
-		
+
 	template<class H,class T>
 	elem_t( const Cell<H,T>* p )
 		: pcell( p ), is_cell( true ) {}
-		
+
 	bool is_null() const { return is_cell && pcell.is_null(); }
 };
 
