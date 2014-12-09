@@ -51,12 +51,19 @@ pcell_t Parser::_reverse_and_reduce( pcell_t pcell )
     {
         if( pcell.is_null() )
         {
-            pcell_t rhead = tail.pcell;	//check
+        	assert( tail.is_cell, "Expected recursive cell tail" );
+            
+            pcell_t rhead = tail.pcell;
 
             pcell = pcells.top(); pcells.pop();
             tail = tails.top(); tails.pop();
 
-            tail = new (_alloc) Cell<pcell_t,pcell_t>{ rhead, tail.pcell };	//check
+			if( tail.is_null() )
+				tail = rhead;
+			else if( !tail.is_cell )
+				tail = new (_alloc) Cell<pcell_t,value_t>{ rhead, tail.value };
+			else
+            	tail = new (_alloc) Cell<pcell_t,pcell_t>{ rhead, tail.pcell };
         }
 
         switch( pcell.typecode() )
@@ -76,7 +83,15 @@ pcell_t Parser::_reverse_and_reduce( pcell_t pcell )
             {
                 const Cell<value_t,pcell_t>* pvc = pcell.cast<value_t,pcell_t>();
 
-                tail = new (_alloc) Cell<value_t,pcell_t>{ pvc->head, tail.pcell };	//check
+				const value_t value = pvc->head;
+				
+				if( tail.is_null() )
+					tail = value;
+				else if( !tail.is_cell )
+					tail = new (_alloc) Cell<value_t,value_t>{ value, tail.value };
+				else
+					tail = new (_alloc) Cell<value_t,pcell_t>{ value, tail.pcell };
+					
                 pcell = pvc->tail;
 
                 break;
