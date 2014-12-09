@@ -42,6 +42,11 @@ inline void assert( int test, const char* fmt, ... )
 	exit(1);
 }
 
+inline void assert( int test, const std::string& msg )
+{
+	assert( test, msg.c_str() );
+}
+
 template<bool>
 struct ASSERT_FAILED;
 

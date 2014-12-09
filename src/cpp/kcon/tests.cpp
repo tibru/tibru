@@ -27,8 +27,26 @@ void test_parser()
 	KConOStream( std::cout ) << Parser( a ).parse( iss );
 }
 
+void test_io( std::string in, KConOStream::Manip m, std::string out="" )
+{
+	if( out.empty() )
+		out = in;
+		
+	Allocator a;
+	std::istringstream iss( in );
+	std::ostringstream oss;
+	KConOStream( oss ) << m << Parser( a ).parse( iss );
+	
+	assert( oss.str() == out, _ << "IO failed for: " << in << "\nExpected: " << out << "\nFound: " << oss.str() );
+}
+
+void test_stream()
+{
+	test_io( "[0 0]", flat, "3" );
+}
+
 void run_tests()
 {
 	test_ostream();
-	test_parser();
+	test_stream();
 }
