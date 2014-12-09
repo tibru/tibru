@@ -3,6 +3,7 @@
 #include "stream.h"
 #include "Parser.h"
 #include <sstream>
+#include <iostream>
 
 void test_ostream()
 {
@@ -19,11 +20,15 @@ void test_ostream()
 	assert( os.str() == "flat = [0 [3 3] 2]deep = [0 [[3 3] 2]]", "Incorrect printing found '%s'", os.str().c_str()  );
 }
 
-#include <iostream>
-
 void test_parser()
 {
 	Allocator a;
 	std::istringstream iss("[0 [1 [2 3] 4] 5 6]");
 	KConOStream( std::cout ) << Parser( a ).parse( iss );
+}
+
+void run_tests()
+{
+	test_ostream();
+	test_parser();
 }

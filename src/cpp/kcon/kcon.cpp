@@ -3,7 +3,6 @@
 
 int main( int argc, const char* argv[] )
 {
-	test_ostream();
-	test_parser();
+	run_tests();
 	std::cout << "** All tests passed **\n";
 }
