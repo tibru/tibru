@@ -19,10 +19,7 @@ public:
 struct Runtime;
 typedef Error<Runtime> RuntimeError;
 
-inline std::string _( const char* s )
-{
-    return s;
-}
+static std::string _;
 
 template<class T>
 inline std::string operator<<( const std::string& s, const T& t )

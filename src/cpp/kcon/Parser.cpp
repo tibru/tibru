@@ -35,7 +35,7 @@ pcell_t Parser::_parse_elems( std::istream& is )
 			tail = new (_alloc) Cell<value_t,pcell_t>{ value, tail };
 		}
 		else
-			SyntaxError( _("Unexpected '") << c << "'" );
+			SyntaxError( _ << "Unexpected '" << c << "'" );
 	}
 
 	throw SyntaxError( "Unexpected end of input" );
