@@ -23,6 +23,7 @@ public:
 	pcell_t parse( std::istream& is );
 };
 
-struct SyntaxError : Error {};
+struct Syntax;
+typedef Error<Syntax> SyntaxError;
 
 #endif

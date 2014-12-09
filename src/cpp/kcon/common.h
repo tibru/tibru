@@ -7,21 +7,30 @@
 #include <exception>
 #include <sstream>
 
+template<class Tag>
 class Error : public std::exception
 {
-    std::ostringstream* _oss;
+    std::string _msg;
 public:
-    Error() : _oss( new std::ostringstream ) {}
-
-    template<class T>
-    Error& operator<<( const T& t )
-    {
-        (*_oss) << t;
-        return *this;
-    }
+    Error( const std::string& msg ) : _msg( msg ) {}
+    Error( const std::ostringstream& oss ) : _msg( oss.str() ) {}
 };
 
-struct RuntimeError : Error {};
+struct Runtime;
+typedef Error<Runtime> RuntimeError;
+
+inline std::string _( const char* s )
+{
+    return s;
+}
+
+template<class T>
+inline std::string operator<<( const std::string& s, const T& t )
+{
+    std::ostringstream oss( s );
+    oss << t;
+    return oss.str();
+}
 
 inline void assert( int test, const char* fmt, ... )
 {
