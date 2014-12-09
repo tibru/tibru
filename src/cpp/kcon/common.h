@@ -4,16 +4,24 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
+#include <exception>
+#include <sstream>
 
-inline void error( const char* fmt, ... )
+class Error : public std::exception
 {
-	va_list argptr;
-	va_start( argptr, fmt );
-	vprintf( fmt, argptr );
-	va_end( argptr );
+    std::ostringstream* _oss;
+public:
+    Error() : _oss( new std::ostringstream ) {}
 
-	exit(-1);
-}
+    template<class T>
+    Error& operator<<( const T& t )
+    {
+        (*_oss) << t;
+        return *this;
+    }
+};
+
+struct RuntimeError : Error {};
 
 inline void assert( int test, const char* fmt, ... )
 {
@@ -40,6 +48,5 @@ struct assert_test {};
 #define APPLY(fn,x,y) fn(x,y)
 #define CONCAT(x,y) x##y
 #define ASSERT( cond ) typedef assert_test< sizeof( ASSERT_FAILED< ( cond ) > ) > APPLY( CONCAT, assert_test_type, __COUNTER__ )
-
 
 #endif

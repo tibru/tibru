@@ -60,6 +60,6 @@ void KConOStream::_format( pcell_t pcell )
 			_format( pcell.cast<value_t,value_t>() );
 			break;
 		default:
-			error( "format dispatch failed" );
+			throw RuntimeError() << "format dispatch failed";
 	}
 }

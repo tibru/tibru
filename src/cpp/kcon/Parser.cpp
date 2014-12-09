@@ -30,16 +30,15 @@ pcell_t Parser::_parse_elems( std::istream& is )
 			is.putback( c );
 			value_t value;
 			if( !(is >> value) || (value >= 256) )
-				error( "Malformed byte" );
+				throw SyntaxError() << "Malformed byte";
 
 			tail = new (_alloc) Cell<value_t,pcell_t>{ value, tail };
 		}
 		else
-			error( "Unexpected '%c'", c );
+			SyntaxError() << "Unexpected '" << c << "'";
 	}
 
-	error( "Unexpected end of input" );
-	return pcell_t::null();
+	throw SyntaxError() << "Unexpected end of input";
 }
 
 pcell_t Parser::_reverse_and_reduce( pcell_t pcell )
@@ -76,14 +75,14 @@ pcell_t Parser::_reverse_and_reduce( pcell_t pcell )
             case Cell<value_t,pcell_t>::TYPECODE:
             {
                 const Cell<value_t,pcell_t>* pvc = pcell.cast<value_t,pcell_t>();
-            
+
                 tail = new (_alloc) Cell<value_t,pcell_t>{ pvc->head, tail.pcell };	//check
                 pcell = pvc->tail;
 
                 break;
             }
             default:
-                error( "Dispatch failed in reverse and reduce" );
+                assert( false, "Dispatch failed in reverse and reduce" );
         }
     }
 
@@ -101,7 +100,5 @@ pcell_t Parser::parse( std::istream& is )
 		return _reverse_and_reduce( _parse_elems( is ) );
 	}
 
-	error( "Unexpected end of input" );
-
-	return pcell_t::null();
+	throw SyntaxError() << "Unexpected end of input";
 }

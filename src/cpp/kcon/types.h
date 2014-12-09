@@ -113,7 +113,7 @@ inline elem_t head( pcell_t pcell )
 		case Cell<value_t,value_t>::TYPECODE:
 			return pcell.cast<value_t,value_t>()->head;
 		default:
-			error( "head dispatch failed" );
+			throw RuntimeError() << "head dispatch failed";
 	}
 }
 
@@ -130,7 +130,7 @@ inline elem_t tail( pcell_t pcell )
 		case Cell<value_t,value_t>::TYPECODE:
 			return pcell.cast<value_t,value_t>()->tail;
 		default:
-			error( "head dispatch failed" );
+			throw RuntimeError() << "head dispatch failed";
 	}
 }
 
