@@ -31,6 +31,8 @@
 		<Unit filename="kcon/kcon.cpp" />
 		<Unit filename="kcon/stream.cpp" />
 		<Unit filename="kcon/stream.h" />
+		<Unit filename="kcon/tests.cpp" />
+		<Unit filename="kcon/tests.h" />
 		<Unit filename="kcon/types.h" />
 		<Extensions>
 			<code_completion />
