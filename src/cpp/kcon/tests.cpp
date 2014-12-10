@@ -14,12 +14,12 @@ void test_ostream()
 						2 } };
 
 	std::ostringstream os;
-	KConOStream( os ) << "flat = " << p;
-	KConOStream( os ) << "deep = " << deep << p;
+	kostream( os ) << "flat = " << p;
+	kostream( os ) << "deep = " << deep << p;
 	test( os.str() == "flat = [0 [3 3] 2]deep = [0 [[3 3] 2]]", "Incorrect printing found '" + os.str() + "'" );
 }
 
-void test_io( const std::string& in, KConOStream::Manip m=flat, std::string out="" )
+void test_io( const std::string& in, kostream::Manip m=flat, std::string out="" )
 {
 	if( out.empty() )
 		out = in;
@@ -27,7 +27,7 @@ void test_io( const std::string& in, KConOStream::Manip m=flat, std::string out=
 	Allocator a;
 	std::istringstream iss( in );
 	std::ostringstream oss;
-	KConOStream( oss ) << m << Parser( a ).parse( iss );
+	kostream( oss ) << m << Parser( a ).parse( iss );
 
 	test( oss.str() == out, "IO failed for: '" + in + "'\nExpected: '" + out + "'\nFound:    '" + oss.str() + "'" );
 }
@@ -39,7 +39,7 @@ void test_io_error( const std::string& in, const std::string& msg )
 	std::ostringstream oss;
 	try
 	{
-        KConOStream( oss ) << Parser( a ).parse( iss );
+        kostream( oss ) << Parser( a ).parse( iss );
 	}
 	catch( const Error<Syntax>& e )
 	{

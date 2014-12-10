@@ -4,7 +4,7 @@
 #include <ostream>
 #include "types.h"
 
-class KConOStream
+class kostream
 {
 	std::ostream& _os;
 	bool _flatten;
@@ -16,36 +16,36 @@ class KConOStream
 	void _format( pcell_t pcell );
 	void _format( value_t value );
 public:
-	KConOStream( std::ostream& os, bool flatten=true )
+	kostream( std::ostream& os, bool flatten=true )
 		: _os( os ), _flatten( flatten ) {}
 
-    KConOStream& setflatten( bool b ) { _flatten = b; return *this; }
+    kostream& setflatten( bool b ) { _flatten = b; return *this; }
 
 	std::ostream& operator<<( pcell_t pcell );
 	std::ostream& operator<<( value_t value );
 	std::ostream& operator<<( elem_t elem );
 
     template<class T>
-    KConOStream& operator<<( const T& t )
+    kostream& operator<<( const T& t )
     {
         _os << t;
         return *this;
     }
 
-    typedef KConOStream& (*Manip)( KConOStream& );
+    typedef kostream& (*Manip)( kostream& );
 
-    KConOStream& operator<<( Manip m )
+    kostream& operator<<( Manip m )
     {
         return m(*this);
     }
 };
 
-inline KConOStream& flat( KConOStream& kos )
+inline kostream& flat( kostream& kos )
 {
     return kos.setflatten( true );
 }
 
-inline KConOStream& deep( KConOStream& kos )
+inline kostream& deep( kostream& kos )
 {
     return kos.setflatten( false );
 }

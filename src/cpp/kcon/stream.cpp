@@ -1,27 +1,27 @@
 #include "stream.h"
 
-std::ostream& KConOStream::operator<<( pcell_t pcell )
+std::ostream& kostream::operator<<( pcell_t pcell )
 {
 	_os << '[';
 	_format( pcell );
 	return _os << ']';
 }
 
-std::ostream& KConOStream::operator<<( value_t value )
+std::ostream& kostream::operator<<( value_t value )
 {
 	_format( value );
 	return _os;
 }
 
-std::ostream& KConOStream::operator<<( elem_t elem )
+std::ostream& kostream::operator<<( elem_t elem )
 {
     if( elem.is_cell )
-        return KConOStream::operator<<( elem.pcell );
+        return kostream::operator<<( elem.pcell );
     else
-        return KConOStream::operator<<( elem.value );
+        return kostream::operator<<( elem.value );
 }
 
-void KConOStream::_format( const Cell<pcell_t,pcell_t>* pcell )
+void kostream::_format( const Cell<pcell_t,pcell_t>* pcell )
 {
 	_os << '[';
 	_format( pcell->head );
@@ -31,14 +31,14 @@ void KConOStream::_format( const Cell<pcell_t,pcell_t>* pcell )
 	if( !_flatten ) _os << ']';
 }
 
-void KConOStream::_format( const Cell<pcell_t,value_t>* pcell )
+void kostream::_format( const Cell<pcell_t,value_t>* pcell )
 {
 	_os << '[';
 	_format( pcell->head );
 	_os << "] " << pcell->tail;
 }
 
-void KConOStream::_format( const Cell<value_t,pcell_t>* pcell )
+void kostream::_format( const Cell<value_t,pcell_t>* pcell )
 {
 	_os << pcell->head << ' ';
 	if( !_flatten ) _os << '[';
@@ -46,12 +46,12 @@ void KConOStream::_format( const Cell<value_t,pcell_t>* pcell )
 	if( !_flatten ) _os << ']';
 }
 
-void KConOStream::_format( const Cell<value_t,value_t>* pcell )
+void kostream::_format( const Cell<value_t,value_t>* pcell )
 {
 	_os << pcell->head << ' ' << pcell->tail;
 }
 
-void KConOStream::_format( pcell_t pcell )
+void kostream::_format( pcell_t pcell )
 {
 	if( pcell.is_null() )
 	{
@@ -78,7 +78,7 @@ void KConOStream::_format( pcell_t pcell )
 	}
 }
 
-void KConOStream::_format( value_t value )
+void kostream::_format( value_t value )
 {
     _os << value;
 }
