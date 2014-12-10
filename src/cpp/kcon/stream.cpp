@@ -7,6 +7,20 @@ std::ostream& KConOStream::operator<<( pcell_t pcell )
 	return _os << ']';
 }
 
+std::ostream& KConOStream::operator<<( value_t value )
+{
+	_format( value );
+	return _os;
+}
+
+std::ostream& KConOStream::operator<<( elem_t elem )
+{
+    if( elem.is_cell )
+        return KConOStream::operator<<( elem.pcell );
+    else
+        return KConOStream::operator<<( elem.value );
+}
+
 void KConOStream::_format( const Cell<pcell_t,pcell_t>* pcell )
 {
 	_os << '[';
@@ -62,4 +76,9 @@ void KConOStream::_format( pcell_t pcell )
 		default:
 			throw Error<Runtime>( "format dispatch failed" );
 	}
+}
+
+void KConOStream::_format( value_t value )
+{
+    _os << value;
 }

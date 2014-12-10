@@ -14,6 +14,7 @@ class KConOStream
 	void _format( const Cell<value_t,pcell_t>* pcell );
 	void _format( const Cell<value_t,value_t>* pcell );
 	void _format( pcell_t pcell );
+	void _format( value_t value );
 public:
 	KConOStream( std::ostream& os, bool flatten=true )
 		: _os( os ), _flatten( flatten ) {}
@@ -21,6 +22,8 @@ public:
     KConOStream& setflatten( bool b ) { _flatten = b; return *this; }
 
 	std::ostream& operator<<( pcell_t pcell );
+	std::ostream& operator<<( value_t value );
+	std::ostream& operator<<( elem_t elem );
 
     template<class T>
     KConOStream& operator<<( const T& t )

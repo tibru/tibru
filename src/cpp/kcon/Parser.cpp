@@ -1,6 +1,15 @@
 #include "Parser.h"
 #include <stack>
 
+value_t Parser::_parse_value( std::istream& is )
+{
+    value_t value;
+    if( !(is >> value) || (value >= 256) )
+        throw SyntaxError( "Malformed byte" );
+
+    return value;
+}
+
 pcell_t Parser::_parse_elems( std::istream& is )
 {
 	pcell_t tail = pcell_t::null();
@@ -11,6 +20,12 @@ pcell_t Parser::_parse_elems( std::istream& is )
 	{
 		if( c == ']' )
 		{
+		    if( tail.is_null() )
+                throw SyntaxError( "Unexpected empty cell" );
+
+		    if( _is_singleton( tail ) )
+                throw SyntaxError( "Unexpected singleton" );
+
 			if( tails.empty() )
 				return tail;
 
@@ -27,14 +42,10 @@ pcell_t Parser::_parse_elems( std::istream& is )
 		else if( isdigit( c ) )
 		{
 			is.putback( c );
-			value_t value;
-			if( !(is >> value) || (value >= 256) )
-				throw SyntaxError( "Malformed byte" );
-
-			tail = new (_alloc) Cell<value_t,pcell_t>{ value, tail };
+			tail = new (_alloc) Cell<value_t,pcell_t>{ _parse_value( is ), tail };
 		}
 		else
-			SyntaxError( "Unexpected '"s + c + "'" );
+			throw SyntaxError( "Unexpected '"s + c + "'" );
 	}
 
 	throw SyntaxError( "Unexpected end of input" );
@@ -51,7 +62,7 @@ pcell_t Parser::_reverse_and_reduce( pcell_t pcell )
         if( pcell.is_null() )
         {
         	assert( tail.is_cell, "Expected recursive cell tail" );
-            
+
             pcell_t rhead = tail.pcell;
 
             pcell = pcells.top(); pcells.pop();
@@ -83,14 +94,14 @@ pcell_t Parser::_reverse_and_reduce( pcell_t pcell )
                 const Cell<value_t,pcell_t>* pvc = pcell.cast<value_t,pcell_t>();
 
 				const value_t value = pvc->head;
-				
+
 				if( tail.is_null() )
 					tail = value;
 				else if( !tail.is_cell )
 					tail = new (_alloc) Cell<value_t,value_t>{ value, tail.value };
 				else
 					tail = new (_alloc) Cell<value_t,pcell_t>{ value, tail.pcell };
-					
+
                 pcell = pvc->tail;
 
                 break;
@@ -105,14 +116,21 @@ pcell_t Parser::_reverse_and_reduce( pcell_t pcell )
 	return tail.pcell;	//check
 }
 
-pcell_t Parser::parse( std::istream& is )
+elem_t Parser::parse( std::istream& is )
 {
 	char c;
-	if( is >> c )
-	{
-		assert( c == '[', "Expected '['" );
-		return _reverse_and_reduce( _parse_elems( is ) );
-	}
+	if( !(is >> c) )
+        throw SyntaxError( "Unexpected end of input" );
 
-	throw SyntaxError( "Unexpected end of input" );
+    if( c == '[' )
+    {
+        return _reverse_and_reduce( _parse_elems( is ) );
+    }
+    else if( isdigit( c ) )
+    {
+        is.putback( c );
+        return _parse_value( is );
+    }
+    else
+        throw SyntaxError( "Unexpected '"s + c + "'" );
 }

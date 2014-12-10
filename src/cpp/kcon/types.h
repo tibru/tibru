@@ -134,5 +134,4 @@ inline elem_t tail( pcell_t pcell )
 	}
 }
 
-
 #endif

@@ -11,16 +11,17 @@ class Parser
 
     static bool _is_singleton( pcell_t p )
     {
-        return (p.tailcode() == Tag<pcell_t>::CODE) && p.cast<value_t,pcell_t>()->tail.is_null();
+        return !p.is_null() && tail( p ).is_null();
     }
 
+    value_t _parse_value( std::istream& is );
 	pcell_t _parse_elems( std::istream& is );
 	pcell_t _reverse_and_reduce( pcell_t p );
 public:
 	Parser( Allocator& alloc )
 		: _alloc( alloc ) {}
 
-	pcell_t parse( std::istream& is );
+	elem_t parse( std::istream& is );
 };
 
 struct Syntax;

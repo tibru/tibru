@@ -9,11 +9,12 @@ using namespace std::string_literals;
 template<class Tag>
 class Error : public std::exception
 {
-    std::string _msg;
+    std::string _message;
 public:
-    Error( const std::string& msg ) : _msg( msg ) {}
+    Error( const std::string& message ) : _message( message ) {}
 
-	const char* what() const throw() { return _msg.c_str(); }
+	const char* what() const throw() { return ('\n' + _message).c_str(); }
+	const std::string& message() const { return _message; }
 };
 
 struct Runtime;
