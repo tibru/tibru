@@ -18,6 +18,7 @@ public:
 };
 
 struct Runtime;
+struct Syntax;
 struct Assertion;
 struct Test;
 

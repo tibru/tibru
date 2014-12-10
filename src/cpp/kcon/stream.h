@@ -1,8 +1,10 @@
 #ifndef KCON_STREAM_H
 #define KCON_STREAM_H
 
-#include <ostream>
 #include "types.h"
+#include "Allocator.h"
+#include <ostream>
+#include <istream>
 
 class kostream
 {
@@ -21,9 +23,9 @@ public:
 
     kostream& setflatten( bool b ) { _flatten = b; return *this; }
 
-	std::ostream& operator<<( pcell_t pcell );
-	std::ostream& operator<<( value_t value );
-	std::ostream& operator<<( elem_t elem );
+	kostream& operator<<( pcell_t pcell );
+	kostream& operator<<( value_t value );
+	kostream& operator<<( elem_t elem );
 
     template<class T>
     kostream& operator<<( const T& t )
@@ -49,5 +51,21 @@ inline kostream& deep( kostream& kos )
 {
     return kos.setflatten( false );
 }
+
+class kistream
+{
+    std::istream& _is;
+    Allocator& _alloc;
+
+    value_t _parse_value();
+	pcell_t _parse_elems();
+	pcell_t _reverse_and_reduce( pcell_t p );
+	elem_t _parse();
+public:
+    kistream( std::istream& is, Allocator& alloc )
+        : _is( is ), _alloc( alloc ) {}
+
+	kistream& operator>>( elem_t& elem );
+};
 
 #endif

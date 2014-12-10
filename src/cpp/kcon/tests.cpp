@@ -1,7 +1,6 @@
 #include "tests.h"
 #include "Allocator.h"
 #include "stream.h"
-#include "Parser.h"
 #include <sstream>
 
 void test_ostream()
@@ -27,7 +26,10 @@ void test_io( const std::string& in, kostream::Manip m=flat, std::string out="" 
 	Allocator a;
 	std::istringstream iss( in );
 	std::ostringstream oss;
-	kostream( oss ) << m << Parser( a ).parse( iss );
+
+    elem_t elem;
+    kistream( iss, a ) >> elem;
+    kostream( oss ) << m << elem;
 
 	test( oss.str() == out, "IO failed for: '" + in + "'\nExpected: '" + out + "'\nFound:    '" + oss.str() + "'" );
 }
@@ -39,7 +41,9 @@ void test_io_error( const std::string& in, const std::string& msg )
 	std::ostringstream oss;
 	try
 	{
-        kostream( oss ) << Parser( a ).parse( iss );
+	    elem_t elem;
+	    kistream( iss, a ) >> elem;
+        kostream( oss ) << elem;
 	}
 	catch( const Error<Syntax>& e )
 	{

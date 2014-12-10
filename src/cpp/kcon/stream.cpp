@@ -1,19 +1,21 @@
 #include "stream.h"
+#include <stack>
 
-std::ostream& kostream::operator<<( pcell_t pcell )
+kostream& kostream::operator<<( pcell_t pcell )
 {
 	_os << '[';
 	_format( pcell );
-	return _os << ']';
+	_os << ']';
+	return *this;
 }
 
-std::ostream& kostream::operator<<( value_t value )
+kostream& kostream::operator<<( value_t value )
 {
 	_format( value );
-	return _os;
+	return *this;
 }
 
-std::ostream& kostream::operator<<( elem_t elem )
+kostream& kostream::operator<<( elem_t elem )
 {
     if( elem.is_cell )
         return kostream::operator<<( elem.pcell );
@@ -81,4 +83,144 @@ void kostream::_format( pcell_t pcell )
 void kostream::_format( value_t value )
 {
     _os << value;
+}
+
+value_t kistream::_parse_value()
+{
+    value_t value;
+    if( !(_is >> value) || (value >= 256) )
+        throw Error<Syntax>( "Malformed byte" );
+
+    return value;
+}
+
+pcell_t kistream::_parse_elems()
+{
+	pcell_t tail = pcell_t::null();
+	std::stack<pcell_t> tails;
+
+	char c;
+	while( _is >> c )
+	{
+		if( c == ']' )
+		{
+		    if( tail.is_null() )
+                throw Error<Syntax>( "Unexpected empty cell" );
+
+		    if( is_singleton( tail ) )
+                throw Error<Syntax>( "Unexpected singleton" );
+
+			if( tails.empty() )
+				return tail;
+
+			pcell_t elems = tail;
+			tail = tails.top();
+			tails.pop();
+			tail = new (_alloc) Cell<pcell_t,pcell_t>{ elems, tail };
+		}
+		else if( c == '[' )
+		{
+			tails.push( tail );
+			tail = pcell_t::null();
+		}
+		else if( isdigit( c ) )
+		{
+			_is.putback( c );
+			tail = new (_alloc) Cell<value_t,pcell_t>{ _parse_value(), tail };
+		}
+		else
+			throw Error<Syntax>( "Unexpected '"s + c + "'" );
+	}
+
+	throw Error<Syntax>( "Unexpected end of input" );
+}
+
+pcell_t kistream::_reverse_and_reduce( pcell_t pcell )
+{
+    elem_t tail = pcell_t::null();
+	std::stack<elem_t> tails;
+	std::stack<pcell_t> pcells;
+
+    while( !pcell.is_null() || !pcells.empty() )
+    {
+        if( pcell.is_null() )
+        {
+        	assert( tail.is_cell, "Expected recursive cell tail" );
+
+            pcell_t rhead = tail.pcell;
+
+            pcell = pcells.top(); pcells.pop();
+            tail = tails.top(); tails.pop();
+
+			if( tail.is_null() )
+				tail = rhead;
+			else if( !tail.is_cell )
+				tail = new (_alloc) Cell<pcell_t,value_t>{ rhead, tail.value };
+			else
+            	tail = new (_alloc) Cell<pcell_t,pcell_t>{ rhead, tail.pcell };
+        }
+
+        switch( pcell.typecode() )
+        {
+            case Cell<pcell_t,pcell_t>::TYPECODE:
+            {
+                const Cell<pcell_t,pcell_t>* pcc = pcell.cast<pcell_t,pcell_t>();
+
+                pcells.push( pcc->tail );
+                tails.push( tail );
+
+                pcell = pcc->head;
+                tail = pcell_t::null();
+                break;
+            }
+            case Cell<value_t,pcell_t>::TYPECODE:
+            {
+                const Cell<value_t,pcell_t>* pvc = pcell.cast<value_t,pcell_t>();
+
+				const value_t value = pvc->head;
+
+				if( tail.is_null() )
+					tail = value;
+				else if( !tail.is_cell )
+					tail = new (_alloc) Cell<value_t,value_t>{ value, tail.value };
+				else
+					tail = new (_alloc) Cell<value_t,pcell_t>{ value, tail.pcell };
+
+                pcell = pvc->tail;
+
+                break;
+            }
+            default:
+                assert( false, "Dispatch failed in reverse and reduce" );
+        }
+    }
+
+    assert( tails.empty(), "Cell and tail stack mismatch" );
+
+	return tail.pcell;	//check
+}
+
+elem_t kistream::_parse()
+{
+	char c;
+	if( !(_is >> c) )
+        throw Error<Syntax>( "Unexpected end of input" );
+
+    if( c == '[' )
+    {
+        return _reverse_and_reduce( _parse_elems() );
+    }
+    else if( isdigit( c ) )
+    {
+        _is.putback( c );
+        return _parse_value();
+    }
+    else
+        throw Error<Syntax>( "Unexpected '"s + c + "'" );
+}
+
+kistream& kistream::operator>>( elem_t& elem )
+{
+    elem = _parse();
+    return *this;
 }

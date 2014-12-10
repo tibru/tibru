@@ -90,7 +90,7 @@ struct elem_t
 	elem_t( value_t v )
 		: value( v ), is_cell( false ) {}
 
-	elem_t( pcell_t p )
+	elem_t( pcell_t p=pcell_t::null() )
 		: pcell( p ), is_cell( true ) {}
 
 	template<class H,class T>
@@ -132,6 +132,11 @@ inline elem_t tail( pcell_t pcell )
 		default:
 			throw Error<Runtime>( "head dispatch failed" );
 	}
+}
+
+inline bool is_singleton( pcell_t p )
+{
+    return !p.is_null() && tail( p ).is_null();
 }
 
 #endif
