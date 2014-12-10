@@ -1,11 +1,10 @@
 #ifndef KCON_COMMON_H
 #define KCON_COMMON_H
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdarg.h>
 #include <exception>
-#include <sstream>
+#include <string>
+
+using namespace std::string_literals;
 
 template<class Tag>
 class Error : public std::exception
@@ -13,33 +12,24 @@ class Error : public std::exception
     std::string _msg;
 public:
     Error( const std::string& msg ) : _msg( msg ) {}
-    Error( const std::ostringstream& oss ) : _msg( oss.str() ) {}
+
+	const char* what() const throw() { return _msg.c_str(); }
 };
 
 struct Runtime;
-typedef Error<Runtime> RuntimeError;
+struct Assertion;
+struct Test;
 
-inline std::string operator""_s( const char* s, size_t l )
+inline void assert( bool cond, const std::string& msg )
 {
-	return s;
+	if( !cond )
+		throw Error<Assertion>( msg );
 }
 
-inline void assert( int test, const char* fmt, ... )
+inline void test( bool cond, const std::string& msg )
 {
-	if( test )
-		return;
-
-	va_list argptr;
-	va_start( argptr, fmt );
-	vprintf( fmt, argptr );
-	va_end( argptr );
-
-	exit(1);
-}
-
-inline void assert( int test, const std::string& msg )
-{
-	assert( test, msg.c_str() );
+	if( !cond )
+		throw Error<Test>( msg );
 }
 
 template<bool>

@@ -1,5 +1,4 @@
 #include "Parser.h"
-
 #include <stack>
 
 pcell_t Parser::_parse_elems( std::istream& is )
@@ -35,7 +34,7 @@ pcell_t Parser::_parse_elems( std::istream& is )
 			tail = new (_alloc) Cell<value_t,pcell_t>{ value, tail };
 		}
 		else
-			SyntaxError( "Unexpected '"_s + c + "'" );
+			SyntaxError( "Unexpected '"s + c + "'" );
 	}
 
 	throw SyntaxError( "Unexpected end of input" );
