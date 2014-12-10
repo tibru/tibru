@@ -13,7 +13,7 @@
 				<Option compiler="gcc" />
 				<Compiler>
 					<Add option="-O2" />
-					<Add option="-fexceptions -std=c++11" />
+					<Add option="-fexceptions -std=c++14" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
