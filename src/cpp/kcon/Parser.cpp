@@ -5,7 +5,7 @@ value_t Parser::_parse_value( std::istream& is )
 {
     value_t value;
     if( !(is >> value) || (value >= 256) )
-        throw SyntaxError( "Malformed byte" );
+        throw Error<Syntax>( "Malformed byte" );
 
     return value;
 }
@@ -21,10 +21,10 @@ pcell_t Parser::_parse_elems( std::istream& is )
 		if( c == ']' )
 		{
 		    if( tail.is_null() )
-                throw SyntaxError( "Unexpected empty cell" );
+                throw Error<Syntax>( "Unexpected empty cell" );
 
 		    if( _is_singleton( tail ) )
-                throw SyntaxError( "Unexpected singleton" );
+                throw Error<Syntax>( "Unexpected singleton" );
 
 			if( tails.empty() )
 				return tail;
@@ -45,10 +45,10 @@ pcell_t Parser::_parse_elems( std::istream& is )
 			tail = new (_alloc) Cell<value_t,pcell_t>{ _parse_value( is ), tail };
 		}
 		else
-			throw SyntaxError( "Unexpected '"s + c + "'" );
+			throw Error<Syntax>( "Unexpected '"s + c + "'" );
 	}
 
-	throw SyntaxError( "Unexpected end of input" );
+	throw Error<Syntax>( "Unexpected end of input" );
 }
 
 pcell_t Parser::_reverse_and_reduce( pcell_t pcell )
@@ -120,7 +120,7 @@ elem_t Parser::parse( std::istream& is )
 {
 	char c;
 	if( !(is >> c) )
-        throw SyntaxError( "Unexpected end of input" );
+        throw Error<Syntax>( "Unexpected end of input" );
 
     if( c == '[' )
     {
@@ -132,5 +132,5 @@ elem_t Parser::parse( std::istream& is )
         return _parse_value( is );
     }
     else
-        throw SyntaxError( "Unexpected '"s + c + "'" );
+        throw Error<Syntax>( "Unexpected '"s + c + "'" );
 }

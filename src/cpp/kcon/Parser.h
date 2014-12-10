@@ -25,6 +25,5 @@ public:
 };
 
 struct Syntax;
-typedef Error<Syntax> SyntaxError;
 
 #endif
