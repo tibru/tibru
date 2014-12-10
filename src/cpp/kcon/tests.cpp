@@ -19,13 +19,6 @@ void test_ostream()
 	test( os.str() == "flat = [0 [3 3] 2]deep = [0 [[3 3] 2]]", "Incorrect printing found '" + os.str() + "'" );
 }
 
-void test_parser()
-{
-	Allocator a;
-	std::istringstream iss("[0 [1 [2 3] 4] 5 6]");
-	//KConOStream( std::cout ) << Parser( a ).parse( iss );
-}
-
 void test_io( std::string in, KConOStream::Manip m, std::string out="" )
 {
 	if( out.empty() )
@@ -36,12 +29,15 @@ void test_io( std::string in, KConOStream::Manip m, std::string out="" )
 	std::ostringstream oss;
 	KConOStream( oss ) << m << Parser( a ).parse( iss );
 	
-	test( oss.str() == out, "IO failed for: " + in + "\nExpected: " + out + "\nFound: " + oss.str() );
+	test( oss.str() == out, "IO failed for: " + in + "\nExpected: " + out + "\nFound:    " + oss.str() );
 }
 
 void test_stream()
 {
-	test_io( "[0 0]", flat, "3" );
+	test_io( "[0 [1 2]]", flat, "[0 1 2]" );
+	test_io( "[0 1 2]", deep, "[0 [1 2]]" );
+	test_io( "[0 [1 [2 3] 4] 5 6]", flat );
+	test_io( "[0 [1 [2 3] 4] 5 6]", deep, "[0 [[1 [[2 3] 4]] [5 6]]]" );
 }
 
 void run_tests()
