@@ -37,7 +37,7 @@ void test_io( std::string in, KConOStream::Manip m, std::string out="" )
 	std::ostringstream oss;
 	KConOStream( oss ) << m << Parser( a ).parse( iss );
 	
-	assert( oss.str() == out, _ << "IO failed for: " << in << "\nExpected: " << out << "\nFound: " << oss.str() );
+	assert( oss.str() == out, "IO failed for: " + in + "\nExpected: " + out + "\nFound: " + oss.str() );
 }
 
 void test_stream()

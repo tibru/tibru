@@ -19,14 +19,9 @@ public:
 struct Runtime;
 typedef Error<Runtime> RuntimeError;
 
-static std::string _;
-
-template<class T>
-inline std::string operator<<( const std::string& s, const T& t )
+inline std::string operator""_s( const char* s, size_t l )
 {
-    std::ostringstream oss( s );
-    oss << t;
-    return oss.str();
+	return s;
 }
 
 inline void assert( int test, const char* fmt, ... )
