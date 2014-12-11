@@ -7,15 +7,29 @@
 
 using namespace std::string_literals;
 
-template<class Tag>
-class Error : public std::exception
+struct AnyType {};
+
+template<class Type, class SubType=AnyType>
+class Error;
+
+template<>
+template<class Type>
+class Error<Type,AnyType> : public std::exception
 {
     std::string _message;
 public:
-    Error( const std::string& message ) : _message( message ) {}
+    Error( const std::string& message )
+    	: _message( message ) {}
 
 	const char* what() const throw() { return ('\n' + _message).c_str(); }
 	const std::string& message() const { return _message; }
+};
+
+template<class Type, class SubType>
+struct Error : Error<Type>
+{
+	Error( const std::string& message )
+    	: Error<Type>( message ) {}
 };
 
 struct Runtime;

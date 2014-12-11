@@ -39,6 +39,7 @@ void test_io( const std::string& in, kostream::KManip m=flat, std::string out=""
 	test( oss.str() == out, "IO failed for: '" + in + "'\nExpected: '" + out + "'\nFound:    '" + oss.str() + "'" );
 }
 
+template<class SubType=AnyType>
 void test_io_error( const std::string& in, const std::string& msg )
 {
 	Allocator a;
@@ -50,7 +51,7 @@ void test_io_error( const std::string& in, const std::string& msg )
 	    kistream( iss, a ) >> elem;
         kostream( oss ) << elem;
 	}
-	catch( const Error<Syntax>& e )
+	catch( const Error<Syntax,SubType>& e )
 	{
 	    test( e.message() == msg, "IO failed for: '" + in + "'\nExpected error: '" + msg + "'\nFound:          '" + e.message() + "'" );
 	    return;
@@ -74,7 +75,7 @@ void test_stream()
 	test_io( "[[[0 1] [2 3]] [[4 5] [6 7]]]", flat, "[[[0 1] 2 3] [4 5] 6 7]" );
 	test_io( "[[[0 1] 2 3] [4 5] 6 7]", flat );
 
-	test_io_error( "[", "Unexpected end of input" );
+	test_io_error<EOS>( "[", "Unexpected end of input" );
 	test_io_error( "]", "Unexpected ']'" );
 	test_io_error( "[0]", "Unexpected singleton" );
 	test_io_error( "[[0] 2]", "Unexpected singleton" );

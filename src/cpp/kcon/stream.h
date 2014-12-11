@@ -6,6 +6,8 @@
 #include <ostream>
 #include <istream>
 
+struct EOS {};
+
 class kostream
 {
 	std::ostream& _os;

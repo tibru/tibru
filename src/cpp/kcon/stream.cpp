@@ -158,7 +158,7 @@ pcell_t kistream::_parse_elems()
 			throw Error<Syntax>( "Unexpected '"s + c + "'" );
 	}
 
-	throw Error<Syntax>( "Unexpected end of input" );
+	throw Error<Syntax,EOS>( "Unexpected end of input" );
 }
 
 pcell_t kistream::_reverse_and_reduce( pcell_t pcell )
