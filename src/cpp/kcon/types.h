@@ -12,9 +12,9 @@ const slot_t ADDR_MASK = ~TAG_MASK;
 const slot_t TAIL_MASK = 1;
 const slot_t HEAD_MASK = 2;
 const slot_t TYPE_MASK = HEAD_MASK | TAIL_MASK;
-const slot_t MARK_ADDR_BIT = 1 << 2;
-const slot_t MARK_BYTE_BIT = 1 << 8;
-const slot_t MARK_MASK = MARK_BYTE_BIT | MARK_ADDR_BIT;
+//const slot_t MARK_ADDR_BIT = 1 << 2;
+//const slot_t MARK_BYTE_BIT = 1 << 8;
+//const slot_t MARK_MASK = MARK_BYTE_BIT | MARK_ADDR_BIT;
 
 ASSERT( sizeof(slot_t) == sizeof(void*) );
 
