@@ -34,3 +34,5 @@ obj/
 .c4droid
 *.depend
 *.layout
+*.cbTemp
+*.c

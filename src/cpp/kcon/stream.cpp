@@ -62,8 +62,6 @@ void kostream::_format( pcell_t pcell )
         }
         else
         {
-            assert( !tail.elem.pcell.is_null(), "Null tail whilst printing" );
-
             switch( tail.elem.pcell.typecode() )
             {
                 case Cell<pcell_t,pcell_t>::TYPECODE:
@@ -169,23 +167,23 @@ pcell_t kistream::_reverse_and_reduce( pcell_t pcell )
 	std::stack<elem_t> tails;
 	std::stack<pcell_t> pcells;
 
-    while( !pcell.is_null() || !pcells.empty() )
+    while( !(pcell.is_null() && pcells.empty()) )
     {
         if( pcell.is_null() )
         {
         	assert( tail.is_cell, "Expected recursive cell tail" );
 
-            pcell_t rhead = tail.pcell;
+            pcell_t head = tail.pcell;
 
             pcell = pcells.top(); pcells.pop();
             tail = tails.top(); tails.pop();
 
 			if( tail.is_null() )
-				tail = rhead;
+				tail = head;
 			else if( !tail.is_cell )
-				tail = new (_alloc) Cell<pcell_t,value_t>{ rhead, tail.value };
+				tail = new (_alloc) Cell<pcell_t,value_t>{ head, tail.value };
 			else
-            	tail = new (_alloc) Cell<pcell_t,pcell_t>{ rhead, tail.pcell };
+            	tail = new (_alloc) Cell<pcell_t,pcell_t>{ head, tail.pcell };
         }
         else
         {
@@ -200,7 +198,6 @@ pcell_t kistream::_reverse_and_reduce( pcell_t pcell )
 
                     pcell = p->head;
                     tail = pcell_t::null();
-
                     break;
                 }
                 case Cell<value_t,pcell_t>::TYPECODE:
@@ -217,7 +214,6 @@ pcell_t kistream::_reverse_and_reduce( pcell_t pcell )
                         tail = new (_alloc) Cell<value_t,pcell_t>{ value, tail.pcell };
 
                     pcell = p->tail;
-
                     break;
                 }
                 default:
@@ -228,7 +224,7 @@ pcell_t kistream::_reverse_and_reduce( pcell_t pcell )
 
     assert( tails.empty(), "Cell and tail stack mismatch" );
 
-	return tail.pcell;	//check
+	return tail.pcell;
 }
 
 elem_t kistream::_parse()
