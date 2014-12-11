@@ -17,10 +17,10 @@ void test_ostream()
 	auto expected_flat = "[0 [3 3] 2]";
 	test( oss_flat.str() == expected_flat, "Incorrect flat printing found '" + oss_flat.str() + "'\nExpected '" + expected_flat + "'" );
 
-	/*std::ostringstream oss_deep;
+	std::ostringstream oss_deep;
 	kostream( oss_deep ) << deep << p;
 	auto expected_deep = "[0 [[3 3] 2]]";
-	test( oss_deep.str() == expected_deep, "Incorrect deep printing found '" + oss_deep.str() + "'\nExpected '" + expected_deep + "'" );*/
+	test( oss_deep.str() == expected_deep, "Incorrect deep printing found '" + oss_deep.str() + "'\nExpected '" + expected_deep + "'" );
 }
 
 void test_io( const std::string& in, kostream::Manip m=flat, std::string out="" )
@@ -65,9 +65,10 @@ void test_stream()
     test_io( " 3 ", flat, "3" );
 	test_io( "[0 [1 2]]", flat, "[0 1 2]" );
 	test_io( " [ 0 [ 1\n 2]\t]\t", flat, "[0 1 2]" );
-	//test_io( "[0 1 2]", deep, "[0 [1 2]]" );
+	test_io( "[0 1 2]", deep, "[0 [1 2]]" );
 	test_io( "[0 [1 [2 3] 4] 5 6]", flat );
-	//test_io( "[0 [1 [2 3] 4] 5 6]", deep, "[0 [[1 [[2 3] 4]] [5 6]]]" );
+	test_io( "[0 [1 [2 3] 4] 5 6]", deep, "[0 [[1 [[2 3] 4]] [5 6]]]" );
+	//test_io( "[[0 0] 0]", deep );
 
 	test_io_error( "[", "Unexpected end of input" );
 	test_io_error( "]", "Unexpected ']'" );

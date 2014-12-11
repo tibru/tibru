@@ -50,66 +50,81 @@ void kostream::_format( const Cell<value_t,pcell_t>* pcell )
 
 void kostream::_format( const Cell<value_t,value_t>* pcell )
 {
-	assert( false, "" );
+	_os << pcell->head << ' ' << pcell->tail;
 }
+
+struct Tail
+{
+    elem_t elem;
+    size_t len;
+
+    Tail( elem_t elem, size_t len )
+        : elem( elem ), len( len ) {}
+};
 
 void kostream::_format( pcell_t pcell )
 {
-    std::stack<elem_t> tails;
-    elem_t tail = pcell;
+    std::stack<Tail > tails;
+    Tail tail( pcell, 0 );
 
     while( true )
     {
-        if( !tail.is_cell )
+        if( !tail.elem.is_cell )
         {
-            _os << tail.value;
-            //if( !_flatten ) _os << ']';
+            _os << tail.elem.value;
+
+            if( !_flatten )
+                for( size_t l = tail.len; l != 0; --l )
+                    _os << ']';
 
             if( tails.empty() )
                 return;
 
             _os << "] ";
-            tail = tails.top(); tails.pop();
+            tail = tails.top();
+            tails.pop();
+
+            if( !_flatten && tail.elem.is_cell) _os << '[';
         }
         else
         {
-            assert( !tail.pcell.is_null(), "Null tail whilst printing" );
+            assert( !tail.elem.pcell.is_null(), "Null tail whilst printing" );
 
-            switch( tail.pcell.typecode() )
+            switch( tail.elem.pcell.typecode() )
             {
                 case Cell<pcell_t,pcell_t>::TYPECODE:
                 {
-                    auto p = tail.pcell.cast<pcell_t,pcell_t>();
-                    tails.push( p->tail );
+                    auto p = tail.elem.pcell.cast<pcell_t,pcell_t>();
+                    tails.push( Tail( p->tail, tail.len + 1 ) );
 
                     _os << '[';
-                    tail = p->head;
+                    tail = Tail( p->head, 0 );
                     break;
                 }
                 case Cell<pcell_t,value_t>::TYPECODE:
                 {
-                    auto p = tail.pcell.cast<pcell_t,value_t>();
-                    tails.push( p->tail );
+                    auto p = tail.elem.pcell.cast<pcell_t,value_t>();
+                    tails.push( Tail( p->tail, tail.len ) );
 
                     _os << '[';
-                    tail = p->head;
+                    tail = Tail( p->head, 0 );
                     break;
                 }
                 case Cell<value_t,pcell_t>::TYPECODE:
                 {
-                    auto p = tail.pcell.cast<value_t,pcell_t>();
+                    auto p = tail.elem.pcell.cast<value_t,pcell_t>();
 
                     _os << p->head << ' ';
-                    tail = p->tail;
+                    tail = Tail( p->tail, tail.len + 1 );
+                    if( !_flatten ) _os << '[';
                     break;
                 }
                 case Cell<value_t,value_t>::TYPECODE:
                 {
-                    auto p = tail.pcell.cast<value_t,value_t>();
+                    auto p = tail.elem.pcell.cast<value_t,value_t>();
 
-                    //if( !_flatten ) _os << '[';
                     _os << p->head << ' ';
-                    tail = p->tail;
+                    tail = Tail( p->tail, tail.len );
                     break;
                 }
                 default:
