@@ -69,9 +69,12 @@ void kostream::_format( pcell_t pcell )
 
     while( true )
     {
-        if( !tail.elem.is_cell )
+        if( !tail.elem.is_cell || tail.elem.is_null() )
         {
-            _os << tail.elem.value;
+            if( tail.elem.is_null() )
+                _os << "<null>";
+            else
+                _os << tail.elem.value;
 
             if( !_flatten )
                 for( size_t l = tail.len; l != 0; --l )

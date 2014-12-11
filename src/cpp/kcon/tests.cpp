@@ -23,7 +23,7 @@ void test_ostream()
 	test( oss_deep.str() == expected_deep, "Incorrect deep printing found '" + oss_deep.str() + "'\nExpected '" + expected_deep + "'" );
 }
 
-void test_io( const std::string& in, kostream::Manip m=flat, std::string out="" )
+void test_io( const std::string& in, kostream::KManip m=flat, std::string out="" )
 {
 	if( out.empty() )
 		out = in;

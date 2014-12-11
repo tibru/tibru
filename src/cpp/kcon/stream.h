@@ -34,11 +34,19 @@ public:
         return *this;
     }
 
-    typedef kostream& (*Manip)( kostream& );
+    typedef kostream& (*KManip)( kostream& );
+
+    kostream& operator<<( KManip m )
+    {
+        return m(*this);
+    }
+
+    typedef std::ostream& (*Manip)( std::ostream& );
 
     kostream& operator<<( Manip m )
     {
-        return m(*this);
+        m(_os);
+        return *this;
     }
 };
 
