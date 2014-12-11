@@ -23,36 +23,6 @@ kostream& kostream::operator<<( elem_t elem )
         return kostream::operator<<( elem.value );
 }
 
-void kostream::_format( const Cell<pcell_t,pcell_t>* pcell )
-{
-	_os << '[';
-	_format( pcell->head );
-	_os << "] ";
-	if( !_flatten ) _os << '[';
-	_format( pcell->tail );
-	if( !_flatten ) _os << ']';
-}
-
-void kostream::_format( const Cell<pcell_t,value_t>* pcell )
-{
-	_os << '[';
-	_format( pcell->head );
-	_os << "] " << pcell->tail;
-}
-
-void kostream::_format( const Cell<value_t,pcell_t>* pcell )
-{
-	_os << pcell->head << ' ';
-	if( !_flatten ) _os << '[';
-	_format( pcell->tail );
-	if( !_flatten ) _os << ']';
-}
-
-void kostream::_format( const Cell<value_t,value_t>* pcell )
-{
-	_os << pcell->head << ' ' << pcell->tail;
-}
-
 struct Tail
 {
     elem_t elem;
@@ -74,7 +44,7 @@ void kostream::_format( pcell_t pcell )
             if( tail.elem.is_null() )
                 _os << "<null>";
             else
-                _os << tail.elem.value;
+                _format( tail.elem.value );
 
             if( !_flatten )
                 for( size_t l = tail.len; l != 0; --l )

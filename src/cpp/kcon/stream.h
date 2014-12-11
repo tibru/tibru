@@ -11,10 +11,6 @@ class kostream
 	std::ostream& _os;
 	bool _flatten;
 
-	void _format( const Cell<pcell_t,pcell_t>* pcell );
-	void _format( const Cell<pcell_t,value_t>* pcell );
-	void _format( const Cell<value_t,pcell_t>* pcell );
-	void _format( const Cell<value_t,value_t>* pcell );
 	void _format( pcell_t pcell );
 	void _format( value_t value );
 public:
