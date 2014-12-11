@@ -68,7 +68,11 @@ void test_stream()
 	test_io( "[0 1 2]", deep, "[0 [1 2]]" );
 	test_io( "[0 [1 [2 3] 4] 5 6]", flat );
 	test_io( "[0 [1 [2 3] 4] 5 6]", deep, "[0 [[1 [[2 3] 4]] [5 6]]]" );
-	//test_io( "[[0 0] 0]", deep );
+	test_io( "[[0 1] 2]", deep );
+	test_io( "[[0 1] 2]", flat );
+	test_io( "[[[0 1] [2 3]] [[4 5] [6 7]]]", deep );
+	test_io( "[[[0 1] [2 3]] [[4 5] [6 7]]]", flat, "[[[0 1] 2 3] [4 5] 6 7]" );
+	test_io( "[[[0 1] 2 3] [4 5] 6 7]", flat );
 
 	test_io_error( "[", "Unexpected end of input" );
 	test_io_error( "]", "Unexpected ']'" );

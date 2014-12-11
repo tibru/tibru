@@ -1,22 +1,25 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
 	<ActiveTarget name="Release" />
-	<File name="kcon/Parser.cpp" open="1" top="0" tabpos="4">
-		<Cursor position="1771" topLine="73" />
+	<File name="kcon/common.h" open="1" top="0" tabpos="2">
+		<Cursor position="444" topLine="0" />
 	</File>
-	<File name="kcon/Parser.h" open="1" top="0" tabpos="5">
-		<Cursor position="276" topLine="0" />
+	<File name="kcon/kcon.cpp" open="0" top="0" tabpos="1">
+		<Cursor position="39" topLine="0" />
 	</File>
-	<File name="kcon/kcon.cpp" open="1" top="0" tabpos="1">
-		<Cursor position="453" topLine="0" />
+	<File name="kcon/stream.cpp" open="1" top="0" tabpos="4">
+		<Cursor position="4432" topLine="188" />
 	</File>
-	<File name="kcon/stream.cpp" open="1" top="1" tabpos="2">
-		<Cursor position="1264" topLine="37" />
+	<File name="kcon/stream.h" open="1" top="1" tabpos="1">
+		<Cursor position="1226" topLine="43" />
 	</File>
-	<File name="kcon/stream.h" open="1" top="0" tabpos="3">
-		<Cursor position="483" topLine="21" />
+	<File name="kcon/tests.cpp" open="1" top="0" tabpos="5">
+		<Cursor position="741" topLine="0" />
 	</File>
-	<File name="kcon/types.h" open="1" top="0" tabpos="6">
-		<Cursor position="2631" topLine="109" />
+	<File name="kcon/tests.h" open="0" top="0" tabpos="9">
+		<Cursor position="82" topLine="0" />
+	</File>
+	<File name="kcon/types.h" open="1" top="0" tabpos="3">
+		<Cursor position="2134" topLine="86" />
 	</File>
 </CodeBlocks_layout_file>

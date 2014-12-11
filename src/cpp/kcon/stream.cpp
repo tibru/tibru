@@ -32,6 +32,7 @@ struct Tail
         : elem( elem ), len( len ) {}
 };
 
+//complicated but avoids recursion on c-stack
 void kostream::_format( pcell_t pcell )
 {
     std::stack<Tail > tails;
@@ -186,39 +187,42 @@ pcell_t kistream::_reverse_and_reduce( pcell_t pcell )
 			else
             	tail = new (_alloc) Cell<pcell_t,pcell_t>{ rhead, tail.pcell };
         }
-
-        switch( pcell.typecode() )
+        else
         {
-            case Cell<pcell_t,pcell_t>::TYPECODE:
+            switch( pcell.typecode() )
             {
-                const Cell<pcell_t,pcell_t>* pcc = pcell.cast<pcell_t,pcell_t>();
+                case Cell<pcell_t,pcell_t>::TYPECODE:
+                {
+                    auto p = pcell.cast<pcell_t,pcell_t>();
 
-                pcells.push( pcc->tail );
-                tails.push( tail );
+                    pcells.push( p->tail );
+                    tails.push( tail );
 
-                pcell = pcc->head;
-                tail = pcell_t::null();
-                break;
+                    pcell = p->head;
+                    tail = pcell_t::null();
+
+                    break;
+                }
+                case Cell<value_t,pcell_t>::TYPECODE:
+                {
+                    auto* p = pcell.cast<value_t,pcell_t>();
+
+                    const value_t value = p->head;
+
+                    if( tail.is_null() )
+                        tail = value;
+                    else if( !tail.is_cell )
+                        tail = new (_alloc) Cell<value_t,value_t>{ value, tail.value };
+                    else
+                        tail = new (_alloc) Cell<value_t,pcell_t>{ value, tail.pcell };
+
+                    pcell = p->tail;
+
+                    break;
+                }
+                default:
+                    assert( false, "Dispatch failed in reverse and reduce" );
             }
-            case Cell<value_t,pcell_t>::TYPECODE:
-            {
-                const Cell<value_t,pcell_t>* pvc = pcell.cast<value_t,pcell_t>();
-
-				const value_t value = pvc->head;
-
-				if( tail.is_null() )
-					tail = value;
-				else if( !tail.is_cell )
-					tail = new (_alloc) Cell<value_t,value_t>{ value, tail.value };
-				else
-					tail = new (_alloc) Cell<value_t,pcell_t>{ value, tail.pcell };
-
-                pcell = pvc->tail;
-
-                break;
-            }
-            default:
-                assert( false, "Dispatch failed in reverse and reduce" );
         }
     }
 
