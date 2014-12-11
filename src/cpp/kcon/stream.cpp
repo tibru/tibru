@@ -50,34 +50,73 @@ void kostream::_format( const Cell<value_t,pcell_t>* pcell )
 
 void kostream::_format( const Cell<value_t,value_t>* pcell )
 {
-	_os << pcell->head << ' ' << pcell->tail;
+	assert( false, "" );
 }
 
 void kostream::_format( pcell_t pcell )
 {
-	if( pcell.is_null() )
-	{
-		_os << "null";
-		return;
-	}
+    std::stack<elem_t> tails;
+    elem_t tail = pcell;
 
-	switch( pcell.typecode() )
-	{
-		case Cell<pcell_t,pcell_t>::TYPECODE:
-			_format( pcell.cast<pcell_t,pcell_t>() );
-			break;
-		case Cell<pcell_t,value_t>::TYPECODE:
-			_format( pcell.cast<pcell_t,value_t>() );
-			break;
-		case Cell<value_t,pcell_t>::TYPECODE:
-			_format( pcell.cast<value_t,pcell_t>() );
-			break;
-		case Cell<value_t,value_t>::TYPECODE:
-			_format( pcell.cast<value_t,value_t>() );
-			break;
-		default:
-			throw Error<Runtime>( "format dispatch failed" );
-	}
+    while( true )
+    {
+        if( !tail.is_cell )
+        {
+            _os << tail.value;
+            //if( !_flatten ) _os << ']';
+
+            if( tails.empty() )
+                return;
+
+            _os << "] ";
+            tail = tails.top(); tails.pop();
+        }
+        else
+        {
+            assert( !tail.pcell.is_null(), "Null tail whilst printing" );
+
+            switch( tail.pcell.typecode() )
+            {
+                case Cell<pcell_t,pcell_t>::TYPECODE:
+                {
+                    auto p = tail.pcell.cast<pcell_t,pcell_t>();
+                    tails.push( p->tail );
+
+                    _os << '[';
+                    tail = p->head;
+                    break;
+                }
+                case Cell<pcell_t,value_t>::TYPECODE:
+                {
+                    auto p = tail.pcell.cast<pcell_t,value_t>();
+                    tails.push( p->tail );
+
+                    _os << '[';
+                    tail = p->head;
+                    break;
+                }
+                case Cell<value_t,pcell_t>::TYPECODE:
+                {
+                    auto p = tail.pcell.cast<value_t,pcell_t>();
+
+                    _os << p->head << ' ';
+                    tail = p->tail;
+                    break;
+                }
+                case Cell<value_t,value_t>::TYPECODE:
+                {
+                    auto p = tail.pcell.cast<value_t,value_t>();
+
+                    //if( !_flatten ) _os << '[';
+                    _os << p->head << ' ';
+                    tail = p->tail;
+                    break;
+                }
+                default:
+                    throw Error<Runtime>( "format dispatch failed" );
+            }
+        }
+    }
 }
 
 void kostream::_format( value_t value )
