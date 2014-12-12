@@ -3,6 +3,8 @@
 #include "stream.h"
 #include <sstream>
 
+namespace kcon {
+
 void test_ostream()
 {
 	SimpleAllocator a( 1024 );
@@ -145,3 +147,5 @@ void run_tests()
 	test_ostream();
 	test_gc<SimpleAllocator>();
 }
+
+}	//namespace

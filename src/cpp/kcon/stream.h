@@ -7,6 +7,8 @@
 #include <istream>
 #include <sstream>
 
+namespace kcon {
+
 struct EOS {};
 
 class kostream
@@ -83,5 +85,7 @@ elem_t parse( Alloc& allocator, const std::string& in )
     kistream( iss, allocator ) >> elem;
     return elem;
 }
+
+}	//namespace
 
 #endif

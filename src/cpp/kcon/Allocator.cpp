@@ -1,5 +1,7 @@
 #include "Allocator.h"
 
+using namespace kcon;
+
 void SimpleAllocator::_mark( std::set<void*>& live, pcell_t pcell )
 {
     if( live.find( pcell.addr() ) != live.end() )

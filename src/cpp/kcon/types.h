@@ -4,6 +4,8 @@
 #include <cstdint>
 #include "common.h"
 
+namespace kcon {
+
 template<class T> struct Tag;
 
 typedef uintptr_t slot_t;
@@ -146,5 +148,7 @@ inline bool is_singleton( pcell_t p )
 {
     return !p.is_null() && tail( p ).is_null();
 }
+
+}	//namespace
 
 #endif

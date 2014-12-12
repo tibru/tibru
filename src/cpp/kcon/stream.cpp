@@ -1,6 +1,8 @@
 #include "stream.h"
 #include <stack>
 
+using namespace kcon;
+
 kostream& kostream::operator<<( pcell_t pcell )
 {
 	_os << '[';

@@ -5,6 +5,8 @@
 #include <string>
 #include <iostream>
 
+namespace kcon {
+	
 using namespace std::string_literals;
 
 struct AnyType {};
@@ -66,5 +68,7 @@ struct assert_test {};
 #define APPLY(fn,x,y) fn(x,y)
 #define CONCAT(x,y) x##y
 #define ASSERT( cond ) typedef assert_test< sizeof( ASSERT_FAILED< ( cond ) > ) > APPLY( CONCAT, assert_test_type, __COUNTER__ )
+
+}	//namespace
 
 #endif

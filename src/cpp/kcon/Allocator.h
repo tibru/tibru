@@ -7,6 +7,8 @@
 #include <initializer_list>
 #include <set>
 
+namespace kcon {
+	
 struct OutOfMemory {};
 
 class FreeCell
@@ -67,13 +69,15 @@ public:
     }
 };
 
-inline void* operator new( size_t size, SimpleAllocator& allocator, const std::initializer_list<pcell_t*>& roots={} )
+typedef SimpleAllocator Allocator;
+
+}	//namespace
+
+inline void* operator new( size_t size, kcon::SimpleAllocator& allocator, const std::initializer_list<kcon::pcell_t*>& roots={} )
 {
-    assert( size == sizeof(Cell<slot_t,slot_t>), "SimpleAllocator can only allocate cells of a fixed size" );
+    kcon::assert( size == sizeof(kcon::Cell<kcon::slot_t,kcon::slot_t>), "SimpleAllocator can only allocate cells of a fixed size" );
 
 	return allocator.allocate( roots );
 }
-
-typedef SimpleAllocator Allocator;
 
 #endif
