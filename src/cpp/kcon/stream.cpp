@@ -17,7 +17,7 @@ kostream& kostream::operator<<( value_t value )
 
 kostream& kostream::operator<<( elem_t elem )
 {
-    if( elem.is_cell )
+    if( elem.is_cell() )
         return kostream::operator<<( elem.pcell );
     else
         return kostream::operator<<( elem.value );
@@ -37,7 +37,7 @@ void kostream::_format( pcell_t pcell )
 
     while( true )
     {
-        if( !tail.elem.is_cell || tail.elem.is_null() )
+        if( !tail.elem.is_cell() || tail.elem.is_null() )
         {
             if( tail.elem.is_null() )
                 _os << "<null>";
@@ -55,7 +55,7 @@ void kostream::_format( pcell_t pcell )
             tail = tails.top();
             tails.pop();
 
-            if( !_flatten && tail.elem.is_cell) _os << '[';
+            if( !_flatten && tail.elem.is_cell()) _os << '[';
         }
         else
         {
@@ -168,7 +168,7 @@ pcell_t kistream::_reverse_and_reduce( pcell_t pcell )
     {
         if( pcell.is_null() )
         {
-        	assert( tail.is_cell, "Expected recursive cell tail" );
+        	assert( tail.is_cell(), "Expected recursive cell tail" );
 
             pcell_t head = tail.pcell;
 
@@ -177,7 +177,7 @@ pcell_t kistream::_reverse_and_reduce( pcell_t pcell )
 
 			if( tail.is_null() )
 				tail = head;
-			else if( !tail.is_cell )
+			else if( !tail.is_cell() )
 				tail = new (_alloc) Cell<pcell_t,value_t>{ head, tail.value };
 			else
             	tail = new (_alloc) Cell<pcell_t,pcell_t>{ head, tail.pcell };
@@ -205,7 +205,7 @@ pcell_t kistream::_reverse_and_reduce( pcell_t pcell )
 
                     if( tail.is_null() )
                         tail = value;
-                    else if( !tail.is_cell )
+                    else if( !tail.is_cell() )
                         tail = new (_alloc) Cell<value_t,value_t>{ value, tail.value };
                     else
                         tail = new (_alloc) Cell<value_t,pcell_t>{ value, tail.pcell };

@@ -78,26 +78,28 @@ ASSERT( sizeof(value_t) == sizeof(slot_t) );
 template<> struct Tag<pcell_t> { enum { CODE = 0 }; };
 template<> struct Tag<value_t> { enum { CODE = 1 }; };
 
-struct elem_t
+class elem_t
 {
+    bool _is_cell;
+public:
 	union
 	{
 		value_t value;
 		pcell_t pcell;
 	};
-	bool is_cell;
 
 	elem_t( value_t v )
-		: value( v ), is_cell( false ) {}
+		: _is_cell( false ), value( v ) {}
 
 	elem_t( pcell_t p=pcell_t::null() )
-		: pcell( p ), is_cell( true ) {}
+		: _is_cell( true ), pcell( p ) {}
 
 	template<class H,class T>
 	elem_t( const Cell<H,T>* p )
-		: pcell( p ), is_cell( true ) {}
+		: _is_cell( true ), pcell( p ) {}
 
-	bool is_null() const { return is_cell && pcell.is_null(); }
+	bool is_cell() const { return _is_cell; }
+	bool is_null() const { return is_cell() && pcell.is_null(); }
 };
 
 inline elem_t head( pcell_t pcell )
