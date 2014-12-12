@@ -37,7 +37,7 @@ void kostream::_format( pcell_t pcell )
 
     while( true )
     {
-        if( !tail.elem.is_cell() || tail.elem.is_null() )
+        if( tail.elem.is_byte() || tail.elem.is_null() )
         {
             if( tail.elem.is_null() )
                 _os << "<null>";
@@ -177,7 +177,7 @@ pcell_t kistream::_reverse_and_reduce( pcell_t pcell )
 
 			if( tail.is_null() )
 				tail = head;
-			else if( !tail.is_cell() )
+			else if( tail.is_byte() )
 				tail = new (_alloc) Cell<pcell_t,value_t>{ head, tail.byte_value() };
 			else
             	tail = new (_alloc) Cell<pcell_t,pcell_t>{ head, tail.pcell() };
@@ -205,7 +205,7 @@ pcell_t kistream::_reverse_and_reduce( pcell_t pcell )
 
                     if( tail.is_null() )
                         tail = value;
-                    else if( !tail.is_cell() )
+                    else if( tail.is_byte() )
                         tail = new (_alloc) Cell<value_t,value_t>{ value, tail.byte_value() };
                     else
                         tail = new (_alloc) Cell<value_t,pcell_t>{ value, tail.pcell() };

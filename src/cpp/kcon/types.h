@@ -103,6 +103,7 @@ public:
     byte_t byte_value() const { return _value; }
 
 	bool is_cell() const { return _is_cell; }
+	bool is_byte() const { return !_is_cell; }
 	bool is_null() const { return is_cell() && pcell().is_null(); }
 };
 
