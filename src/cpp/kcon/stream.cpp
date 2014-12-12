@@ -27,16 +27,13 @@ struct Tail
 {
     elem_t elem;
     size_t len;
-
-    Tail( elem_t elem, size_t len )
-        : elem( elem ), len( len ) {}
 };
 
 //complicated but avoids recursion on c-stack
 void kostream::_format( pcell_t pcell )
 {
     std::stack<Tail > tails;
-    Tail tail( pcell, 0 );
+    Tail tail{ pcell, 0 };
 
     while( true )
     {
@@ -67,19 +64,19 @@ void kostream::_format( pcell_t pcell )
                 case Cell<pcell_t,pcell_t>::TYPECODE:
                 {
                     auto p = tail.elem.pcell.cast<pcell_t,pcell_t>();
-                    tails.push( Tail( p->tail, tail.len + 1 ) );
+                    tails.push( Tail{ p->tail, tail.len + 1 } );
 
                     _os << '[';
-                    tail = Tail( p->head, 0 );
+                    tail = Tail{ p->head, 0 };
                     break;
                 }
                 case Cell<pcell_t,value_t>::TYPECODE:
                 {
                     auto p = tail.elem.pcell.cast<pcell_t,value_t>();
-                    tails.push( Tail( p->tail, tail.len ) );
+                    tails.push( Tail{ p->tail, tail.len } );
 
                     _os << '[';
-                    tail = Tail( p->head, 0 );
+                    tail = Tail{ p->head, 0 };
                     break;
                 }
                 case Cell<value_t,pcell_t>::TYPECODE:
@@ -87,7 +84,7 @@ void kostream::_format( pcell_t pcell )
                     auto p = tail.elem.pcell.cast<value_t,pcell_t>();
 
                     _os << p->head << ' ';
-                    tail = Tail( p->tail, tail.len + 1 );
+                    tail = Tail{ p->tail, tail.len + 1 };
                     if( !_flatten ) _os << '[';
                     break;
                 }
@@ -96,7 +93,7 @@ void kostream::_format( pcell_t pcell )
                     auto p = tail.elem.pcell.cast<value_t,value_t>();
 
                     _os << p->head << ' ';
-                    tail = Tail( p->tail, tail.len );
+                    tail = Tail{ p->tail, tail.len };
                     break;
                 }
                 default:
