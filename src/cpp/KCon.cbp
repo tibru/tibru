@@ -24,6 +24,7 @@
 			<Add option="-Wall" />
 			<Add option="-fexceptions" />
 		</Compiler>
+		<Unit filename="kcon/Allocator.cpp" />
 		<Unit filename="kcon/Allocator.h" />
 		<Unit filename="kcon/common.h" />
 		<Unit filename="kcon/kcon.cpp" />

@@ -8,10 +8,20 @@
 
 struct OutOfMemory {};
 
-struct FreeCell
+class FreeCell
 {
-    FreeCell* next;
-    slot_t blank;
+    value_t _salt;
+    FreeCell* _next;
+
+    static FreeCell* _hash( value_t salt, FreeCell* p )
+    {
+        return reinterpret_cast<FreeCell*>( reinterpret_cast<uintptr_t>( p ) ^ salt );
+    }
+public:
+    FreeCell( FreeCell* next=0 )
+        : _salt( rand() & ADDR_MASK ), _next( _hash( _salt, next ) ) {}
+
+    FreeCell* next() const { return _hash( _salt, _next ); }
 };
 
 ASSERT( sizeof(FreeCell) == sizeof(Cell<slot_t,slot_t>) );
@@ -42,14 +52,14 @@ public:
             gc( roots );
 
         void* p = _free_list;
-        _free_list = _free_list->next;
+        _free_list = _free_list->next();
         return p;
     }
 
     size_t num_allocated() const
     {
         size_t n = _ncells;
-        for( const FreeCell* p = _free_list; p != 0; p = p->next )
+        for( const FreeCell* p = _free_list; p != 0; p = p->next() )
             --n;
 
         return n;

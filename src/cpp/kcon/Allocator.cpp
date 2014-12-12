@@ -50,7 +50,7 @@ void SimpleAllocator::gc( const std::initializer_list<pcell_t*>& roots )
     {
         void* p = &_page[i];
         if( live.find( p ) == live.end() )
-            _free_list = new (p) FreeCell{ _free_list, 0 };
+            _free_list = new (p) FreeCell( _free_list );
     }
 
     if( _free_list == 0 )
