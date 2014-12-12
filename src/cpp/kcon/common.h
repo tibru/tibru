@@ -43,10 +43,15 @@ inline void assert( bool cond, const std::string& msg )
 		throw Error<Assertion>( msg );
 }
 
+inline void fail( const std::string& msg )
+{
+	throw Error<Test>( msg );
+}
+
 inline void test( bool cond, const std::string& msg )
 {
 	if( !cond )
-		throw Error<Test>( msg );
+		fail( msg );
 }
 
 template<bool>

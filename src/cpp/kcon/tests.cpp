@@ -83,8 +83,22 @@ void test_stream()
 	test_io_error( "[[] 2]", "Unexpected empty cell" );
 }
 
+void test_gc()
+{
+    try
+    {
+        SimpleAllocator a( 1 );
+        new (a) Cell<value_t,value_t>{0,0};
+        new (a) Cell<value_t,value_t>{0,0};
+
+        fail( "Failed to catch out of memory" );
+    }
+    catch( const Error<Runtime,OutOfMemory>& ) {}
+}
+
 void run_tests()
 {
 	test_stream();
 	test_ostream();
+	test_gc();
 }

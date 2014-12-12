@@ -4,6 +4,8 @@
 #include "types.h"
 #include <cstdint>
 
+struct OutOfMemory {};
+
 struct FreeCell
 {
     FreeCell* next;
@@ -19,7 +21,7 @@ class SimpleAllocator
 
     void _gc()
     {
-        throw Error<Runtime>( "Out of memory" );
+        throw Error<Runtime,OutOfMemory>( "Out of memory" );
     }
 public:
     SimpleAllocator( size_t ncells )
