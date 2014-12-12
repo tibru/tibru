@@ -5,7 +5,7 @@
 
 void test_ostream()
 {
-	Allocator a;
+	SimpleAllocator a( 1024 );
 	pcell_t p = new (a) Cell<value_t,pcell_t>{
 					0,
 					new (a) Cell<pcell_t,value_t>{
@@ -28,7 +28,7 @@ void test_io( const std::string& in, kostream::KManip m=flat, std::string out=""
 	if( out.empty() )
 		out = in;
 
-	Allocator a;
+	SimpleAllocator a( 1024 );
 	std::istringstream iss( in );
 	std::ostringstream oss;
 
@@ -42,7 +42,7 @@ void test_io( const std::string& in, kostream::KManip m=flat, std::string out=""
 template<class SubType=AnyType>
 void test_io_error( const std::string& in, const std::string& msg )
 {
-	Allocator a;
+	SimpleAllocator a( 1024 );
 	std::istringstream iss( in );
 	std::ostringstream oss;
 	try
