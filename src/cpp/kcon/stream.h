@@ -5,6 +5,7 @@
 #include "Allocator.h"
 #include <ostream>
 #include <istream>
+#include <sstream>
 
 struct EOS {};
 
@@ -73,5 +74,14 @@ public:
 
 	kistream& operator>>( elem_t& elem );
 };
+
+template<class Alloc>
+elem_t parse( Alloc& allocator, const std::string& in )
+{
+    std::istringstream iss( in );
+    elem_t elem;
+    kistream( iss, allocator ) >> elem;
+    return elem;
+}
 
 #endif

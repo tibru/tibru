@@ -29,12 +29,9 @@ void test_io( const std::string& in, kostream::KManip m=flat, std::string out=""
 		out = in;
 
 	SimpleAllocator a( 1024 );
-	std::istringstream iss( in );
 	std::ostringstream oss;
 
-    elem_t elem;
-    kistream( iss, a ) >> elem;
-    kostream( oss ) << m << elem;
+    kostream( oss ) << m << parse( a, in );
 
 	test( oss.str() == out, "IO failed for: '" + in + "'\nExpected: '" + out + "'\nFound:    '" + oss.str() + "'" );
 }
@@ -43,13 +40,10 @@ template<class SubType=AnyType>
 void test_io_error( const std::string& in, const std::string& msg )
 {
 	SimpleAllocator a( 1024 );
-	std::istringstream iss( in );
 	std::ostringstream oss;
 	try
 	{
-	    elem_t elem;
-	    kistream( iss, a ) >> elem;
-        kostream( oss ) << elem;
+        kostream( oss ) << parse( a, in );
 	}
 	catch( const Error<Syntax,SubType>& e )
 	{
@@ -83,22 +77,55 @@ void test_stream()
 	test_io_error( "[[] 2]", "Unexpected empty cell" );
 }
 
+template<class Allocator>
 void test_gc()
 {
     try
     {
-        SimpleAllocator a( 1 );
-        new (a) Cell<value_t,value_t>{0,0};
-        new (a) Cell<value_t,value_t>{0,0};
+        Allocator a( 1 );
+        pcell_t p = new (a) Cell<value_t,value_t>{0,0};
+        new (a,{&p}) Cell<value_t,value_t>{0,0};
 
         fail( "Failed to catch out of memory" );
     }
     catch( const Error<Runtime,OutOfMemory>& ) {}
+
+    {
+        Allocator a( 10 );
+        pcell_t p = new (a) Cell<value_t,value_t>{0,0};
+        new (a) Cell<value_t,value_t>{0,0};
+
+        assert( a.num_allocated() == 2, "Failed to register allocated cells" );
+
+        a.gc({&p});
+
+        assert( a.num_allocated() == 1, "Failed to cleanup after gc" );
+    }
+
+    {
+        Allocator a( 1024 );
+        pcell_t p = parse( a, "[0 [1 [2 3] 4] 5 6]" ).pcell();
+        pcell_t q = parse( a, "[0 [1 [2 3] 4] 5 6]" ).pcell();
+
+        a.gc({&p,&q});
+
+        assert( a.num_allocated() == 12, "Failed to hold all cells in gc" );
+    }
+
+    {
+        Allocator a( 1024 );
+        pcell_t p = parse( a, "[0 [1 [2 3] 4] 5 6]" ).pcell();
+        parse( a, "[0 [1 [2 3] 4] 5 6]" ).pcell();
+
+        a.gc({&p});
+
+        assert( a.num_allocated() == 6, "Failed to hold and cleanup all cells in gc" );
+    }
 }
 
 void run_tests()
 {
 	test_stream();
 	test_ostream();
-	test_gc();
+	test_gc<SimpleAllocator>();
 }

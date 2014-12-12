@@ -46,6 +46,7 @@ public:
 	static pcell_t null() { return pcell_t(); }
 
 	bool is_null() const { return _addr_and_type == 0; }
+    void* addr() const { return reinterpret_cast<void*>( _addr_and_type & ADDR_MASK ); }
 
 	short typecode() const
 	{
@@ -66,10 +67,10 @@ public:
 	const Cell<H,T>* cast() const
 	{
 		assert( typecode() == Cell<H,T>::TYPECODE, "Invalid cast" );
-		return reinterpret_cast<const Cell<H,T>*>( _addr_and_type & ADDR_MASK );
+		return static_cast<const Cell<H,T>*>( addr() );
 	}
 
-	void dispatch( struct CellVisitor& visitor );
+	bool operator<( pcell_t pcell ) const { return _addr_and_type < pcell._addr_and_type; }
 };
 
 typedef uintptr_t value_t;

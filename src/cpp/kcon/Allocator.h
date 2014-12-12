@@ -3,6 +3,8 @@
 
 #include "types.h"
 #include <cstdint>
+#include <initializer_list>
+#include <set>
 
 struct OutOfMemory {};
 
@@ -16,39 +18,47 @@ ASSERT( sizeof(FreeCell) == sizeof(Cell<slot_t,slot_t>) );
 
 class SimpleAllocator
 {
+    const size_t _ncells;
     FreeCell* _page;
     FreeCell* _free_list;
 
-    void _gc()
-    {
-        throw Error<Runtime,OutOfMemory>( "Out of memory" );
-    }
+    static void _mark( std::set<void*>& live, pcell_t pcell );
 public:
     SimpleAllocator( size_t ncells )
-        : _page( new FreeCell[ncells] ), _free_list( 0 )
+        : _ncells( ncells ), _page( new FreeCell[ncells] ), _free_list( 0 )
     {
-        for( size_t i = 0; i != ncells; ++i )
-            _free_list = new (&_page[i]) FreeCell{ _free_list, 0 };
+        gc({});
     }
 
-    void* allocate()
+    void gc( const std::initializer_list<pcell_t*>& roots );
+
+    void* allocate( const std::initializer_list<pcell_t*>& roots )
     {
         if( _free_list == 0 )
-            _gc();
+            gc( roots );
 
         void* p = _free_list;
         _free_list = _free_list->next;
         return p;
     }
+
+    size_t num_allocated() const
+    {
+        size_t n = _ncells;
+        for( const FreeCell* p = _free_list; p != 0; p = p->next )
+            --n;
+
+        return n;
+    }
 };
 
-typedef SimpleAllocator Allocator;
-
-inline void* operator new( size_t size, Allocator& allocator )
+inline void* operator new( size_t size, SimpleAllocator& allocator, const std::initializer_list<pcell_t*>& roots={} )
 {
-    assert( size == sizeof(Cell<slot_t,slot_t>), "Allocator can only allocate cells of a fixed size" );
+    assert( size == sizeof(Cell<slot_t,slot_t>), "SimpleAllocator can only allocate cells of a fixed size" );
 
-	return allocator.allocate();
+	return allocator.allocate( roots );
 }
+
+typedef SimpleAllocator Allocator;
 
 #endif
