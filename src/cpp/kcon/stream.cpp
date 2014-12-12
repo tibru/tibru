@@ -18,7 +18,7 @@ kostream& kostream::operator<<( byte_t value )
 kostream& kostream::operator<<( elem_t elem )
 {
     if( elem.is_cell() )
-        return kostream::operator<<( elem.pcell );
+        return kostream::operator<<( elem.pcell() );
     else
         return kostream::operator<<( elem.byte_value() );
 }
@@ -59,11 +59,11 @@ void kostream::_format( pcell_t pcell )
         }
         else
         {
-            switch( tail.elem.pcell.typecode() )
+            switch( tail.elem.pcell().typecode() )
             {
                 case Cell<pcell_t,pcell_t>::TYPECODE:
                 {
-                    auto p = tail.elem.pcell.cast<pcell_t,pcell_t>();
+                    auto p = tail.elem.pcell().cast<pcell_t,pcell_t>();
                     tails.push( Tail{ p->tail, tail.len + 1 } );
 
                     _os << '[';
@@ -72,7 +72,7 @@ void kostream::_format( pcell_t pcell )
                 }
                 case Cell<pcell_t,value_t>::TYPECODE:
                 {
-                    auto p = tail.elem.pcell.cast<pcell_t,value_t>();
+                    auto p = tail.elem.pcell().cast<pcell_t,value_t>();
                     tails.push( Tail{ p->tail, tail.len } );
 
                     _os << '[';
@@ -81,7 +81,7 @@ void kostream::_format( pcell_t pcell )
                 }
                 case Cell<value_t,pcell_t>::TYPECODE:
                 {
-                    auto p = tail.elem.pcell.cast<value_t,pcell_t>();
+                    auto p = tail.elem.pcell().cast<value_t,pcell_t>();
 
                     _os << p->head << ' ';
                     tail = Tail{ p->tail, tail.len + 1 };
@@ -90,7 +90,7 @@ void kostream::_format( pcell_t pcell )
                 }
                 case Cell<value_t,value_t>::TYPECODE:
                 {
-                    auto p = tail.elem.pcell.cast<value_t,value_t>();
+                    auto p = tail.elem.pcell().cast<value_t,value_t>();
 
                     _os << p->head << ' ';
                     tail = Tail{ p->tail, tail.len };
@@ -170,7 +170,7 @@ pcell_t kistream::_reverse_and_reduce( pcell_t pcell )
         {
         	assert( tail.is_cell(), "Expected recursive cell tail" );
 
-            pcell_t head = tail.pcell;
+            pcell_t head = tail.pcell();
 
             pcell = pcells.top(); pcells.pop();
             tail = tails.top(); tails.pop();
@@ -180,7 +180,7 @@ pcell_t kistream::_reverse_and_reduce( pcell_t pcell )
 			else if( !tail.is_cell() )
 				tail = new (_alloc) Cell<pcell_t,value_t>{ head, tail.byte_value() };
 			else
-            	tail = new (_alloc) Cell<pcell_t,pcell_t>{ head, tail.pcell };
+            	tail = new (_alloc) Cell<pcell_t,pcell_t>{ head, tail.pcell() };
         }
         else
         {
@@ -208,7 +208,7 @@ pcell_t kistream::_reverse_and_reduce( pcell_t pcell )
                     else if( !tail.is_cell() )
                         tail = new (_alloc) Cell<value_t,value_t>{ value, tail.byte_value() };
                     else
-                        tail = new (_alloc) Cell<value_t,pcell_t>{ value, tail.pcell };
+                        tail = new (_alloc) Cell<value_t,pcell_t>{ value, tail.pcell() };
 
                     pcell = p->tail;
                     break;
@@ -221,7 +221,7 @@ pcell_t kistream::_reverse_and_reduce( pcell_t pcell )
 
     assert( tails.empty(), "Cell and tail stack mismatch" );
 
-	return tail.pcell;
+	return tail.pcell();
 }
 
 elem_t kistream::_parse()

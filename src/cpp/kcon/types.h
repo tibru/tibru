@@ -83,27 +83,27 @@ template<> struct Tag<value_t> { enum { CODE = 1 }; };
 class elem_t
 {
     bool _is_cell;
-public:
 	union
 	{
 		value_t _value;
-		pcell_t pcell;
+		pcell_t _pcell;
 	};
-
+public:
 	elem_t( value_t v )
 		: _is_cell( false ), _value( v ) {}
 
 	elem_t( pcell_t p=pcell_t::null() )
-		: _is_cell( true ), pcell( p ) {}
+		: _is_cell( true ), _pcell( p ) {}
 
 	template<class H,class T>
 	elem_t( const Cell<H,T>* p )
-		: _is_cell( true ), pcell( p ) {}
+		: _is_cell( true ), _pcell( p ) {}
 
+    pcell_t pcell() const { return _pcell; }
     byte_t byte_value() const { return _value; }
 
 	bool is_cell() const { return _is_cell; }
-	bool is_null() const { return is_cell() && pcell.is_null(); }
+	bool is_null() const { return is_cell() && pcell().is_null(); }
 };
 
 inline elem_t head( pcell_t pcell )
