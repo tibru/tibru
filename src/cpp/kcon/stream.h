@@ -14,7 +14,7 @@ class kostream
 	bool _flatten;
 
 	void _format( pcell_t pcell );
-	void _format( value_t value );
+	void _format( byte_t value );
 public:
 	kostream( std::ostream& os, bool flatten=true )
 		: _os( os ), _flatten( flatten ) {}
@@ -22,7 +22,7 @@ public:
     kostream& setflatten( bool b ) { _flatten = b; return *this; }
 
 	kostream& operator<<( pcell_t pcell );
-	kostream& operator<<( value_t value );
+	kostream& operator<<( byte_t value );
 	kostream& operator<<( elem_t elem );
 
     template<class T>

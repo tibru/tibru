@@ -16,6 +16,8 @@ const slot_t TYPE_MASK = HEAD_MASK | TAIL_MASK;
 //const slot_t MARK_BYTE_BIT = 1 << 8;
 //const slot_t MARK_MASK = MARK_BYTE_BIT | MARK_ADDR_BIT;
 
+typedef uint8_t byte_t;
+
 ASSERT( sizeof(slot_t) == sizeof(void*) );
 
 template<class H, class T>
@@ -84,12 +86,12 @@ class elem_t
 public:
 	union
 	{
-		value_t value;
+		value_t _value;
 		pcell_t pcell;
 	};
 
 	elem_t( value_t v )
-		: _is_cell( false ), value( v ) {}
+		: _is_cell( false ), _value( v ) {}
 
 	elem_t( pcell_t p=pcell_t::null() )
 		: _is_cell( true ), pcell( p ) {}
@@ -97,6 +99,8 @@ public:
 	template<class H,class T>
 	elem_t( const Cell<H,T>* p )
 		: _is_cell( true ), pcell( p ) {}
+
+    byte_t byte_value() const { return _value; }
 
 	bool is_cell() const { return _is_cell; }
 	bool is_null() const { return is_cell() && pcell.is_null(); }

@@ -9,7 +9,7 @@ kostream& kostream::operator<<( pcell_t pcell )
 	return *this;
 }
 
-kostream& kostream::operator<<( value_t value )
+kostream& kostream::operator<<( byte_t value )
 {
 	_format( value );
 	return *this;
@@ -20,7 +20,7 @@ kostream& kostream::operator<<( elem_t elem )
     if( elem.is_cell() )
         return kostream::operator<<( elem.pcell );
     else
-        return kostream::operator<<( elem.value );
+        return kostream::operator<<( elem.byte_value() );
 }
 
 struct Tail
@@ -42,7 +42,7 @@ void kostream::_format( pcell_t pcell )
             if( tail.elem.is_null() )
                 _os << "<null>";
             else
-                _format( tail.elem.value );
+                _format( tail.elem.byte_value() );
 
             if( !_flatten )
                 for( size_t l = tail.len; l != 0; --l )
@@ -103,9 +103,9 @@ void kostream::_format( pcell_t pcell )
     }
 }
 
-void kostream::_format( value_t value )
+void kostream::_format( byte_t value )
 {
-    _os << value;
+    _os << short(value);
 }
 
 value_t kistream::_parse_value()
@@ -178,7 +178,7 @@ pcell_t kistream::_reverse_and_reduce( pcell_t pcell )
 			if( tail.is_null() )
 				tail = head;
 			else if( !tail.is_cell() )
-				tail = new (_alloc) Cell<pcell_t,value_t>{ head, tail.value };
+				tail = new (_alloc) Cell<pcell_t,value_t>{ head, tail.byte_value() };
 			else
             	tail = new (_alloc) Cell<pcell_t,pcell_t>{ head, tail.pcell };
         }
@@ -206,7 +206,7 @@ pcell_t kistream::_reverse_and_reduce( pcell_t pcell )
                     if( tail.is_null() )
                         tail = value;
                     else if( !tail.is_cell() )
-                        tail = new (_alloc) Cell<value_t,value_t>{ value, tail.value };
+                        tail = new (_alloc) Cell<value_t,value_t>{ value, tail.byte_value() };
                     else
                         tail = new (_alloc) Cell<value_t,pcell_t>{ value, tail.pcell };
 
