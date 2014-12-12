@@ -21,16 +21,20 @@ class SimpleAllocator
     const size_t _ncells;
     FreeCell* _page;
     FreeCell* _free_list;
+    size_t _gc_count;
 
     static void _mark( std::set<void*>& live, pcell_t pcell );
 public:
     SimpleAllocator( size_t ncells )
-        : _ncells( ncells ), _page( new FreeCell[ncells] ), _free_list( 0 )
+        : _ncells( ncells ), _page( new FreeCell[ncells] ), _free_list( 0 ), _gc_count( 0 )
     {
         gc({});
+        _gc_count = 0;
     }
 
     void gc( const std::initializer_list<pcell_t*>& roots );
+
+    size_t gc_count() const { return _gc_count; }
 
     void* allocate( const std::initializer_list<pcell_t*>& roots )
     {

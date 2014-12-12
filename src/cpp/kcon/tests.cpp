@@ -99,7 +99,7 @@ void test_gc()
 
         a.gc({&p});
 
-        assert( a.num_allocated() == 1, "Failed to cleanup after gc" );
+        assert( a.num_allocated() == 1, "Failed to cleanup after GC" );
     }
 
     {
@@ -109,7 +109,8 @@ void test_gc()
 
         a.gc({&p,&q});
 
-        assert( a.num_allocated() == 12, "Failed to hold all cells in gc" );
+        assert( a.gc_count() > 0, "GC failed to run with 2 roots" );
+        assert( a.num_allocated() == 12, "Failed to hold all cells in GC" );
     }
 
     {
@@ -119,7 +120,22 @@ void test_gc()
 
         a.gc({&p});
 
-        assert( a.num_allocated() == 6, "Failed to hold and cleanup all cells in gc" );
+        assert( a.gc_count() > 0, "GC failed to run with 1 root" );
+        assert( a.num_allocated() == 6, "Failed to hold and cleanup all cells in GC" );
+    }
+
+
+    {
+        //Test with minimal memory to create memory churn
+        Allocator a( 1024 );
+        pcell_t p = parse( a, "[0 [1 [2 3] 4] 5 6]" ).pcell();
+
+        assert( a.gc_count() == 0, "GC ran during parse" );
+        //assert( a.gc_count() == 1, "GC failed to run during parse" );
+
+        a.gc({&p});
+
+        assert( a.num_allocated() == 6, "Failed to hold and cleanup all cells in GC" );
     }
 }
 
