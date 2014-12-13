@@ -6,7 +6,7 @@
 namespace kcon {
 
 void test_ostream()
-{
+{TEST
 	SimpleAllocator a( 1024 );
 	pcell_t p = new (a) Cell<value_t,pcell_t>{
 					0,
@@ -50,14 +50,14 @@ void test_io_error( const std::string& in, const std::string& msg )
 	catch( const Error<Syntax,SubType>& e )
 	{
 	    test( e.message() == msg, "IO failed for: '" + in + "'\nExpected error: '" + msg + "'\nFound:          '" + e.message() + "'" );
-	    return;
+	    return pass();
 	}
 
 	test( false, "IO failed for: '" + in + "'\nExpected error: '" + msg + "'\nFound:    '" + oss.str() + "'" );
 }
 
 void test_stream()
-{
+{TEST
     test_io( "3" );
     test_io( " 3 ", flat, "3" );
 	test_io( "[0 [1 2]]", flat, "[0 1 2]" );
@@ -81,7 +81,7 @@ void test_stream()
 
 template<class Allocator>
 void test_gc()
-{
+{TEST
     try
     {
         Allocator a( 1 );
@@ -90,18 +90,18 @@ void test_gc()
 
         fail( "Failed to catch out of memory" );
     }
-    catch( const Error<Runtime,OutOfMemory>& ) {}
+    catch( const Error<Runtime,OutOfMemory>& ) { pass(); }
 
     {
         Allocator a( 10 );
         pcell_t p = new (a) Cell<value_t,value_t>{0,0};
         new (a) Cell<value_t,value_t>{0,0};
 
-        assert( a.num_allocated() == 2, "Failed to register allocated cells" );
+        test( a.num_allocated() == 2, "Failed to register allocated cells" );
 
         a.gc({&p});
 
-        assert( a.num_allocated() == 1, "Failed to cleanup after GC" );
+        test( a.num_allocated() == 1, "Failed to cleanup after GC" );
     }
 
     {
@@ -111,8 +111,8 @@ void test_gc()
 
         a.gc({&p,&q});
 
-        assert( a.gc_count() > 0, "GC failed to run with 2 roots" );
-        assert( a.num_allocated() == 12, "Failed to hold all cells in GC" );
+        test( a.gc_count() > 0, "GC failed to run with 2 roots" );
+        test( a.num_allocated() == 12, "Failed to hold all cells in GC" );
     }
 
     {
@@ -122,8 +122,8 @@ void test_gc()
 
         a.gc({&p});
 
-        assert( a.gc_count() > 0, "GC failed to run with 1 root" );
-        assert( a.num_allocated() == 6, "Failed to hold and cleanup all cells in GC" );
+        test( a.gc_count() > 0, "GC failed to run with 1 root" );
+        test( a.num_allocated() == 6, "Failed to hold and cleanup all cells in GC" );
     }
 
 
@@ -132,12 +132,12 @@ void test_gc()
         Allocator a( 1024 );
         pcell_t p = parse( a, "[0 [1 [2 3] 4] 5 6]" ).pcell();
 
-        assert( a.gc_count() == 0, "GC ran during parse" );
-        //assert( a.gc_count() == 1, "GC failed to run during parse" );
+        test( a.gc_count() == 0, "GC ran during parse" );
+        //test( a.gc_count() == 1, "GC failed to run during parse" );
 
         a.gc({&p});
 
-        assert( a.num_allocated() == 6, "Failed to hold and cleanup all cells in GC" );
+        test( a.num_allocated() == 6, "Failed to hold and cleanup all cells in GC" );
     }
 }
 

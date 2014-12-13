@@ -6,7 +6,7 @@
 #include <iostream>
 
 namespace kcon {
-	
+
 using namespace std::string_literals;
 
 struct AnyType {};
@@ -50,11 +50,20 @@ inline void fail( const std::string& msg )
 	throw Error<Test>( msg );
 }
 
+inline void pass()
+{
+	std::cout << '.' << std::flush;
+}
+
 inline void test( bool cond, const std::string& msg )
 {
 	if( !cond )
 		fail( msg );
+
+    pass();
 }
+
+#define TEST std::cout << "\n" << __func__ << ": " << std::flush;
 
 template<bool>
 struct ASSERT_FAILED;
