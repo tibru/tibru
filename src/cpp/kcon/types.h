@@ -73,6 +73,7 @@ public:
 	}
 
 	bool operator<( pcell_t pcell ) const { return _addr_and_type < pcell._addr_and_type; }
+	bool operator==( pcell_t pcell ) const { return _addr_and_type == pcell._addr_and_type; }
 };
 
 typedef uintptr_t value_t;

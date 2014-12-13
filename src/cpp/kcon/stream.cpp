@@ -1,4 +1,5 @@
 #include "stream.h"
+#include "kstack.h"
 #include <stack>
 
 using namespace kcon;
@@ -34,7 +35,7 @@ struct Tail
 //complicated but avoids recursion on c-stack
 void kostream::_format( pcell_t pcell )
 {
-    std::stack<Tail > tails;
+    std::stack<Tail> tails;
     Tail tail{ pcell, 0 };
 
     while( true )
@@ -122,7 +123,7 @@ value_t kistream::_parse_value()
 pcell_t kistream::_parse_elems()
 {
 	pcell_t tail = pcell_t::null();
-	std::stack<pcell_t> tails;
+	kstack<pcell_t> tails( _alloc );
 
 	char c;
 	while( _is >> c )
