@@ -50,12 +50,10 @@ public:
         if( item.is_cell() )
         {
             _pcell_items = new (_alloc,roots) Cell<pcell_t,pcell_t>{ item.pcell(), _pcell_items };
-            _value_items = new (_alloc,roots) Cell<value_t,pcell_t>{ 0, _value_items };
             _which_items = new (_alloc,roots) Cell<value_t,pcell_t>{ 0, _which_items };
         }
         else
         {
-            _pcell_items = new (_alloc,roots) Cell<pcell_t,pcell_t>{ pcell_t::null(), _pcell_items };
             _value_items = new (_alloc,roots) Cell<value_t,pcell_t>{ item.byte_value(), _value_items };
             _which_items = new (_alloc,roots) Cell<value_t,pcell_t>{ 1, _which_items };
         }
@@ -72,8 +70,12 @@ public:
 
     void pop()
     {
-        _pcell_items = _pcell_items.cast<pcell_t,pcell_t>()->tail;
-        _value_items = _value_items.cast<value_t,pcell_t>()->tail;
+        value_t w = _which_items.cast<value_t,pcell_t>()->head;
+        if( w == 0 )
+            _pcell_items = _pcell_items.cast<pcell_t,pcell_t>()->tail;
+        else
+            _value_items = _value_items.cast<value_t,pcell_t>()->tail;
+
         _which_items = _which_items.cast<value_t,pcell_t>()->tail;
     }
 
