@@ -39,7 +39,7 @@ void SimpleAllocator::_mark( std::set<void*>& live, pcell_t pcell )
     }
 }
 
-void SimpleAllocator::gc( const std::initializer_list<pcell_t*>& roots )
+void SimpleAllocator::gc( const Roots& roots )
 {
     ++_gc_count;
 

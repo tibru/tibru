@@ -8,7 +8,7 @@
 #include <set>
 
 namespace kcon {
-	
+
 struct OutOfMemory {};
 
 class FreeCell
@@ -38,6 +38,8 @@ class SimpleAllocator
 
     static void _mark( std::set<void*>& live, pcell_t pcell );
 public:
+    typedef std::initializer_list<pcell_t*> Roots;
+
     SimpleAllocator( size_t ncells )
         : _ncells( ncells ), _page( new FreeCell[ncells] ), _free_list( 0 ), _gc_count( 0 )
     {
@@ -45,11 +47,11 @@ public:
         _gc_count = 0;
     }
 
-    void gc( const std::initializer_list<pcell_t*>& roots );
+    void gc( const Roots& roots );
 
     size_t gc_count() const { return _gc_count; }
 
-    void* allocate( const std::initializer_list<pcell_t*>& roots )
+    void* allocate( const Roots& roots )
     {
         if( _free_list == 0 )
             gc( roots );
@@ -73,7 +75,7 @@ typedef SimpleAllocator Allocator;
 
 }	//namespace
 
-inline void* operator new( size_t size, kcon::SimpleAllocator& allocator, const std::initializer_list<kcon::pcell_t*>& roots={} )
+inline void* operator new( size_t size, kcon::SimpleAllocator& allocator, const kcon::SimpleAllocator::Roots& roots={} )
 {
     kcon::assert( size == sizeof(kcon::Cell<kcon::slot_t,kcon::slot_t>), "SimpleAllocator can only allocate cells of a fixed size" );
 

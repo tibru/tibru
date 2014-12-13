@@ -12,9 +12,11 @@ public:
     kstack( Allocator& alloc )
         : _alloc( alloc ), _items( pcell_t::null() ) {}
 
-    void push( const T& item )
+    pcell_t& items() { return _items; }
+
+    void push( const T& item, Allocator::Roots roots )
     {
-        _items = new (_alloc,{&_items}) Cell<T,pcell_t>{ item, _items };
+        _items = new (_alloc,roots) Cell<T,pcell_t>{ item, _items };
     }
 
     const T& top()

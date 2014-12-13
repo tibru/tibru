@@ -142,17 +142,17 @@ pcell_t kistream::_parse_elems()
 			pcell_t elems = tail;
 			tail = tails.top();
 			tails.pop();
-			tail = new (_alloc) Cell<pcell_t,pcell_t>{ elems, tail };
+			tail = new ( _alloc, {&tails.items(), &elems, &tail} ) Cell<pcell_t,pcell_t>{ elems, tail };
 		}
 		else if( c == '[' )
 		{
-			tails.push( tail );
+			tails.push( tail, {&tails.items(), &tail} );
 			tail = pcell_t::null();
 		}
 		else if( isdigit( c ) )
 		{
 			_is.putback( c );
-			tail = new (_alloc) Cell<value_t,pcell_t>{ _parse_value(), tail };
+			tail = new ( _alloc, {&tails.items(), &tail} ) Cell<value_t,pcell_t>{ _parse_value(), tail };
 		}
 		else
 			throw Error<Syntax>( "Unexpected '"s + c + "'" );
