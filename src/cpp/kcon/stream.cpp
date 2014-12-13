@@ -164,8 +164,8 @@ pcell_t kistream::_parse_elems()
 pcell_t kistream::_reverse_and_reduce( pcell_t pcell )
 {
     elem_t tail = pcell_t::null();
-	std::stack<elem_t> tails;
-	std::stack<pcell_t> pcells;
+	kstack<elem_t> tails( _alloc );
+	kstack<pcell_t> pcells( _alloc );
 
     while( !(pcell.is_null() && pcells.empty()) )
     {
@@ -181,7 +181,7 @@ pcell_t kistream::_reverse_and_reduce( pcell_t pcell )
 			if( tail.is_null() )
 				tail = head;
 			else if( tail.is_byte() )
-				tail = new (_alloc) Cell<pcell_t,value_t>{ head, tail.byte_value() };
+				tail = new ( _alloc) Cell<pcell_t,value_t>{ head, tail.byte_value() };
 			else
             	tail = new (_alloc) Cell<pcell_t,pcell_t>{ head, tail.pcell() };
         }
@@ -193,8 +193,8 @@ pcell_t kistream::_reverse_and_reduce( pcell_t pcell )
                 {
                     auto p = pcell.cast<pcell_t,pcell_t>();
 
-                    pcells.push( p->tail );
-                    tails.push( tail );
+                    pcells.push( p->tail, {&pcell, &pcells.items()} );
+                    tails.push( tail, {&pcell, &pcells.items()} );
 
                     pcell = p->head;
                     tail = pcell_t::null();
