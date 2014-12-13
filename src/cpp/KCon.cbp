@@ -28,6 +28,7 @@
 		<Unit filename="kcon/Allocator.h" />
 		<Unit filename="kcon/common.h" />
 		<Unit filename="kcon/kcon.cpp" />
+		<Unit filename="kcon/kstack.h" />
 		<Unit filename="kcon/stream.cpp" />
 		<Unit filename="kcon/stream.h" />
 		<Unit filename="kcon/tests.cpp" />
