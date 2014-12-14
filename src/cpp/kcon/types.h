@@ -28,10 +28,14 @@ struct Cell
 	const H head;
 	const T tail;
 
-	static const short TYPECODE = (Tag<H>::CODE << 1) | Tag<T>::CODE;
-
 	ASSERT( sizeof(H) == sizeof(slot_t) );
 	ASSERT( sizeof(T) == sizeof(slot_t) );
+};
+
+template<class H, class T>
+struct CellType
+{
+	static const short TYPECODE = (Tag<H>::CODE << 1) | Tag<T>::CODE;
 };
 
 class pcell_t
@@ -68,7 +72,7 @@ public:
 	template<class H, class T>
 	const Cell<H,T>* cast() const
 	{
-		assert( typecode() == Cell<H,T>::TYPECODE, "Invalid cast" );
+		assert( typecode() == CellType<H,T>::TYPECODE, "Invalid cast" );
 		return static_cast<const Cell<H,T>*>( addr() );
 	}
 
@@ -114,13 +118,13 @@ inline elem_t head( pcell_t pcell )
 {
 	switch( pcell.typecode() )
 	{
-		case Cell<pcell_t,pcell_t>::TYPECODE:
+		case CellType<pcell_t,pcell_t>::TYPECODE:
 			return pcell.cast<pcell_t,pcell_t>()->head;
-		case Cell<pcell_t,value_t>::TYPECODE:
+		case CellType<pcell_t,value_t>::TYPECODE:
 			return pcell.cast<pcell_t,value_t>()->head;
-		case Cell<value_t,pcell_t>::TYPECODE:
+		case CellType<value_t,pcell_t>::TYPECODE:
 			return pcell.cast<value_t,pcell_t>()->head;
-		case Cell<value_t,value_t>::TYPECODE:
+		case CellType<value_t,value_t>::TYPECODE:
 			return pcell.cast<value_t,value_t>()->head;
 		default:
 			throw Error<Runtime>( "head dispatch failed" );
@@ -131,13 +135,13 @@ inline elem_t tail( pcell_t pcell )
 {
 	switch( pcell.typecode() )
 	{
-		case Cell<pcell_t,pcell_t>::TYPECODE:
+		case CellType<pcell_t,pcell_t>::TYPECODE:
 			return pcell.cast<pcell_t,pcell_t>()->tail;
-		case Cell<pcell_t,value_t>::TYPECODE:
+		case CellType<pcell_t,value_t>::TYPECODE:
 			return pcell.cast<pcell_t,value_t>()->tail;
-		case Cell<value_t,pcell_t>::TYPECODE:
+		case CellType<value_t,pcell_t>::TYPECODE:
 			return pcell.cast<value_t,pcell_t>()->tail;
-		case Cell<value_t,value_t>::TYPECODE:
+		case CellType<value_t,value_t>::TYPECODE:
 			return pcell.cast<value_t,value_t>()->tail;
 		default:
 			throw Error<Runtime>( "head dispatch failed" );

@@ -64,7 +64,7 @@ void kostream::_format( pcell_t pcell )
         {
             switch( tail.elem.pcell().typecode() )
             {
-                case Cell<pcell_t,pcell_t>::TYPECODE:
+                case CellType<pcell_t,pcell_t>::TYPECODE:
                 {
                     auto p = tail.elem.pcell().cast<pcell_t,pcell_t>();
                     tails.push( Tail{ p->tail, tail.len + 1 } );
@@ -73,7 +73,7 @@ void kostream::_format( pcell_t pcell )
                     tail = Tail{ p->head, 0 };
                     break;
                 }
-                case Cell<pcell_t,value_t>::TYPECODE:
+                case CellType<pcell_t,value_t>::TYPECODE:
                 {
                     auto p = tail.elem.pcell().cast<pcell_t,value_t>();
                     tails.push( Tail{ p->tail, tail.len } );
@@ -82,7 +82,7 @@ void kostream::_format( pcell_t pcell )
                     tail = Tail{ p->head, 0 };
                     break;
                 }
-                case Cell<value_t,pcell_t>::TYPECODE:
+                case CellType<value_t,pcell_t>::TYPECODE:
                 {
                     auto p = tail.elem.pcell().cast<value_t,pcell_t>();
 
@@ -91,7 +91,7 @@ void kostream::_format( pcell_t pcell )
                     if( !_flatten ) _os << '[';
                     break;
                 }
-                case Cell<value_t,value_t>::TYPECODE:
+                case CellType<value_t,value_t>::TYPECODE:
                 {
                     auto p = tail.elem.pcell().cast<value_t,value_t>();
 
@@ -189,7 +189,7 @@ pcell_t kistream::_reverse_and_reduce( pcell_t pcell )
         {
             switch( pcell.typecode() )
             {
-                case Cell<pcell_t,pcell_t>::TYPECODE:
+                case CellType<pcell_t,pcell_t>::TYPECODE:
                 {
                     auto p = pcell.cast<pcell_t,pcell_t>();
 
@@ -200,7 +200,7 @@ pcell_t kistream::_reverse_and_reduce( pcell_t pcell )
                     tail = pcell_t::null();
                     break;
                 }
-                case Cell<value_t,pcell_t>::TYPECODE:
+                case CellType<value_t,pcell_t>::TYPECODE:
                 {
                     auto* p = pcell.cast<value_t,pcell_t>();
 
