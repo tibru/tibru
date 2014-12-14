@@ -43,6 +43,7 @@ public:
     SimpleAllocator( size_t ncells )
         : _ncells( ncells ), _page( new FreeCell[ncells] ), _free_list( 0 ), _gc_count( 0 )
     {
+        assert( reinterpret_cast<uintptr_t>(_page) % sizeof(FreeCell) == 0, "Page not cell aligned" );
         gc({});
         _gc_count = 0;
     }

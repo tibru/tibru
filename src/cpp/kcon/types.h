@@ -39,7 +39,7 @@ class pcell_t
 	uintptr_t _addr_and_type;
 
 	pcell_t()
-		: _addr_and_type( 0 ) {}
+		: _addr_and_type( 256 ) {}
 public:
 	template<class H, class T>
 	pcell_t( const Cell<H,T>* pcell )
@@ -47,7 +47,7 @@ public:
 
 	static pcell_t null() { return pcell_t(); }
 
-	bool is_null() const { return _addr_and_type == 0; }
+	bool is_null() const { return *this == pcell_t(); }
     void* addr() const { return reinterpret_cast<void*>( _addr_and_type & ADDR_MASK ); }
 
 	short typecode() const
@@ -86,28 +86,27 @@ template<> struct Tag<value_t> { enum { CODE = 1 }; };
 
 class elem_t
 {
-    bool _is_cell;
 	union
 	{
 		value_t _value;
 		pcell_t _pcell;
 	};
 public:
-	elem_t( value_t v )
-		: _is_cell( false ), _value( v ) {}
+	elem_t( byte_t b )
+		: _value( b ) {}
 
 	elem_t( pcell_t p=pcell_t::null() )
-		: _is_cell( true ), _pcell( p ) {}
+		: _pcell( p ) {}
 
 	template<class H,class T>
 	elem_t( const Cell<H,T>* p )
-		: _is_cell( true ), _pcell( p ) {}
+		: _pcell( p ) {}
 
     pcell_t pcell() const { return _pcell; }
     byte_t byte_value() const { return _value; }
 
-	bool is_cell() const { return _is_cell; }
-	bool is_byte() const { return !_is_cell; }
+	bool is_cell() const { return !is_byte(); }
+	bool is_byte() const { return _value < 256; }
 	bool is_null() const { return is_cell() && pcell().is_null(); }
 };
 
