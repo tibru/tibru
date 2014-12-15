@@ -2,32 +2,29 @@
 
 using namespace kcon;
 
-void SimpleAllocator::_mark( std::set<void*>& live, pcell_t pcell )
+void SimpleAllocator::_mark( std::set<pcell_t>& live, pcell_t p )
 {
-    if( live.find( pcell.addr() ) != live.end() )
+    if( live.find( p.addr() ) != live.end() )
         return;
 
-    live.insert( pcell.addr() );
+    live.insert( p.addr() );
 
-    switch( pcell.typecode() )
+    switch( p.typecode() )
     {
 		case CellType<pcell_t,pcell_t>::TYPECODE:
 		{
-			auto p = pcell.cast<pcell_t,pcell_t>();
-			_mark( live, p->head );
-			_mark( live, p->tail );
+			_mark( live, p->head.pcell );
+			_mark( live, p->tail.pcell );
 			break;
 		}
 		case CellType<pcell_t,value_t>::TYPECODE:
 		{
-		    auto p = pcell.cast<pcell_t,value_t>();
-		    _mark( live, p->head );
+		    _mark( live, p->head.pcell );
 		    break;
 		}
 		case CellType<value_t,pcell_t>::TYPECODE:
 		{
-		    auto p = pcell.cast<value_t,pcell_t>();
-		    _mark( live, p->tail );
+		    _mark( live, p->tail.pcell );
 		    break;
 		}
 		case CellType<value_t,value_t>::TYPECODE:
@@ -43,14 +40,14 @@ void SimpleAllocator::gc( const Roots& roots )
 {
     ++_gc_count;
 
-    std::set<void*> live;
+    std::set<pcell_t> live;
     for( auto r : roots )
         _mark( live, *r );
 
     _free_list = 0;
     for( size_t i = 0; i != _ncells; ++i )
     {
-        void* p = &_page[i];
+        auto p = reinterpret_cast<Cell*>( &_page[i] );
         if( live.find( p ) == live.end() )
             _free_list = new (p) FreeCell( _free_list );
     }

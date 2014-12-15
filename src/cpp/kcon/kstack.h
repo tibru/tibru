@@ -16,17 +16,17 @@ public:
 
     void push( const T& item, Allocator::Roots roots )
     {
-        _items = new (_alloc,roots) Cell<T,pcell_t>{ item, _items };
+        _items = new (_alloc,roots) Cell{ item, _items };
     }
 
     const T& top()
     {
-        return _items.cast<T,pcell_t>()->head;
+        return _items->head.pcell;
     }
 
     void pop()
     {
-        _items = _items.cast<T,pcell_t>()->tail;
+        _items = _items->tail.pcell;
     }
 
     bool empty() const { return _items == pcell_t::null(); }
@@ -47,36 +47,36 @@ public:
 
     void push( const elem_t& item, Allocator::Roots roots )
     {
-        if( item.is_cell() )
+        if( item.is_pcell() )
         {
-            _pcell_items = new (_alloc,roots) Cell<pcell_t,pcell_t>{ item.pcell(), _pcell_items };
-            _which_items = new (_alloc,roots) Cell<value_t,pcell_t>{ 0, _which_items };
+            _pcell_items = new (_alloc,roots) Cell{ item.pcell, _pcell_items };
+            _which_items = new (_alloc,roots) Cell{ byte_t(0), _which_items };
         }
         else
         {
-            _value_items = new (_alloc,roots) Cell<value_t,pcell_t>{ item.byte_value(), _value_items };
-            _which_items = new (_alloc,roots) Cell<value_t,pcell_t>{ 1, _which_items };
+            _value_items = new (_alloc,roots) Cell{ item.value, _value_items };
+            _which_items = new (_alloc,roots) Cell{ 1, _which_items };
         }
     }
 
     elem_t top()
     {
-        value_t w = _which_items.cast<value_t,pcell_t>()->head;
+        value_t w = _which_items->head.value;
         if( w == 0 )
-            return _pcell_items.cast<pcell_t,pcell_t>()->head;
+            return _pcell_items->head;
         else
-            return _value_items.cast<value_t,pcell_t>()->head;
+            return _value_items->head;
     }
 
     void pop()
     {
-        value_t w = _which_items.cast<value_t,pcell_t>()->head;
+        value_t w = _which_items->head.value;
         if( w == 0 )
-            _pcell_items = _pcell_items.cast<pcell_t,pcell_t>()->tail;
+            _pcell_items = _pcell_items->tail.pcell;
         else
-            _value_items = _value_items.cast<value_t,pcell_t>()->tail;
+            _value_items = _value_items->tail.pcell;
 
-        _which_items = _which_items.cast<value_t,pcell_t>()->tail;
+        _which_items = _which_items->tail.pcell;
     }
 
     bool empty() const { return _pcell_items == pcell_t::null(); }

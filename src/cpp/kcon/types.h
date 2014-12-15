@@ -19,18 +19,62 @@ const slot_t TYPE_MASK = HEAD_MASK | TAIL_MASK;
 //const slot_t MARK_MASK = MARK_BYTE_BIT | MARK_ADDR_BIT;
 
 typedef uint8_t byte_t;
+typedef uintptr_t value_t;
 
-ASSERT( sizeof(slot_t) == sizeof(void*) );
+class pcell_t
+{
+    const struct Cell* _pcell;
 
-template<class H, class T>
+    pcell_t() : _pcell( reinterpret_cast<const Cell*>( 256 ) ) {}
+public:
+    pcell_t( const Cell* p ) : _pcell( p ) {}
+
+    const Cell* addr() const { return _pcell; }
+    const Cell* operator->() const { return _pcell; }
+    bool is_null() const { return _pcell == pcell_t()._pcell; }
+
+    short typecode() const;
+    bool operator<( pcell_t q ) const { return _pcell < q._pcell; }
+    bool operator==( pcell_t q ) const { return _pcell == q._pcell; }
+
+    static pcell_t null() { return pcell_t(); }
+};
+
+struct elem_t
+{
+    union {
+        value_t value;
+        pcell_t pcell;
+    };
+
+    elem_t( byte_t b ) : value( b ) {}
+    elem_t( pcell_t p=pcell_t::null() ) : pcell( p ) {}
+    elem_t( const Cell* p ) : pcell( p ) {}
+
+    bool is_byte() const { return value < 256; }
+    bool is_pcell() const { return !is_byte(); }
+    bool is_null() const { return is_pcell() && pcell.is_null(); }
+};
+
+ASSERT( sizeof(value_t) == sizeof(void*) );
+ASSERT( sizeof(pcell_t) == sizeof(void*) );
+ASSERT( sizeof(elem_t) == sizeof(void*) );
+
 struct Cell
 {
-	const H head;
-	const T tail;
+	const elem_t head;
+	const elem_t tail;
 
-	ASSERT( sizeof(H) == sizeof(slot_t) );
-	ASSERT( sizeof(T) == sizeof(slot_t) );
+	short typecode() const
+	{
+	    return (head.is_byte() ? 2 : 0) | (tail.is_byte() ? 1 : 0);
+	}
 };
+
+inline short pcell_t::typecode() const
+{
+    return _pcell->typecode();
+}
 
 template<class H, class T>
 struct CellType
@@ -38,119 +82,12 @@ struct CellType
 	static const short TYPECODE = (Tag<H>::CODE << 1) | Tag<T>::CODE;
 };
 
-class pcell_t
-{
-	uintptr_t _addr_and_type;
-
-	pcell_t()
-		: _addr_and_type( 256 ) {}
-public:
-	template<class H, class T>
-	pcell_t( const Cell<H,T>* pcell )
-		: _addr_and_type( reinterpret_cast<uintptr_t>( pcell ) | (Tag<H>::CODE << 1) | Tag<T>::CODE ) {}
-
-	static pcell_t null() { return pcell_t(); }
-
-	bool is_null() const { return *this == pcell_t(); }
-    void* addr() const { return reinterpret_cast<void*>( _addr_and_type & ADDR_MASK ); }
-
-	short typecode() const
-	{
-		return _addr_and_type & TYPE_MASK;
-	}
-
-	short headcode() const
-	{
-		return _addr_and_type & HEAD_MASK;
-	}
-
-	short tailcode() const
-	{
-		return _addr_and_type & TAIL_MASK;
-	}
-
-	template<class H, class T>
-	const Cell<H,T>* cast() const
-	{
-		assert( typecode() == CellType<H,T>::TYPECODE, "Invalid cast" );
-		return static_cast<const Cell<H,T>*>( addr() );
-	}
-
-	bool operator<( pcell_t pcell ) const { return _addr_and_type < pcell._addr_and_type; }
-	bool operator==( pcell_t pcell ) const { return _addr_and_type == pcell._addr_and_type; }
-};
-
-typedef uintptr_t value_t;
-
-ASSERT( sizeof(pcell_t) == sizeof(slot_t) );
-ASSERT( sizeof(value_t) == sizeof(slot_t) );
-
 template<> struct Tag<pcell_t> { enum { CODE = 0 }; };
 template<> struct Tag<value_t> { enum { CODE = 1 }; };
 
-class elem_t
-{
-	union
-	{
-		value_t _value;
-		pcell_t _pcell;
-	};
-public:
-	elem_t( byte_t b )
-		: _value( b ) {}
-
-	elem_t( pcell_t p=pcell_t::null() )
-		: _pcell( p ) {}
-
-	template<class H,class T>
-	elem_t( const Cell<H,T>* p )
-		: _pcell( p ) {}
-
-    pcell_t pcell() const { return _pcell; }
-    byte_t byte_value() const { return _value; }
-
-	bool is_cell() const { return !is_byte(); }
-	bool is_byte() const { return _value < 256; }
-	bool is_null() const { return is_cell() && pcell().is_null(); }
-};
-
-inline elem_t head( pcell_t pcell )
-{
-	switch( pcell.typecode() )
-	{
-		case CellType<pcell_t,pcell_t>::TYPECODE:
-			return pcell.cast<pcell_t,pcell_t>()->head;
-		case CellType<pcell_t,value_t>::TYPECODE:
-			return pcell.cast<pcell_t,value_t>()->head;
-		case CellType<value_t,pcell_t>::TYPECODE:
-			return pcell.cast<value_t,pcell_t>()->head;
-		case CellType<value_t,value_t>::TYPECODE:
-			return pcell.cast<value_t,value_t>()->head;
-		default:
-			throw Error<Runtime>( "head dispatch failed" );
-	}
-}
-
-inline elem_t tail( pcell_t pcell )
-{
-	switch( pcell.typecode() )
-	{
-		case CellType<pcell_t,pcell_t>::TYPECODE:
-			return pcell.cast<pcell_t,pcell_t>()->tail;
-		case CellType<pcell_t,value_t>::TYPECODE:
-			return pcell.cast<pcell_t,value_t>()->tail;
-		case CellType<value_t,pcell_t>::TYPECODE:
-			return pcell.cast<value_t,pcell_t>()->tail;
-		case CellType<value_t,value_t>::TYPECODE:
-			return pcell.cast<value_t,value_t>()->tail;
-		default:
-			throw Error<Runtime>( "head dispatch failed" );
-	}
-}
-
 inline bool is_singleton( pcell_t p )
 {
-    return !p.is_null() && tail( p ).is_null();
+    return !p.is_null() && p->tail.is_null();
 }
 
 }	//namespace
@@ -189,11 +126,14 @@ Cell:
 |addr|000| |addr|xxx|   -> [<addr|000> <addr|000>]
 |addr|001| |      b1|   -> [<addr|000> b1]
 |addr|010| |      b1|   -> [b1 <addr|000>]
-|addr|011| |    b2b1|   -> [b2 b1]
-|addr|101| |b4b3b2b1|   -> [b4 [b3 [b2 [b1 <addr|000>]]]]
-|0000|101| |b4b3b2b1|   -> [b4 [b3 [b2 b1]]]
-|cont|110| |addr|000|   -> [<addr|000> ...]
-|cont|111| |b4b3b2b1|   -> [b4 [b3 [b2 [b1 ...]]]]
+|0000|011| |    b2b1|   -> [b2 b1]
+|addr|011| |    b2b1|   -> [b2 [b1 <addr|000>]]
+|addr|100| |b4b3b2b1|   -> [[b4 [b3 [b2 b1]]] <addr|000>]
+|0000|100| |b4b3b2b1|   -> [b4 [b3 [b2 b1]]]
+|cont|101| |b4b3b2b1|   -> [b4 [b3 [b2 [b1 ...]]]]
+|cont|110| |b4b3b2b1|   -> [[b4 [b3 [b2 b1]]] ...]
+|cont|111| |      b1|   -> [b1 ...]
+|cont|111| |addr|000|   -> [<addr|000> ...]
 
 pcell_t:
 |addr|000|
@@ -201,4 +141,6 @@ pcell_t:
 elem_t:
 |addr|000|
 |b1| < 256
+*/
+
 #endif

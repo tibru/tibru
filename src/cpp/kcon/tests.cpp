@@ -8,20 +8,20 @@ namespace kcon {
 void test_ostream()
 {TEST
 	SimpleAllocator a( 1024 );
-	pcell_t p = new (a) Cell<value_t,pcell_t>{
-					0,
-					new (a) Cell<pcell_t,value_t>{
-						new (a) Cell<value_t,value_t>{3,3},
+	pcell_t p = new (a) Cell{
+					1,
+					new (a) Cell{
+						new (a) Cell{3,3},
 						2 } };
 
 	std::ostringstream oss_flat;
 	kostream( oss_flat ) << flat << p;
-	auto expected_flat = "[0 [3 3] 2]";
+	auto expected_flat = "[1 [3 3] 2]";
 	test( oss_flat.str() == expected_flat, "Incorrect flat printing found '" + oss_flat.str() + "'\nExpected '" + expected_flat + "'" );
 
 	std::ostringstream oss_deep;
 	kostream( oss_deep ) << deep << p;
-	auto expected_deep = "[0 [[3 3] 2]]";
+	auto expected_deep = "[1 [[3 3] 2]]";
 	test( oss_deep.str() == expected_deep, "Incorrect deep printing found '" + oss_deep.str() + "'\nExpected '" + expected_deep + "'" );
 }
 
@@ -85,8 +85,8 @@ void test_gc()
     try
     {
         Allocator a( 1 );
-        pcell_t p = new (a) Cell<value_t,value_t>{0,0};
-        new (a,{&p}) Cell<value_t,value_t>{0,0};
+        pcell_t p = new (a) Cell{1,1};
+        new (a,{&p}) Cell{1,1};
 
         fail( "Failed to catch out of memory" );
     }
@@ -94,8 +94,8 @@ void test_gc()
 
     {
         Allocator a( 10 );
-        pcell_t p = new (a) Cell<value_t,value_t>{0,0};
-        new (a) Cell<value_t,value_t>{0,0};
+        pcell_t p = new (a) Cell{1,1};
+        new (a) Cell{1,1};
 
         test( a.num_allocated() == 2, "Failed to register allocated cells" );
 
@@ -106,8 +106,8 @@ void test_gc()
 
     {
         Allocator a( 1024 );
-        pcell_t p = parse( a, "[0 [1 [2 3] 4] 5 6]" ).pcell();
-        pcell_t q = parse( a, "[0 [1 [2 3] 4] 5 6]" ).pcell();
+        pcell_t p = parse( a, "[0 [1 [2 3] 4] 5 6]" ).pcell;
+        pcell_t q = parse( a, "[0 [1 [2 3] 4] 5 6]" ).pcell;
 
         a.gc({&p,&q});
 
@@ -117,8 +117,8 @@ void test_gc()
 
     {
         Allocator a( 1024 );
-        pcell_t p = parse( a, "[0 [1 [2 3] 4] 5 6]" ).pcell();
-        parse( a, "[0 [1 [2 3] 4] 5 6]" ).pcell();
+        pcell_t p = parse( a, "[0 [1 [2 3] 4] 5 6]" ).pcell;
+        parse( a, "[0 [1 [2 3] 4] 5 6]" ).pcell;
 
         a.gc({&p});
 
@@ -130,7 +130,7 @@ void test_gc()
     {
         //Test with minimal memory to create memory churn
         Allocator a( 1024 );
-        pcell_t p = parse( a, "[0 [1 [2 3] 4] 5 6]" ).pcell();
+        pcell_t p = parse( a, "[0 [1 [2 3] 4] 5 6]" ).pcell;
 
         test( a.gc_count() == 0, "GC ran during parse" );
         //test( a.gc_count() == 1, "GC failed to run during parse" );

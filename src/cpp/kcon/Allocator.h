@@ -27,7 +27,7 @@ public:
     FreeCell* next() const { return _hash( _salt, _next ); }
 };
 
-ASSERT( sizeof(FreeCell) == sizeof(Cell<slot_t,slot_t>) );
+ASSERT( sizeof(FreeCell) == sizeof(Cell) );
 
 class SimpleAllocator
 {
@@ -36,7 +36,7 @@ class SimpleAllocator
     FreeCell* _free_list;
     size_t _gc_count;
 
-    static void _mark( std::set<void*>& live, pcell_t pcell );
+    static void _mark( std::set<pcell_t>& live, pcell_t pcell );
 public:
     typedef std::initializer_list<pcell_t*> Roots;
 
@@ -78,7 +78,7 @@ typedef SimpleAllocator Allocator;
 
 inline void* operator new( size_t size, kcon::SimpleAllocator& allocator, const kcon::SimpleAllocator::Roots& roots={} )
 {
-    kcon::assert( size == sizeof(kcon::Cell<kcon::slot_t,kcon::slot_t>), "SimpleAllocator can only allocate cells of a fixed size" );
+    kcon::assert( size == sizeof(kcon::Cell), "SimpleAllocator can only allocate cells of a fixed size" );
 
 	return allocator.allocate( roots );
 }
