@@ -184,6 +184,8 @@ pcell_t kistream::_reverse_and_reduce( pcell_t pcell )
         }
         else
         {
+            assert( p->tail().is_pcell(), "Expected tail to be cell in reverse and reduce" );
+
             switch( p->typecode() )
             {
                 case CellType<pcell_t,pcell_t>::TYPECODE:
