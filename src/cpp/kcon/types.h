@@ -155,4 +155,50 @@ inline bool is_singleton( pcell_t p )
 
 }	//namespace
 
+/*
+Scheme 1
+Combines selector bits of address and type of cell
+Extends to 64 bit with upto 8 packed bytes per cell
+
+addr = hi bits of address
+sl = 2-bit byte selector (32bit)
+psl = selector of pointer address (ie can point into a cell)
+
+Cell:
+|addr|0|sl| |addr|0|sl|   -> [<addr|0|sl> <addr|0|sl>]
+|addr|0|sl| |cont|1|00|   -> [<addr|0|sl> ...]  ('cont' contiguous cells of type [[] ...]
+
+|addr|1|sl| |b4b3b2b1|    -> psl=3:[b4 [b3 [b2 [b1 <addr|0|sl>]]]], psl=2:[b3 [b2 [b1 <addr|0|sl>]]], psl=1:[b2 [b1 <addr|0|sl>], psl=0:[b1 <addr|0|sl>]
+|<pge|1|00| |b4b3b2b1|    -> psl=3:[b4 [b3 [b2 [b1 ...]]]],         psl=2:[b3 [b2 [b1 ...]]],         psl=1:[b2 [b1 ...]],        psl=0:[b1 ...]           (small addresses assumed to be cell count)
+|0000|1|00| |b4b3b2b1|    -> psl=3:[b4 [b3 [b2 b1]]],               psl=2:[b3 [b2 b1]],               psl=1:[b2 b1],              psl=0:[b1]
+
+NB [[] b] => [[] [b]] ie [<addr|0|sl> <addr|0|00>] + |0000|1|00| |xxxxxxb1|
+
+pcell_t:
+|addr|0|sel|
+
+elem_t:
+|addr|0|sel|
+|b1| < 256
+
+Scheme 2
+More compact but taking tails requires heap allocations to unpack
+All addresses are cell aligned
+
+Cell:
+|addr|000| |addr|xxx|   -> [<addr|000> <addr|000>]
+|addr|001| |      b1|   -> [<addr|000> b1]
+|addr|010| |      b1|   -> [b1 <addr|000>]
+|addr|011| |    b2b1|   -> [b2 b1]
+|addr|101| |b4b3b2b1|   -> [b4 [b3 [b2 [b1 <addr|000>]]]]
+|0000|101| |b4b3b2b1|   -> [b4 [b3 [b2 b1]]]
+|cont|110| |addr|000|   -> [<addr|000> ...]
+|cont|111| |b4b3b2b1|   -> [b4 [b3 [b2 [b1 ...]]]]
+
+pcell_t:
+|addr|000|
+
+elem_t:
+|addr|000|
+|b1| < 256
 #endif
