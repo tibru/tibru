@@ -66,7 +66,7 @@ class kistream
     std::istream& _is;
     Allocator& _alloc;
 
-    value_t _parse_value();
+    byte_t _parse_byte();
 	pcell_t _parse_elems();
 	pcell_t _reverse_and_reduce( pcell_t p );
 	elem_t _parse();

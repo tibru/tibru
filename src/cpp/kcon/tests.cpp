@@ -106,8 +106,8 @@ void test_gc()
 
     {
         Allocator a( 1024 );
-        pcell_t p = parse( a, "[0 [1 [2 3] 4] 5 6]" ).pcell;
-        pcell_t q = parse( a, "[0 [1 [2 3] 4] 5 6]" ).pcell;
+        pcell_t p = parse( a, "[0 [1 [2 3] 4] 5 6]" ).pcell();
+        pcell_t q = parse( a, "[0 [1 [2 3] 4] 5 6]" ).pcell();
 
         a.gc({&p,&q});
 
@@ -117,8 +117,8 @@ void test_gc()
 
     {
         Allocator a( 1024 );
-        pcell_t p = parse( a, "[0 [1 [2 3] 4] 5 6]" ).pcell;
-        parse( a, "[0 [1 [2 3] 4] 5 6]" ).pcell;
+        pcell_t p = parse( a, "[0 [1 [2 3] 4] 5 6]" ).pcell();
+        parse( a, "[0 [1 [2 3] 4] 5 6]" ).pcell();
 
         a.gc({&p});
 
@@ -130,7 +130,7 @@ void test_gc()
     {
         //Test with minimal memory to create memory churn
         Allocator a( 1024 );
-        pcell_t p = parse( a, "[0 [1 [2 3] 4] 5 6]" ).pcell;
+        pcell_t p = parse( a, "[0 [1 [2 3] 4] 5 6]" ).pcell();
 
         test( a.gc_count() == 0, "GC ran during parse" );
         //test( a.gc_count() == 1, "GC failed to run during parse" );

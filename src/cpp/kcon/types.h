@@ -33,48 +33,60 @@ public:
     const Cell* operator->() const { return _pcell; }
     bool is_null() const { return _pcell == pcell_t()._pcell; }
 
-    short typecode() const;
     bool operator<( pcell_t q ) const { return _pcell < q._pcell; }
     bool operator==( pcell_t q ) const { return _pcell == q._pcell; }
 
     static pcell_t null() { return pcell_t(); }
 };
 
-struct elem_t
+class elem_t
 {
     union {
-        value_t value;
-        pcell_t pcell;
+        value_t _value;
+        pcell_t _pcell;
     };
+public:
+    elem_t( byte_t b ) : _value( b ) {}
+    elem_t( pcell_t p=pcell_t::null() ) : _pcell( p ) {}
+    elem_t( const Cell* p ) : _pcell( p ) {}
 
-    elem_t( byte_t b ) : value( b ) {}
-    elem_t( pcell_t p=pcell_t::null() ) : pcell( p ) {}
-    elem_t( const Cell* p ) : pcell( p ) {}
-
-    bool is_byte() const { return value < 256; }
+    bool is_byte() const { return _value < 256; }
     bool is_pcell() const { return !is_byte(); }
-    bool is_null() const { return is_pcell() && pcell.is_null(); }
+    bool is_null() const { return is_pcell() && _pcell.is_null(); }
+
+    byte_t byte() const
+    {
+        assert( is_byte(), "elem_t is not a byte" );
+        return static_cast<byte_t>( _value );
+    }
+
+    pcell_t pcell() const
+    {
+        assert( is_pcell(), "elem_t is not a pcell" );
+        return _pcell;
+    }
 };
 
 ASSERT( sizeof(value_t) == sizeof(void*) );
 ASSERT( sizeof(pcell_t) == sizeof(void*) );
 ASSERT( sizeof(elem_t) == sizeof(void*) );
 
-struct Cell
+class Cell
 {
-	const elem_t head;
-	const elem_t tail;
+	const elem_t _head;
+	const elem_t _tail;
+public:
+    Cell( elem_t head, elem_t tail )
+        : _head( head ), _tail( tail ) {}
+
+    elem_t head() const { return _head; }
+    elem_t tail() const { return _tail; }
 
 	short typecode() const
 	{
-	    return (head.is_byte() ? 2 : 0) | (tail.is_byte() ? 1 : 0);
+	    return (_head.is_byte() ? 2 : 0) | (_tail.is_byte() ? 1 : 0);
 	}
 };
-
-inline short pcell_t::typecode() const
-{
-    return _pcell->typecode();
-}
 
 template<class H, class T>
 struct CellType
@@ -87,7 +99,7 @@ template<> struct Tag<value_t> { enum { CODE = 1 }; };
 
 inline bool is_singleton( pcell_t p )
 {
-    return !p.is_null() && p->tail.is_null();
+    return !p.is_null() && p->tail().is_null();
 }
 
 }	//namespace

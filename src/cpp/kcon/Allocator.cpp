@@ -9,22 +9,22 @@ void SimpleAllocator::_mark( std::set<pcell_t>& live, pcell_t p )
 
     live.insert( p.addr() );
 
-    switch( p.typecode() )
+    switch( p->typecode() )
     {
 		case CellType<pcell_t,pcell_t>::TYPECODE:
 		{
-			_mark( live, p->head.pcell );
-			_mark( live, p->tail.pcell );
+			_mark( live, p->head().pcell() );
+			_mark( live, p->tail().pcell() );
 			break;
 		}
 		case CellType<pcell_t,value_t>::TYPECODE:
 		{
-		    _mark( live, p->head.pcell );
+		    _mark( live, p->head().pcell() );
 		    break;
 		}
 		case CellType<value_t,pcell_t>::TYPECODE:
 		{
-		    _mark( live, p->tail.pcell );
+		    _mark( live, p->tail().pcell() );
 		    break;
 		}
 		case CellType<value_t,value_t>::TYPECODE:

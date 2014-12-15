@@ -21,9 +21,9 @@ kostream& kostream::operator<<( byte_t value )
 kostream& kostream::operator<<( elem_t elem )
 {
     if( elem.is_pcell() )
-        return kostream::operator<<( elem.pcell );
+        return kostream::operator<<( elem.pcell() );
     else
-        return kostream::operator<<( elem.value );
+        return kostream::operator<<( elem.byte() );
 }
 
 struct Tail
@@ -45,7 +45,7 @@ void kostream::_format( pcell_t pcell )
             if( tail.elem.is_null() )
                 _os << "<null>";
             else
-                _format( tail.elem.value );
+                _format( tail.elem.byte() );
 
             if( !_flatten )
                 for( size_t l = tail.len; l != 0; --l )
@@ -62,41 +62,37 @@ void kostream::_format( pcell_t pcell )
         }
         else
         {
-            switch( tail.elem.pcell.typecode() )
+            auto p = tail.elem.pcell();
+
+            switch( p->typecode() )
             {
                 case CellType<pcell_t,pcell_t>::TYPECODE:
                 {
-                    auto p = tail.elem.pcell;
-                    tails.push( Tail{ p->tail, tail.len + 1 } );
+                    tails.push( Tail{ p->tail(), tail.len + 1 } );
 
                     _os << '[';
-                    tail = Tail{ p->head, 0 };
+                    tail = Tail{ p->head(), 0 };
                     break;
                 }
                 case CellType<pcell_t,value_t>::TYPECODE:
                 {
-                    auto p = tail.elem.pcell;
-                    tails.push( Tail{ p->tail, tail.len } );
+                    tails.push( Tail{ p->tail(), tail.len } );
 
                     _os << '[';
-                    tail = Tail{ p->head, 0 };
+                    tail = Tail{ p->head(), 0 };
                     break;
                 }
                 case CellType<value_t,pcell_t>::TYPECODE:
                 {
-                    auto p = tail.elem.pcell;
-
-                    _os << p->head.value << ' ';
-                    tail = Tail{ p->tail, tail.len + 1 };
+                    _os << (short) p->head().byte() << ' ';
+                    tail = Tail{ p->tail(), tail.len + 1 };
                     if( !_flatten ) _os << '[';
                     break;
                 }
                 case CellType<value_t,value_t>::TYPECODE:
                 {
-                    auto p = tail.elem.pcell;
-
-                    _os << p->head.value << ' ';
-                    tail = Tail{ p->tail, tail.len };
+                    _os << (short) p->head().byte() << ' ';
+                    tail = Tail{ p->tail(), tail.len };
                     break;
                 }
                 default:
@@ -111,13 +107,13 @@ void kostream::_format( byte_t value )
     _os << short(value);
 }
 
-value_t kistream::_parse_value()
+byte_t kistream::_parse_byte()
 {
     value_t value;
     if( !(_is >> value) || (value >= 256) )
         throw Error<Syntax>( "Malformed byte" );
 
-    return value;
+    return static_cast<byte_t>( value );
 }
 
 pcell_t kistream::_parse_elems()
@@ -152,7 +148,7 @@ pcell_t kistream::_parse_elems()
 		else if( isdigit( c ) )
 		{
 			_is.putback( c );
-			tail = new ( _alloc, {&tails.items(), &tail} ) Cell{ _parse_value(), tail };
+			tail = new ( _alloc, {&tails.items(), &tail} ) Cell{ _parse_byte(), tail };
 		}
 		else
 			throw Error<Syntax>( "Unexpected '"s + c + "'" );
@@ -174,7 +170,7 @@ pcell_t kistream::_reverse_and_reduce( pcell_t pcell )
         {
         	assert( tail.is_pcell(), "Expected recursive cell tail" );
 
-            pcell_t head = tail.pcell;
+            pcell_t head = tail.pcell();
 
             p = pcells.top(); pcells.pop();
             tail = tails.top(); tails.pop();
@@ -182,35 +178,35 @@ pcell_t kistream::_reverse_and_reduce( pcell_t pcell )
 			if( tail.is_null() )
 				tail = head;
 			else if( tail.is_byte() )
-				tail = new (_alloc) Cell{ head, tail.value };
+				tail = new (_alloc) Cell{ head, tail.byte() };
 			else
-            	tail = new (_alloc) Cell{ head, tail.pcell };
+            	tail = new (_alloc) Cell{ head, tail.pcell() };
         }
         else
         {
-            switch( p.typecode() )
+            switch( p->typecode() )
             {
                 case CellType<pcell_t,pcell_t>::TYPECODE:
                 {
-                    pcells.push( p->tail.pcell, {&p, &pcells.items()} );
+                    pcells.push( p->tail().pcell(), {&p, &pcells.items()} );
                     tails.push( tail, {&p, &pcells.items()} );
 
-                    p = p->head.pcell;
+                    p = p->head().pcell();
                     tail = pcell_t::null();
                     break;
                 }
                 case CellType<value_t,pcell_t>::TYPECODE:
                 {
-                    const value_t value = p->head.value;
+                    const byte_t head = p->head().byte();
 
                     if( tail.is_null() )
-                        tail = value;
+                        tail = head;
                     else if( tail.is_byte() )
-                        tail = new (_alloc) Cell{ value, tail.value };
+                        tail = new (_alloc) Cell{ head, tail.byte() };
                     else
-                        tail = new (_alloc) Cell{ value, tail.pcell };
+                        tail = new (_alloc) Cell{ head, tail.pcell() };
 
-                    p = p->tail.pcell;
+                    p = p->tail().pcell();
                     break;
                 }
                 default:
@@ -221,7 +217,7 @@ pcell_t kistream::_reverse_and_reduce( pcell_t pcell )
 
     assert( tails.empty(), "Cell and tail stack mismatch" );
 
-	return tail.pcell;
+	return tail.pcell();
 }
 
 elem_t kistream::_parse()
@@ -237,7 +233,7 @@ elem_t kistream::_parse()
     else if( isdigit( c ) )
     {
         _is.putback( c );
-        return _parse_value();
+        return _parse_byte();
     }
     else
         throw Error<Syntax>( "Unexpected '"s + c + "'" );

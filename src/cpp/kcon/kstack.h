@@ -21,7 +21,7 @@ public:
 
     void pop()
     {
-        _items = _items->tail.pcell;
+        _items = _items->tail().pcell();
     }
 
     bool empty() const { return _items == pcell_t::null(); }
@@ -36,9 +36,9 @@ struct kstack<elem_t> : basic_kstack
     kstack( Allocator& alloc )
         : basic_kstack( alloc ) {}
 
-    const elem_t& top()
+    elem_t top()
     {
-        return _items->head;
+        return _items->head();
     }
 };
 
@@ -48,9 +48,9 @@ struct kstack<pcell_t> : basic_kstack
     kstack( Allocator& alloc )
         : basic_kstack( alloc ) {}
 
-    const pcell_t& top()
+    pcell_t top()
     {
-        return _items->head.pcell;
+        return _items->head().pcell();
     }
 };
 
