@@ -6,86 +6,93 @@
 
 namespace kcon {
 
-template<class T> struct Tag;
-
-typedef uintptr_t slot_t;
-const slot_t TAG_MASK = 2 * sizeof(slot_t) - 1;
-const slot_t ADDR_MASK = ~TAG_MASK;
-const slot_t TAIL_MASK = 1;
-const slot_t HEAD_MASK = 2;
-const slot_t TYPE_MASK = HEAD_MASK | TAIL_MASK;
-//const slot_t MARK_ADDR_BIT = 1 << 2;
-//const slot_t MARK_BYTE_BIT = 1 << 8;
-//const slot_t MARK_MASK = MARK_BYTE_BIT | MARK_ADDR_BIT;
-
-typedef uint8_t byte_t;
-typedef uintptr_t value_t;
-typedef const struct Cell* pcell_t;
+const uintptr_t TAG_MASK = 2 * sizeof(void*) - 1;
+const uintptr_t ADDR_MASK = ~TAG_MASK;
 
 template<class T>
 T null();
 
-template<>
-inline pcell_t null()
-{
-    return reinterpret_cast<const Cell*>( 256 );
-}
+template<class T>
+bool is_singleton( const T& p );
 
-class elem_t
+struct SimpleScheme
 {
-    union {
-        value_t _value;
-        pcell_t _pcell;
+    struct Cell;
+
+    typedef uint8_t byte_t;
+    typedef uintptr_t value_t;
+    typedef const Cell* pcell_t;
+
+    class elem_t
+    {
+        union {
+            value_t _value;
+            pcell_t _pcell;
+        };
+    public:
+        elem_t( byte_t b ) : _value( b ) {}
+        elem_t( pcell_t p ) : _pcell( p ) {}
+
+        bool is_byte() const { return _value < 256; }
+        bool is_pcell() const { return !is_byte(); }
+
+        byte_t byte() const
+        {
+            assert( is_byte(), "elem_t is not a byte" );
+            return static_cast<byte_t>( _value );
+        }
+
+        pcell_t pcell() const
+        {
+            assert( is_pcell(), "elem_t is not a pcell" );
+            return _pcell;
+        }
+
+        bool operator==( elem_t e ) const { return _value == e._value; }
+        bool operator!=( elem_t e ) const { return _value != e._value; }
     };
-public:
-    elem_t( byte_t b ) : _value( b ) {}
-    elem_t( pcell_t p=null<pcell_t>() ) : _pcell( p ) {}
 
-    bool is_byte() const { return _value < 256; }
-    bool is_pcell() const { return !is_byte(); }
+    ASSERT( sizeof(value_t) == sizeof(void*) );
+    ASSERT( sizeof(pcell_t) == sizeof(void*) );
+    ASSERT( sizeof(elem_t) == sizeof(void*) );
 
-    byte_t byte() const
+    class Cell
     {
-        assert( is_byte(), "elem_t is not a byte" );
-        return static_cast<byte_t>( _value );
-    }
+        const elem_t _head;
+        const elem_t _tail;
+    public:
+        Cell( elem_t head, elem_t tail )
+            : _head( head ), _tail( tail ) {}
 
-    pcell_t pcell() const
-    {
-        assert( is_pcell(), "elem_t is not a pcell" );
-        return _pcell;
-    }
-
-    bool operator==( elem_t e ) const { return _value == e._value; }
-    bool operator!=( elem_t e ) const { return _value != e._value; }
+        elem_t head() const { return _head; }
+        elem_t tail() const { return _tail; }
+    };
 };
 
 template<>
-inline elem_t null<elem_t>()
+inline SimpleScheme::pcell_t null<SimpleScheme::pcell_t>()
 {
-    return null<pcell_t>();
+    return reinterpret_cast<SimpleScheme::pcell_t>( 256 );
 }
 
-ASSERT( sizeof(value_t) == sizeof(void*) );
-ASSERT( sizeof(pcell_t) == sizeof(void*) );
-ASSERT( sizeof(elem_t) == sizeof(void*) );
-
-class Cell
+template<>
+inline SimpleScheme::elem_t null<SimpleScheme::elem_t>()
 {
-	const elem_t _head;
-	const elem_t _tail;
-public:
-    Cell( elem_t head, elem_t tail )
-        : _head( head ), _tail( tail ) {}
-
-    elem_t head() const { return _head; }
-    elem_t tail() const { return _tail; }
-};
-
-inline bool is_singleton( pcell_t p )
-{
-    return (p != null<pcell_t>()) && (p->tail() == null<elem_t>());
+    return null<SimpleScheme::pcell_t>();
 }
+
+template<>
+inline bool is_singleton( const SimpleScheme::pcell_t& p )
+{
+    return (p != null<SimpleScheme::pcell_t>()) && (p->tail() == null<SimpleScheme::elem_t>());
+}
+
+typedef SimpleScheme::value_t value_t;
+typedef SimpleScheme::byte_t byte_t;
+typedef SimpleScheme::pcell_t pcell_t;
+typedef SimpleScheme::elem_t elem_t;
+typedef SimpleScheme::Cell Cell;
+
 
 }	//namespace
 
