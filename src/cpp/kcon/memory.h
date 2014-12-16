@@ -49,6 +49,11 @@ public:
         _gc_count = 0;
     }
 
+	~SimpleAllocator()
+	{
+		delete[] _page;
+	}
+
     void gc( const Roots& roots );
 
     size_t gc_count() const { return _gc_count; }
