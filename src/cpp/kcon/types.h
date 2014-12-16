@@ -43,7 +43,6 @@ public:
 
     bool is_byte() const { return _value < 256; }
     bool is_pcell() const { return !is_byte(); }
-    bool is_null() const { return is_pcell() && (_pcell == null<pcell_t>()); }
 
     byte_t byte() const
     {
@@ -56,7 +55,16 @@ public:
         assert( is_pcell(), "elem_t is not a pcell" );
         return _pcell;
     }
+
+    bool operator==( elem_t e ) const { return _value == e._value; }
+    bool operator!=( elem_t e ) const { return _value != e._value; }
 };
+
+template<>
+inline elem_t null<elem_t>()
+{
+    return null<pcell_t>();
+}
 
 ASSERT( sizeof(value_t) == sizeof(void*) );
 ASSERT( sizeof(pcell_t) == sizeof(void*) );
@@ -76,7 +84,7 @@ public:
 
 inline bool is_singleton( pcell_t p )
 {
-    return (p != null<pcell_t>()) && p->tail().is_null();
+    return (p != null<pcell_t>()) && (p->tail() == null<elem_t>());
 }
 
 }	//namespace
