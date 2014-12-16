@@ -1,4 +1,4 @@
-#include "Allocator.h"
+#include "memory.h"
 #include "runtime.h"
 
 using namespace kcon;

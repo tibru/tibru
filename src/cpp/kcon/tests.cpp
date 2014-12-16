@@ -1,5 +1,5 @@
 #include "tests.h"
-#include "Allocator.h"
+#include "memory.h"
 #include "runtime.h"
 #include "stream.h"
 #include <sstream>

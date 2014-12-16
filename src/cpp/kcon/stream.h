@@ -2,7 +2,7 @@
 #define KCON_STREAM_H
 
 #include "types.h"
-#include "Allocator.h"
+#include "memory.h"
 #include <ostream>
 #include <istream>
 #include <sstream>
