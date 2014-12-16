@@ -81,11 +81,6 @@ public:
 
     elem_t head() const { return _head; }
     elem_t tail() const { return _tail; }
-
-	short typecode() const
-	{
-	    return (_head.is_byte() ? 2 : 0) | (_tail.is_byte() ? 1 : 0);
-	}
 };
 
 template<class H, class T>

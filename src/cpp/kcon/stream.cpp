@@ -64,39 +64,30 @@ void kostream::_format( pcell_t pcell )
         {
             auto p = tail.elem.pcell();
 
-            switch( p->typecode() )
+            if( p->head().is_pcell() && p->tail().is_pcell() )
             {
-                case CellType<pcell_t,pcell_t>::TYPECODE:
-                {
-                    tails.push( Tail{ p->tail(), tail.len + 1 } );
+                tails.push( Tail{ p->tail(), tail.len + 1 } );
 
-                    _os << '[';
-                    tail = Tail{ p->head(), 0 };
-                    break;
-                }
-                case CellType<pcell_t,value_t>::TYPECODE:
-                {
-                    tails.push( Tail{ p->tail(), tail.len } );
+                _os << '[';
+                tail = Tail{ p->head(), 0 };
+            }
+            else if( p->head().is_pcell() && p->tail().is_byte() )
+            {
+                tails.push( Tail{ p->tail(), tail.len } );
 
-                    _os << '[';
-                    tail = Tail{ p->head(), 0 };
-                    break;
-                }
-                case CellType<value_t,pcell_t>::TYPECODE:
-                {
-                    _os << (short) p->head().byte() << ' ';
-                    tail = Tail{ p->tail(), tail.len + 1 };
-                    if( !_flatten ) _os << '[';
-                    break;
-                }
-                case CellType<value_t,value_t>::TYPECODE:
-                {
-                    _os << (short) p->head().byte() << ' ';
-                    tail = Tail{ p->tail(), tail.len };
-                    break;
-                }
-                default:
-                    throw Error<Runtime>( "format dispatch failed" );
+                _os << '[';
+                tail = Tail{ p->head(), 0 };
+            }
+            else if( p->head().is_byte() && p->tail().is_pcell() )
+            {
+                _os << (short) p->head().byte() << ' ';
+                tail = Tail{ p->tail(), tail.len + 1 };
+                if( !_flatten ) _os << '[';
+            }
+            else
+            {
+                _os << (short) p->head().byte() << ' ';
+                tail = Tail{ p->tail(), tail.len };
             }
         }
     }
@@ -186,33 +177,27 @@ pcell_t kistream::_reverse_and_reduce( pcell_t pcell )
         {
             assert( p->tail().is_pcell(), "Expected tail to be cell in reverse and reduce" );
 
-            switch( p->typecode() )
+            if( p->head().is_pcell() )
             {
-                case CellType<pcell_t,pcell_t>::TYPECODE:
-                {
-                    pcells.push( p->tail().pcell(), {&p, &pcells.items()} );
-                    tails.push( tail, {&p, &pcells.items()} );
+                pcells.push( p->tail().pcell(), {&p, &pcells.items()} );
+                tails.push( tail, {&p, &pcells.items()} );
 
-                    p = p->head().pcell();
-                    tail = pcell_t::null();
-                    break;
-                }
-                case CellType<value_t,pcell_t>::TYPECODE:
-                {
-                    const byte_t head = p->head().byte();
+                p = p->head().pcell();
+                tail = pcell_t::null();
+            }
+            else
+            {
+                assert( p->head().is_byte(), "" );
+                const byte_t head = p->head().byte();
 
-                    if( tail.is_null() )
-                        tail = head;
-                    else if( tail.is_byte() )
-                        tail = new (_alloc) Cell{ head, tail.byte() };
-                    else
-                        tail = new (_alloc) Cell{ head, tail.pcell() };
+                if( tail.is_null() )
+                    tail = head;
+                else if( tail.is_byte() )
+                    tail = new (_alloc) Cell{ head, tail.byte() };
+                else
+                    tail = new (_alloc) Cell{ head, tail.pcell() };
 
-                    p = p->tail().pcell();
-                    break;
-                }
-                default:
-                    assert( false, "Dispatch failed in reverse and reduce" );
+                p = p->tail().pcell();
             }
         }
     }
