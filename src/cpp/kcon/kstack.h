@@ -10,7 +10,7 @@ protected:
     pcell_t _items;
 
     basic_kstack( Allocator& alloc )
-        : _alloc( alloc ), _items( pcell_t::null() ) {}
+        : _alloc( alloc ), _items( null<pcell_t>() ) {}
 public:
     pcell_t& items() { return _items; }
 
@@ -24,7 +24,7 @@ public:
         _items = _items->tail().pcell();
     }
 
-    bool empty() const { return _items == pcell_t::null(); }
+    bool empty() const { return _items == null<pcell_t>(); }
 };
 
 template<class T>

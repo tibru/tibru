@@ -4,10 +4,10 @@ using namespace kcon;
 
 void SimpleAllocator::_mark( std::set<pcell_t>& live, pcell_t p )
 {
-    if( live.find( p.addr() ) != live.end() )
+    if( live.find( p ) != live.end() )
         return;
 
-    live.insert( p.addr() );
+    live.insert( p );
 
     if( p->head().is_pcell() )
         _mark( live, p->head().pcell() );

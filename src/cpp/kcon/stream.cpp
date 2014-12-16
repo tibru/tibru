@@ -109,7 +109,7 @@ byte_t kistream::_parse_byte()
 
 pcell_t kistream::_parse_elems()
 {
-	pcell_t tail = pcell_t::null();
+	pcell_t tail = null<pcell_t>();
 	kstack<pcell_t> tails( _alloc );
 
 	char c;
@@ -117,7 +117,7 @@ pcell_t kistream::_parse_elems()
 	{
 		if( c == ']' )
 		{
-		    if( tail.is_null() )
+		    if( tail == null<pcell_t>() )
                 throw Error<Syntax>( "Unexpected empty cell" );
 
 		    if( is_singleton( tail ) )
@@ -134,7 +134,7 @@ pcell_t kistream::_parse_elems()
 		else if( c == '[' )
 		{
 			tails.push( tail, {&tails.items(), &tail} );
-			tail = pcell_t::null();
+			tail = null<pcell_t>();
 		}
 		else if( isdigit( c ) )
 		{
@@ -151,13 +151,13 @@ pcell_t kistream::_parse_elems()
 pcell_t kistream::_reverse_and_reduce( pcell_t pcell )
 {
     pcell_t p = pcell;
-    elem_t tail = pcell_t::null();
+    elem_t tail = null<pcell_t>();
 	kstack<elem_t> tails( _alloc );
 	kstack<pcell_t> pcells( _alloc );
 
-    while( !(p.is_null() && pcells.empty()) )
+    while( !((p == null<pcell_t>()) && pcells.empty()) )
     {
-        if( p.is_null() )
+        if( p == null<pcell_t>() )
         {
         	assert( tail.is_pcell(), "Expected recursive cell tail" );
 
@@ -183,7 +183,7 @@ pcell_t kistream::_reverse_and_reduce( pcell_t pcell )
                 tails.push( tail, {&p, &pcells.items()} );
 
                 p = p->head().pcell();
-                tail = pcell_t::null();
+                tail = null<pcell_t>();
             }
             else
             {

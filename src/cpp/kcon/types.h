@@ -20,24 +20,16 @@ const slot_t TYPE_MASK = HEAD_MASK | TAIL_MASK;
 
 typedef uint8_t byte_t;
 typedef uintptr_t value_t;
+typedef const struct Cell* pcell_t;
 
-class pcell_t
+template<class T>
+T null();
+
+template<>
+inline pcell_t null()
 {
-    const struct Cell* _pcell;
-
-    pcell_t() : _pcell( reinterpret_cast<const Cell*>( 256 ) ) {}
-public:
-    pcell_t( const Cell* p ) : _pcell( p ) {}
-
-    const Cell* addr() const { return _pcell; }
-    const Cell* operator->() const { return _pcell; }
-    bool is_null() const { return _pcell == pcell_t()._pcell; }
-
-    bool operator<( pcell_t q ) const { return _pcell < q._pcell; }
-    bool operator==( pcell_t q ) const { return _pcell == q._pcell; }
-
-    static pcell_t null() { return pcell_t(); }
-};
+    return reinterpret_cast<const Cell*>( 256 );
+}
 
 class elem_t
 {
@@ -47,12 +39,11 @@ class elem_t
     };
 public:
     elem_t( byte_t b ) : _value( b ) {}
-    elem_t( pcell_t p=pcell_t::null() ) : _pcell( p ) {}
-    elem_t( const Cell* p ) : _pcell( p ) {}
+    elem_t( pcell_t p=null<pcell_t>() ) : _pcell( p ) {}
 
     bool is_byte() const { return _value < 256; }
     bool is_pcell() const { return !is_byte(); }
-    bool is_null() const { return is_pcell() && _pcell.is_null(); }
+    bool is_null() const { return is_pcell() && (_pcell == null<pcell_t>()); }
 
     byte_t byte() const
     {
@@ -83,18 +74,9 @@ public:
     elem_t tail() const { return _tail; }
 };
 
-template<class H, class T>
-struct CellType
-{
-	static const short TYPECODE = (Tag<H>::CODE << 1) | Tag<T>::CODE;
-};
-
-template<> struct Tag<pcell_t> { enum { CODE = 0 }; };
-template<> struct Tag<value_t> { enum { CODE = 1 }; };
-
 inline bool is_singleton( pcell_t p )
 {
-    return !p.is_null() && p->tail().is_null();
+    return (p != null<pcell_t>()) && p->tail().is_null();
 }
 
 }	//namespace
