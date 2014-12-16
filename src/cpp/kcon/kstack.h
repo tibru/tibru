@@ -16,7 +16,7 @@ public:
 
     void push( elem_t item, Allocator::Roots roots )
     {
-        _items = new (_alloc,roots) Cell{ item, _items };
+        _items = _alloc.new_Cell( item, _items, roots );
     }
 
     void pop()

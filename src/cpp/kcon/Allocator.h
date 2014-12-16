@@ -70,17 +70,15 @@ public:
 
         return n;
     }
+
+    const Cell* new_Cell( const elem_t& head, const elem_t& tail, const Roots& roots={} )
+    {
+        return new ( allocate( roots ) ) Cell( head, tail );
+    }
 };
 
 typedef SimpleAllocator Allocator;
 
 }	//namespace
-
-inline void* operator new( size_t size, kcon::SimpleAllocator& allocator, const kcon::SimpleAllocator::Roots& roots={} )
-{
-    kcon::assert( size == sizeof(kcon::Cell), "SimpleAllocator can only allocate cells of a fixed size" );
-
-	return allocator.allocate( roots );
-}
 
 #endif

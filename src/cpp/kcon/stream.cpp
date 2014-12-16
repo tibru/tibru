@@ -129,7 +129,7 @@ pcell_t kistream::_parse_elems()
 			pcell_t elems = tail;
 			tail = tails.top();
 			tails.pop();
-			tail = new ( _alloc, {&tails.items(), &elems, &tail} ) Cell{ elems, tail };
+			tail = _alloc.new_Cell( elems, tail, {&tails.items()} );
 		}
 		else if( c == '[' )
 		{
@@ -139,7 +139,7 @@ pcell_t kistream::_parse_elems()
 		else if( isdigit( c ) )
 		{
 			_is.putback( c );
-			tail = new ( _alloc, {&tails.items(), &tail} ) Cell{ _parse_byte(), tail };
+			tail = _alloc.new_Cell( _parse_byte(), tail, {&tails.items()} );
 		}
 		else
 			throw Error<Syntax>( "Unexpected '"s + c + "'" );
@@ -169,9 +169,9 @@ pcell_t kistream::_reverse_and_reduce( pcell_t pcell )
 			if( tail == null<elem_t>() )
 				tail = head;
 			else if( tail.is_byte() )
-				tail = new (_alloc) Cell{ head, tail.byte() };
+				tail = _alloc.new_Cell( head, tail.byte() );
 			else
-            	tail = new (_alloc) Cell{ head, tail.pcell() };
+            	tail = _alloc.new_Cell( head, tail.pcell() );
         }
         else
         {
@@ -193,9 +193,9 @@ pcell_t kistream::_reverse_and_reduce( pcell_t pcell )
                 if( tail== null<elem_t>() )
                     tail = head;
                 else if( tail.is_byte() )
-                    tail = new (_alloc) Cell{ head, tail.byte() };
+                    tail = _alloc.new_Cell( head, tail.byte() );
                 else
-                    tail = new (_alloc) Cell{ head, tail.pcell() };
+                    tail = _alloc.new_Cell( head, tail.pcell() );
 
                 p = p->tail().pcell();
             }

@@ -8,11 +8,11 @@ namespace kcon {
 void test_ostream()
 {TEST
 	SimpleAllocator a( 1024 );
-	pcell_t p = new (a) Cell{
+	pcell_t p = a.new_Cell(
 					1,
-					new (a) Cell{
-						new (a) Cell{3,3},
-						2 } };
+					a.new_Cell(
+						a.new_Cell(3,3),
+						2 ) );
 
 	std::ostringstream oss_flat;
 	kostream( oss_flat ) << flat << p;
@@ -85,8 +85,8 @@ void test_gc()
     try
     {
         Allocator a( 1 );
-        pcell_t p = new (a) Cell{1,1};
-        new (a,{&p}) Cell{1,1};
+        pcell_t p = a.new_Cell( 1, 1 );
+        a.new_Cell( 1, 1, {&p} );
 
         fail( "Failed to catch out of memory" );
     }
@@ -94,8 +94,8 @@ void test_gc()
 
     {
         Allocator a( 10 );
-        pcell_t p = new (a) Cell{1,1};
-        new (a) Cell{1,1};
+        pcell_t p = a.new_Cell( 1, 1 );
+        a.new_Cell( 1, 1 );
 
         test( a.num_allocated() == 2, "Failed to register allocated cells" );
 
