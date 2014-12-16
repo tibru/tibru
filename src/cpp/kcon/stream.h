@@ -12,7 +12,8 @@ namespace kcon {
 struct Syntax;
 struct EOS;
 
-class kostream
+template<class Scheme>
+class _kostream
 {
 	std::ostream& _os;
 	bool _flatten;
@@ -20,44 +21,46 @@ class kostream
 	void _format( pcell_t pcell );
 	void _format( byte_t value );
 public:
-	kostream( std::ostream& os, bool flatten=true )
+	_kostream( std::ostream& os, bool flatten=true )
 		: _os( os ), _flatten( flatten ) {}
 
-    kostream& setflatten( bool b ) { _flatten = b; return *this; }
+    _kostream& setflatten( bool b ) { _flatten = b; return *this; }
 
-	kostream& operator<<( pcell_t pcell );
-	kostream& operator<<( byte_t value );
-	kostream& operator<<( elem_t elem );
+	_kostream& operator<<( pcell_t pcell );
+	_kostream& operator<<( byte_t value );
+	_kostream& operator<<( elem_t elem );
 
     template<class T>
-    kostream& operator<<( const T& t )
+    _kostream& operator<<( const T& t )
     {
         _os << t;
         return *this;
     }
 
-    typedef kostream& (*KManip)( kostream& );
+    typedef _kostream& (*KManip)( _kostream& );
 
-    kostream& operator<<( KManip m )
+    _kostream& operator<<( KManip m )
     {
         return m(*this);
     }
 
     typedef std::ostream& (*Manip)( std::ostream& );
 
-    kostream& operator<<( Manip m )
+    _kostream& operator<<( Manip m )
     {
         m(_os);
         return *this;
     }
 };
 
-inline kostream& flat( kostream& kos )
+template<class Scheme>
+inline _kostream<Scheme>& flat( _kostream<Scheme>& kos )
 {
     return kos.setflatten( true );
 }
 
-inline kostream& deep( kostream& kos )
+template<class Scheme>
+inline _kostream<Scheme>& deep( _kostream<Scheme>& kos )
 {
     return kos.setflatten( false );
 }

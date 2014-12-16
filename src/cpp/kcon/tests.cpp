@@ -9,7 +9,11 @@ namespace kcon {
 template<class Interpreter>
 void test_ostream()
 {TEST
-	typename Interpreter::Allocator a( 1024 );
+	typedef typename Interpreter::Allocator Allocator;
+	typedef typename Interpreter::kostream kostream;
+
+	Allocator a( 1024 );
+
 	pcell_t p = a.new_Cell(
 					1,
 					a.new_Cell(
@@ -28,12 +32,15 @@ void test_ostream()
 }
 
 template<class Interpreter>
-void test_io( const std::string& in, kostream::KManip m=flat, std::string out="" )
+void test_io( const std::string& in, typename Interpreter::kostream::KManip m=flat, std::string out="" )
 {
+    typedef typename Interpreter::Allocator Allocator;
+    typedef typename Interpreter::kostream kostream;
+
 	if( out.empty() )
 		out = in;
 
-	typename Interpreter::Allocator a( 1024 );
+	Allocator a( 1024 );
 	std::ostringstream oss;
 
     kostream( oss ) << m << parse( a, in );
@@ -44,7 +51,11 @@ void test_io( const std::string& in, kostream::KManip m=flat, std::string out=""
 template<class Interpreter, class SubType=AnyType>
 void test_io_error( const std::string& in, const std::string& msg )
 {
-	typename Interpreter::Allocator a( 1024 );
+    typedef typename Interpreter::Allocator Allocator;
+    typedef typename Interpreter::kostream kostream;
+
+	Allocator a( 1024 );
+
 	std::ostringstream oss;
 	try
 	{

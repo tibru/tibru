@@ -2,6 +2,7 @@
 #define KCON_RUNTIME_H
 
 #include "container/kstack.h"
+#include "stream.h"
 
 namespace kcon {
 
@@ -14,6 +15,7 @@ struct Interpreter
     typedef Alloc<Scheme> Allocator;
 
     template<class T> using kstack = container::kstack<Scheme,T>;
+    using kostream = _kostream<Scheme>;
 };
 
 }   //namespace
