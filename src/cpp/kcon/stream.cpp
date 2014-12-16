@@ -9,7 +9,7 @@ template<class T>
 using kstack = Interpreter<SimpleScheme, SimpleAllocator>::kstack<T>;
 
 template<class Scheme>
-_kostream<Scheme>& _kostream<Scheme>::operator<<( pcell_t pcell )
+kostream<Scheme>& kostream<Scheme>::operator<<( pcell_t pcell )
 {
 	_os << '[';
 	_format( pcell );
@@ -18,19 +18,19 @@ _kostream<Scheme>& _kostream<Scheme>::operator<<( pcell_t pcell )
 }
 
 template<class Scheme>
-_kostream<Scheme>& _kostream<Scheme>::operator<<( byte_t value )
+kostream<Scheme>& kostream<Scheme>::operator<<( byte_t value )
 {
 	_format( value );
 	return *this;
 }
 
 template<class Scheme>
-_kostream<Scheme>& _kostream<Scheme>::operator<<( elem_t elem )
+kostream<Scheme>& kostream<Scheme>::operator<<( elem_t elem )
 {
     if( elem.is_pcell() )
-        return _kostream<Scheme>::operator<<( elem.pcell() );
+        return kostream<Scheme>::operator<<( elem.pcell() );
     else
-        return _kostream<Scheme>::operator<<( elem.byte() );
+        return kostream<Scheme>::operator<<( elem.byte() );
 }
 
 struct Tail
@@ -41,7 +41,7 @@ struct Tail
 
 //complicated but avoids recursion on c-stack
 template<class Scheme>
-void _kostream<Scheme>::_format( pcell_t pcell )
+void kostream<Scheme>::_format( pcell_t pcell )
 {
     std::stack<Tail> tails;
     Tail tail{ pcell, 0 };
@@ -102,7 +102,7 @@ void _kostream<Scheme>::_format( pcell_t pcell )
 }
 
 template<class Scheme>
-void _kostream<Scheme>::_format( byte_t value )
+void kostream<Scheme>::_format( byte_t value )
 {
     _os << short(value);
 }
@@ -241,4 +241,4 @@ kistream& kistream::operator>>( elem_t& elem )
     return *this;
 }
 
-template class _kostream<SimpleScheme>;
+template class kostream<SimpleScheme>;

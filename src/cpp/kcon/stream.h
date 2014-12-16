@@ -13,7 +13,7 @@ struct Syntax;
 struct EOS;
 
 template<class Scheme>
-class _kostream
+class kostream
 {
 	std::ostream& _os;
 	bool _flatten;
@@ -21,32 +21,32 @@ class _kostream
 	void _format( pcell_t pcell );
 	void _format( byte_t value );
 public:
-	_kostream( std::ostream& os, bool flatten=true )
+	kostream( std::ostream& os, bool flatten=true )
 		: _os( os ), _flatten( flatten ) {}
 
-    _kostream& setflatten( bool b ) { _flatten = b; return *this; }
+    kostream& setflatten( bool b ) { _flatten = b; return *this; }
 
-	_kostream& operator<<( pcell_t pcell );
-	_kostream& operator<<( byte_t value );
-	_kostream& operator<<( elem_t elem );
+	kostream& operator<<( pcell_t pcell );
+	kostream& operator<<( byte_t value );
+	kostream& operator<<( elem_t elem );
 
     template<class T>
-    _kostream& operator<<( const T& t )
+    kostream& operator<<( const T& t )
     {
         _os << t;
         return *this;
     }
 
-    typedef _kostream& (*KManip)( _kostream& );
+    typedef kostream& (*KManip)( kostream& );
 
-    _kostream& operator<<( KManip m )
+    kostream& operator<<( KManip m )
     {
         return m(*this);
     }
 
     typedef std::ostream& (*Manip)( std::ostream& );
 
-    _kostream& operator<<( Manip m )
+    kostream& operator<<( Manip m )
     {
         m(_os);
         return *this;
@@ -54,13 +54,13 @@ public:
 };
 
 template<class Scheme>
-inline _kostream<Scheme>& flat( _kostream<Scheme>& kos )
+inline kostream<Scheme>& flat( kostream<Scheme>& kos )
 {
     return kos.setflatten( true );
 }
 
 template<class Scheme>
-inline _kostream<Scheme>& deep( _kostream<Scheme>& kos )
+inline kostream<Scheme>& deep( kostream<Scheme>& kos )
 {
     return kos.setflatten( false );
 }

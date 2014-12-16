@@ -15,7 +15,7 @@ struct Interpreter
     typedef Alloc<Scheme> Allocator;
 
     template<class T> using kstack = container::kstack<Scheme,T>;
-    using kostream = _kostream<Scheme>;
+    using kostream = kcon::kostream<Scheme>;
 };
 
 }   //namespace
