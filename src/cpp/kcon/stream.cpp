@@ -1,8 +1,12 @@
 #include "stream.h"
-#include "kstack.h"
+#include "memory.h"
+#include "runtime.h"
 #include <stack>
 
 using namespace kcon;
+
+template<class T>
+using kstack = Interpreter<SimpleScheme, SimpleAllocator>::kstack<T>;
 
 kostream& kostream::operator<<( pcell_t pcell )
 {

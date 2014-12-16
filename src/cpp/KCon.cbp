@@ -5,6 +5,7 @@
 		<Option title="KCon" />
 		<Option pch_mode="2" />
 		<Option compiler="gcc" />
+		<Option virtualFolders="container/;" />
 		<Build>
 			<Target title="Release">
 				<Option output="bin/Release/KCon" prefix_auto="1" extension_auto="1" />
@@ -25,8 +26,10 @@
 			<Add option="-fexceptions" />
 		</Compiler>
 		<Unit filename="kcon/common.h" />
+		<Unit filename="kcon/container/kstack.h">
+			<Option virtualFolder="container/" />
+		</Unit>
 		<Unit filename="kcon/kcon.cpp" />
-		<Unit filename="kcon/kstack.h" />
 		<Unit filename="kcon/memory.cpp" />
 		<Unit filename="kcon/memory.h" />
 		<Unit filename="kcon/runtime.h" />

@@ -1,7 +1,7 @@
-#ifndef HEADER_KCON_KSTACK
-#define HEADER_KCON_KSTACK
+#ifndef HEADER_KCON_CONTAIMER_KSTACK
+#define HEADER_KCON_CONTAIMER_KSTACK
 
-namespace kcon {
+namespace kcon { namespace container {
 
 template<class Scheme>
 class basic_kstack
@@ -29,12 +29,12 @@ public:
 };
 
 template<class Scheme, class T>
-struct _kstack;
+struct kstack;
 
 template<class Scheme>
-struct _kstack<Scheme,elem_t> : basic_kstack<Scheme>
+struct kstack<Scheme,elem_t> : basic_kstack<Scheme>
 {
-    _kstack( Allocator& alloc )
+    kstack( Allocator& alloc )
         : basic_kstack<Scheme>( alloc ) {}
 
     elem_t top()
@@ -44,9 +44,9 @@ struct _kstack<Scheme,elem_t> : basic_kstack<Scheme>
 };
 
 template<class Scheme>
-struct _kstack<Scheme,pcell_t> : basic_kstack<Scheme>
+struct kstack<Scheme,pcell_t> : basic_kstack<Scheme>
 {
-    _kstack( Allocator& alloc )
+    kstack( Allocator& alloc )
         : basic_kstack<Scheme>( alloc ) {}
 
     pcell_t top()
@@ -55,9 +55,6 @@ struct _kstack<Scheme,pcell_t> : basic_kstack<Scheme>
     }
 };
 
-template<class T>
-using kstack = _kstack<SimpleScheme,T>;
-
-}   //namespace
+} } //namespace
 
 #endif // HEADER_KCON_KSTACK
