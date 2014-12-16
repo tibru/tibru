@@ -9,7 +9,7 @@ namespace kcon {
 
 using namespace std::string_literals;
 
-struct AnyType {};
+struct AnyType;
 
 template<class Type, class SubType=AnyType>
 class Error;
@@ -34,8 +34,6 @@ struct Error : Error<Type>
     	: Error<Type>( message ) {}
 };
 
-struct Runtime;
-struct Syntax;
 struct Assertion;
 struct Test;
 

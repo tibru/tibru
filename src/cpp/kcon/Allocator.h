@@ -11,6 +11,7 @@ namespace kcon {
 
 struct OutOfMemory {};
 
+template<class Scheme>
 class SimpleAllocator
 {
     class FreeCell
@@ -77,7 +78,7 @@ public:
     }
 };
 
-typedef SimpleAllocator Allocator;
+typedef SimpleAllocator<SimpleScheme> Allocator;
 
 }	//namespace
 

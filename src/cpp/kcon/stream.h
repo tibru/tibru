@@ -9,7 +9,8 @@
 
 namespace kcon {
 
-struct EOS {};
+struct Syntax;
+struct EOS;
 
 class kostream
 {

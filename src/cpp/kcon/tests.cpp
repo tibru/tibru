@@ -1,13 +1,15 @@
 #include "tests.h"
 #include "Allocator.h"
+#include "runtime.h"
 #include "stream.h"
 #include <sstream>
 
 namespace kcon {
 
+template<class Interpreter>
 void test_ostream()
 {TEST
-	SimpleAllocator a( 1024 );
+	typename Interpreter::Allocator a( 1024 );
 	pcell_t p = a.new_Cell(
 					1,
 					a.new_Cell(
@@ -25,12 +27,13 @@ void test_ostream()
 	test( oss_deep.str() == expected_deep, "Incorrect deep printing found '" + oss_deep.str() + "'\nExpected '" + expected_deep + "'" );
 }
 
+template<class Interpreter>
 void test_io( const std::string& in, kostream::KManip m=flat, std::string out="" )
 {
 	if( out.empty() )
 		out = in;
 
-	SimpleAllocator a( 1024 );
+	typename Interpreter::Allocator a( 1024 );
 	std::ostringstream oss;
 
     kostream( oss ) << m << parse( a, in );
@@ -38,10 +41,10 @@ void test_io( const std::string& in, kostream::KManip m=flat, std::string out=""
 	test( oss.str() == out, "IO failed for: '" + in + "'\nExpected: '" + out + "'\nFound:    '" + oss.str() + "'" );
 }
 
-template<class SubType=AnyType>
+template<class Interpreter, class SubType=AnyType>
 void test_io_error( const std::string& in, const std::string& msg )
 {
-	SimpleAllocator a( 1024 );
+	typename Interpreter::Allocator a( 1024 );
 	std::ostringstream oss;
 	try
 	{
@@ -56,32 +59,35 @@ void test_io_error( const std::string& in, const std::string& msg )
 	test( false, "IO failed for: '" + in + "'\nExpected error: '" + msg + "'\nFound:    '" + oss.str() + "'" );
 }
 
+template<class Interpreter>
 void test_stream()
 {TEST
-    test_io( "3" );
-    test_io( " 3 ", flat, "3" );
-	test_io( "[0 [1 2]]", flat, "[0 1 2]" );
-	test_io( " [ 0 [ 1\n 2]\t]\t", flat, "[0 1 2]" );
-	test_io( "[0 1 2]", deep, "[0 [1 2]]" );
-	test_io( "[0 [1 [2 3] 4] 5 6]", flat );
-	test_io( "[0 [1 [2 3] 4] 5 6]", deep, "[0 [[1 [[2 3] 4]] [5 6]]]" );
-	test_io( "[[0 1] 2]", deep );
-	test_io( "[[0 1] 2]", flat );
-	test_io( "[[[0 1] [2 3]] [[4 5] [6 7]]]", deep );
-	test_io( "[[[0 1] [2 3]] [[4 5] [6 7]]]", flat, "[[[0 1] 2 3] [4 5] 6 7]" );
-	test_io( "[[[0 1] 2 3] [4 5] 6 7]", flat );
+    test_io<Interpreter>( "3" );
+    test_io<Interpreter>( " 3 ", flat, "3" );
+	test_io<Interpreter>( "[0 [1 2]]", flat, "[0 1 2]" );
+	test_io<Interpreter>( " [ 0 [ 1\n 2]\t]\t", flat, "[0 1 2]" );
+	test_io<Interpreter>( "[0 1 2]", deep, "[0 [1 2]]" );
+	test_io<Interpreter>( "[0 [1 [2 3] 4] 5 6]", flat );
+	test_io<Interpreter>( "[0 [1 [2 3] 4] 5 6]", deep, "[0 [[1 [[2 3] 4]] [5 6]]]" );
+	test_io<Interpreter>( "[[0 1] 2]", deep );
+	test_io<Interpreter>( "[[0 1] 2]", flat );
+	test_io<Interpreter>( "[[[0 1] [2 3]] [[4 5] [6 7]]]", deep );
+	test_io<Interpreter>( "[[[0 1] [2 3]] [[4 5] [6 7]]]", flat, "[[[0 1] 2 3] [4 5] 6 7]" );
+	test_io<Interpreter>( "[[[0 1] 2 3] [4 5] 6 7]", flat );
 
-	test_io_error<EOS>( "[", "Unexpected end of input" );
-	test_io_error( "]", "Unexpected ']'" );
-	test_io_error( "[0]", "Unexpected singleton" );
-	test_io_error( "[[0] 2]", "Unexpected singleton" );
-	test_io_error( "[]", "Unexpected empty cell" );
-	test_io_error( "[[] 2]", "Unexpected empty cell" );
+	test_io_error<Interpreter,EOS>( "[", "Unexpected end of input" );
+	test_io_error<Interpreter>( "]", "Unexpected ']'" );
+	test_io_error<Interpreter>( "[0]", "Unexpected singleton" );
+	test_io_error<Interpreter>( "[[0] 2]", "Unexpected singleton" );
+	test_io_error<Interpreter>( "[]", "Unexpected empty cell" );
+	test_io_error<Interpreter>( "[[] 2]", "Unexpected empty cell" );
 }
 
-template<class Allocator>
+template<class Interpreter>
 void test_gc()
 {TEST
+    typedef typename Interpreter::Allocator Allocator;
+
     try
     {
         Allocator a( 1 );
@@ -141,11 +147,17 @@ void test_gc()
     }
 }
 
+template<class Interpreter>
+void run_tests_interpreter()
+{
+    test_stream<Interpreter>();
+	test_ostream<Interpreter>();
+	test_gc<Interpreter>();
+}
+
 void run_tests()
 {
-	test_stream();
-	test_ostream();
-	test_gc<SimpleAllocator>();
+    run_tests_interpreter< Interpreter<SimpleScheme, SimpleAllocator> >();
 }
 
 }	//namespace

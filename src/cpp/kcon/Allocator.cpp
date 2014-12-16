@@ -1,8 +1,10 @@
 #include "Allocator.h"
+#include "runtime.h"
 
 using namespace kcon;
 
-void SimpleAllocator::_mark( std::set<pcell_t>& live, pcell_t p )
+template<class Scheme>
+void SimpleAllocator<Scheme>::_mark( std::set<pcell_t>& live, pcell_t p )
 {
     if( live.find( p ) != live.end() )
         return;
@@ -16,7 +18,8 @@ void SimpleAllocator::_mark( std::set<pcell_t>& live, pcell_t p )
         _mark( live, p->tail().pcell() );
 }
 
-void SimpleAllocator::gc( const Roots& roots )
+template<class Scheme>
+void SimpleAllocator<Scheme>::gc( const Roots& roots )
 {
     ++_gc_count;
 
@@ -35,3 +38,6 @@ void SimpleAllocator::gc( const Roots& roots )
     if( _free_list == 0 )
         throw Error<Runtime,OutOfMemory>( "Out of memory" );
 }
+
+template void SimpleAllocator<SimpleScheme>::_mark( std::set<pcell_t>&, pcell_t );
+template void SimpleAllocator<SimpleScheme>::gc( const Roots& );
