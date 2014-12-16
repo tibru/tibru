@@ -3,6 +3,7 @@
 
 namespace kcon {
 
+template<class Scheme>
 class basic_kstack
 {
 protected:
@@ -27,32 +28,35 @@ public:
     bool empty() const { return _items == null<pcell_t>(); }
 };
 
-template<class T>
-struct kstack;
+template<class Scheme, class T>
+struct _kstack;
 
-template<>
-struct kstack<elem_t> : basic_kstack
+template<class Scheme>
+struct _kstack<Scheme,elem_t> : basic_kstack<Scheme>
 {
-    kstack( Allocator& alloc )
-        : basic_kstack( alloc ) {}
+    _kstack( Allocator& alloc )
+        : basic_kstack<Scheme>( alloc ) {}
 
     elem_t top()
     {
-        return _items->head();
+        return this->_items->head();
     }
 };
 
-template<>
-struct kstack<pcell_t> : basic_kstack
+template<class Scheme>
+struct _kstack<Scheme,pcell_t> : basic_kstack<Scheme>
 {
-    kstack( Allocator& alloc )
-        : basic_kstack( alloc ) {}
+    _kstack( Allocator& alloc )
+        : basic_kstack<Scheme>( alloc ) {}
 
     pcell_t top()
     {
-        return _items->head().pcell();
+        return this->_items->head().pcell();
     }
 };
+
+template<class T>
+using kstack = _kstack<SimpleScheme,T>;
 
 }   //namespace
 
