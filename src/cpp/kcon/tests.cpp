@@ -43,7 +43,7 @@ void test_io( const std::string& in, typename Interpreter::kostream::KManip m=fl
 	Allocator a( 1024 );
 	std::ostringstream oss;
 
-    kostream( oss ) << m << parse( a, in );
+    kostream( oss ) << m << Interpreter::parse( a, in );
 
 	test( oss.str() == out, "IO failed for: '" + in + "'\nExpected: '" + out + "'\nFound:    '" + oss.str() + "'" );
 }
@@ -59,7 +59,7 @@ void test_io_error( const std::string& in, const std::string& msg )
 	std::ostringstream oss;
 	try
 	{
-        kostream( oss ) << parse( a, in );
+        kostream( oss ) << Interpreter::parse( a, in );
 	}
 	catch( const Error<Syntax,SubType>& e )
 	{
@@ -123,8 +123,8 @@ void test_gc()
 
     {
         Allocator a( 1024 );
-        pcell_t p = parse( a, "[0 [1 [2 3] 4] 5 6]" ).pcell();
-        pcell_t q = parse( a, "[0 [1 [2 3] 4] 5 6]" ).pcell();
+        pcell_t p = Interpreter::parse( a, "[0 [1 [2 3] 4] 5 6]" ).pcell();
+        pcell_t q = Interpreter::parse( a, "[0 [1 [2 3] 4] 5 6]" ).pcell();
 
         a.gc({&p,&q});
 
@@ -134,8 +134,8 @@ void test_gc()
 
     {
         Allocator a( 1024 );
-        pcell_t p = parse( a, "[0 [1 [2 3] 4] 5 6]" ).pcell();
-        parse( a, "[0 [1 [2 3] 4] 5 6]" ).pcell();
+        pcell_t p = Interpreter::parse( a, "[0 [1 [2 3] 4] 5 6]" ).pcell();
+        Interpreter::parse( a, "[0 [1 [2 3] 4] 5 6]" ).pcell();
 
         a.gc({&p});
 
@@ -147,7 +147,7 @@ void test_gc()
     {
         //Test with minimal memory to create memory churn
         Allocator a( 1024 );
-        pcell_t p = parse( a, "[0 [1 [2 3] 4] 5 6]" ).pcell();
+        pcell_t p = Interpreter::parse( a, "[0 [1 [2 3] 4] 5 6]" ).pcell();
 
         test( a.gc_count() == 0, "GC ran during parse" );
         //test( a.gc_count() == 1, "GC failed to run during parse" );

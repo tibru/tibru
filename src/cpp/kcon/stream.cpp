@@ -107,7 +107,8 @@ void kostream<Scheme>::_format( byte_t value )
     _os << short(value);
 }
 
-byte_t kistream::_parse_byte()
+template<class Scheme, class Allocator>
+byte_t kistream<Scheme,Allocator>::_parse_byte()
 {
     value_t value;
     if( !(_is >> value) || (value >= 256) )
@@ -116,7 +117,8 @@ byte_t kistream::_parse_byte()
     return static_cast<byte_t>( value );
 }
 
-pcell_t kistream::_parse_elems()
+template<class Scheme, class Allocator>
+pcell_t kistream<Scheme,Allocator>::_parse_elems()
 {
 	pcell_t tail = null<pcell_t>();
 	kstack<pcell_t> tails( _alloc );
@@ -157,7 +159,8 @@ pcell_t kistream::_parse_elems()
 	throw Error<Syntax,EOS>( "Unexpected end of input" );
 }
 
-pcell_t kistream::_reverse_and_reduce( pcell_t pcell )
+template<class Scheme, class Allocator>
+pcell_t kistream<Scheme,Allocator>::_reverse_and_reduce( pcell_t pcell )
 {
     pcell_t p = pcell;
     elem_t tail = null<pcell_t>();
@@ -216,7 +219,8 @@ pcell_t kistream::_reverse_and_reduce( pcell_t pcell )
 	return tail.pcell();
 }
 
-elem_t kistream::_parse()
+template<class Scheme, class Allocator>
+elem_t kistream<Scheme, Allocator>::_parse()
 {
 	char c;
 	if( !(_is >> c) )
@@ -235,10 +239,12 @@ elem_t kistream::_parse()
         throw Error<Syntax>( "Unexpected '"s + c + "'" );
 }
 
-kistream& kistream::operator>>( elem_t& elem )
+template<class Scheme, class Allocator>
+kistream<Scheme, Allocator>& kistream<Scheme, Allocator>::operator>>( elem_t& elem )
 {
     elem = _parse();
     return *this;
 }
 
 template class kostream<SimpleScheme>;
+template class kistream<SimpleScheme,SimpleAllocator<SimpleScheme>>;

@@ -65,6 +65,7 @@ inline kostream<Scheme>& deep( kostream<Scheme>& kos )
     return kos.setflatten( false );
 }
 
+template<class Scheme, class Allocator>
 class kistream
 {
     std::istream& _is;
@@ -80,15 +81,6 @@ public:
 
 	kistream& operator>>( elem_t& elem );
 };
-
-template<class Alloc>
-elem_t parse( Alloc& allocator, const std::string& in )
-{
-    std::istringstream iss( in );
-    elem_t elem = null<elem_t>();
-    kistream( iss, allocator ) >> elem;
-    return elem;
-}
 
 }	//namespace
 
