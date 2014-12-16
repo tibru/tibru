@@ -11,26 +11,26 @@ namespace kcon {
 
 struct OutOfMemory {};
 
-class FreeCell
-{
-    value_t _salt;
-    FreeCell* _next;
-
-    static FreeCell* _hash( value_t salt, FreeCell* p )
-    {
-        return reinterpret_cast<FreeCell*>( reinterpret_cast<uintptr_t>( p ) ^ salt );
-    }
-public:
-    FreeCell( FreeCell* next=0 )
-        : _salt( rand() & ADDR_MASK ), _next( _hash( _salt, next ) ) {}
-
-    FreeCell* next() const { return _hash( _salt, _next ); }
-};
-
-ASSERT( sizeof(FreeCell) == sizeof(Cell) );
-
 class SimpleAllocator
 {
+    class FreeCell
+    {
+        value_t _salt;
+        FreeCell* _next;
+
+        static FreeCell* _hash( value_t salt, FreeCell* p )
+        {
+            return reinterpret_cast<FreeCell*>( reinterpret_cast<uintptr_t>( p ) ^ salt );
+        }
+    public:
+        FreeCell( FreeCell* next=0 )
+            : _salt( rand() & ADDR_MASK ), _next( _hash( _salt, next ) ) {}
+
+        FreeCell* next() const { return _hash( _salt, _next ); }
+    };
+
+    ASSERT( sizeof(FreeCell) == sizeof(Cell) );
+
     const size_t _ncells;
     FreeCell* _page;
     FreeCell* _free_list;
