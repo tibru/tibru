@@ -61,7 +61,7 @@ inline void test( bool cond, const std::string& msg )
     pass();
 }
 
-#define TEST std::cout << "\n" << __func__ << ": " << std::flush;
+#define TEST std::cout << "\n" << __FUNCTION__ << ": " << std::flush;
 
 template<bool>
 struct ASSERT_FAILED;
@@ -75,6 +75,22 @@ struct assert_test {};
 #define APPLY(fn,x,y) fn(x,y)
 #define CONCAT(x,y) x##y
 #define ASSERT( cond ) typedef assert_test< sizeof( ASSERT_FAILED< ( cond ) > ) > APPLY( CONCAT, assert_test_type, __COUNTER__ )
+
+inline std::string extract_type_name( const char* name )
+{
+    std::string s = name;
+    const size_t n = s.find( ';' );
+    return s.substr( 40, n-40 );
+}
+
+template<typename T>
+inline std::string type_name()
+{
+    static std::string s = extract_type_name( __PRETTY_FUNCTION__ );
+    return s;
+}
+
+#define TYPENAME( ... ) type_name<__VA_ARGS__>()
 
 }	//namespace
 

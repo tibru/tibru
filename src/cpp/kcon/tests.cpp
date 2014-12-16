@@ -150,6 +150,8 @@ void test_gc()
 template<class Interpreter>
 void run_tests_interpreter()
 {
+    std::cout << "TEST: " << TYPENAME( Interpreter );
+
     test_stream<Interpreter>();
 	test_ostream<Interpreter>();
 	test_gc<Interpreter>();
