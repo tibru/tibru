@@ -39,5 +39,4 @@ auto SimpleAllocator<Scheme>::gc( const Roots& roots ) -> void
         throw Error<Runtime,OutOfMemory>( "Out of memory" );
 }
 
-template auto SimpleAllocator<SimpleScheme>::_mark( std::set<pcell_t>&, pcell_t ) -> void;
-template auto SimpleAllocator<SimpleScheme>::gc( const Roots& ) -> void;
+template class SimpleAllocator<SimpleScheme>;

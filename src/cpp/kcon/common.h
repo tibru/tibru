@@ -80,7 +80,7 @@ inline auto extract_type_name( const char* name ) -> auto
 {
     std::string s = name;
     const size_t n = s.find( ';' );
-    return s.substr( 40, n-40 );
+    return s.substr( 33, n-33 );
 }
 
 template<typename T>
