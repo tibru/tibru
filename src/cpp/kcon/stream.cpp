@@ -6,7 +6,7 @@
 using namespace kcon;
 
 template<class T>
-using kstack = Interpreter<SimpleScheme, SimpleAllocator>::kstack<T>;
+using kstack = Env<SimpleScheme, SimpleAllocator>::kstack<T>;
 
 template<class Scheme>
 kostream<Scheme>& kostream<Scheme>::operator<<( pcell_t pcell )

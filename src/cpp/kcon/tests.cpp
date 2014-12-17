@@ -6,12 +6,13 @@
 
 namespace kcon {
 
-template<class Interpreter>
+template<class Env>
 struct Tester
 {
-    typedef typename Interpreter::Allocator Allocator;
-    typedef typename Interpreter::kostream kostream;
-    typedef typename Interpreter::kistream kistream;
+    typedef typename Env::Allocator Allocator;
+    typedef typename Env::kostream kostream;
+    typedef typename Env::kistream kistream;
+    typedef typename Env::kostream::KManip KManip;
 
     static elem_t parse( Allocator& allocator, const std::string& in )
     {
@@ -42,7 +43,7 @@ struct Tester
         test( oss_deep.str() == expected_deep, "Incorrect deep printing found '" + oss_deep.str() + "'\nExpected '" + expected_deep + "'" );
     }
 
-    static void test_io( const std::string& in, typename Interpreter::kostream::KManip m=flat, std::string out="" )
+    static void test_io( const std::string& in, KManip m=flat, std::string out="" )
     {
         if( out.empty() )
             out = in;
@@ -160,7 +161,7 @@ struct Tester
 
     static void run_tests()
     {
-        std::cout << "TEST: " << TYPENAME( Interpreter );
+        std::cout << "TEST: " << TYPENAME( Env );
 
         test_stream();
         test_ostream();
@@ -170,7 +171,7 @@ struct Tester
 
 void run_tests()
 {
-    Tester< Interpreter<SimpleScheme, SimpleAllocator> >::run_tests();
+    Tester< Env<SimpleScheme, SimpleAllocator> >::run_tests();
 }
 
 }	//namespace

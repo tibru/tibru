@@ -9,7 +9,7 @@ namespace kcon {
 struct Runtime;
 
 template<class Scheme, template<class> class AllocatorTemplate>
-struct Interpreter
+struct Env
 {
     using Allocator = AllocatorTemplate<Scheme>;
 
