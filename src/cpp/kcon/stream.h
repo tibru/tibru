@@ -15,23 +15,29 @@ struct EOS;
 template<class Scheme>
 class kostream
 {
+    typedef typename Scheme::byte_t byte_t;
+    typedef typename Scheme::pcell_t pcell_t;
+    typedef typename Scheme::elem_t elem_t;
+
 	std::ostream& _os;
 	bool _flatten;
 
-	void _format( pcell_t pcell );
-	void _format( byte_t value );
+	auto _format( pcell_t pcell );
+	auto _format( byte_t value );
+
+    struct Tail { elem_t elem; size_t len; };
 public:
 	kostream( std::ostream& os, bool flatten=true )
 		: _os( os ), _flatten( flatten ) {}
 
-    kostream& setflatten( bool b ) { _flatten = b; return *this; }
+    auto setflatten( bool b ) -> kostream& { _flatten = b; return *this; }
 
-	kostream& operator<<( pcell_t pcell );
-	kostream& operator<<( byte_t value );
-	kostream& operator<<( elem_t elem );
+	auto operator<<( pcell_t pcell ) -> kostream&;
+	auto operator<<( byte_t value ) -> kostream&;
+	auto operator<<( elem_t elem ) -> kostream&;
 
     template<class T>
-    kostream& operator<<( const T& t )
+    auto operator<<( const T& t ) -> kostream&
     {
         _os << t;
         return *this;
@@ -39,14 +45,14 @@ public:
 
     typedef kostream& (*KManip)( kostream& );
 
-    kostream& operator<<( KManip m )
+    auto operator<<( KManip m ) -> kostream&
     {
         return m(*this);
     }
 
     typedef std::ostream& (*Manip)( std::ostream& );
 
-    kostream& operator<<( Manip m )
+    auto operator<<( Manip m ) -> kostream&
     {
         m(_os);
         return *this;
@@ -68,18 +74,23 @@ inline kostream<Scheme>& deep( kostream<Scheme>& kos )
 template<class Scheme, class Allocator>
 class kistream
 {
+    typedef typename Scheme::value_t value_t;
+    typedef typename Scheme::byte_t byte_t;
+    typedef typename Scheme::pcell_t pcell_t;
+    typedef typename Scheme::elem_t elem_t;
+
     std::istream& _is;
     Allocator& _alloc;
 
-    byte_t _parse_byte();
-	pcell_t _parse_elems();
-	pcell_t _reverse_and_reduce( pcell_t p );
-	elem_t _parse();
+    auto _parse_byte() -> byte_t;
+	auto _parse_elems() -> pcell_t;
+	auto _reverse_and_reduce( pcell_t p ) -> pcell_t;
+	auto _parse() -> elem_t;
 public:
     kistream( std::istream& is, Allocator& alloc )
         : _is( is ), _alloc( alloc ) {}
 
-	kistream& operator>>( elem_t& elem );
+	auto operator>>( elem_t& elem ) -> kistream&;
 };
 
 }	//namespace

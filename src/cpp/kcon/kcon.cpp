@@ -1,7 +1,7 @@
 #include "tests.h"
 #include <iostream>
 
-int main( int argc, const char* argv[] )
+auto main( int argc, const char* argv[] ) -> int
 {
 	kcon::run_tests();
 	std::cout << "\n** All tests passed **\n";

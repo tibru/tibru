@@ -8,9 +8,10 @@ namespace kcon {
 
 struct Runtime;
 
-template<class Scheme, template<class> class AllocatorTemplate>
+template<class Schem, template<class> class AllocatorTemplate>
 struct Env
 {
+    using Scheme = Schem;
     using Allocator = AllocatorTemplate<Scheme>;
 
     template<class T> using kstack = container::kstack<Scheme,T>;

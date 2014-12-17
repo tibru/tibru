@@ -14,12 +14,17 @@ struct OutOfMemory {};
 template<class Scheme>
 class SimpleAllocator
 {
+    typedef typename Scheme::value_t value_t;
+    typedef typename Scheme::pcell_t pcell_t;
+    typedef typename Scheme::elem_t elem_t;
+    typedef typename Scheme::Cell Cell;
+
     class FreeCell
     {
         value_t _salt;
         FreeCell* _next;
 
-        static FreeCell* _hash( value_t salt, FreeCell* p )
+        static auto _hash( value_t salt, FreeCell* p ) -> auto
         {
             return reinterpret_cast<FreeCell*>( reinterpret_cast<uintptr_t>( p ) ^ salt );
         }
@@ -27,7 +32,7 @@ class SimpleAllocator
         FreeCell( FreeCell* next=0 )
             : _salt( rand() & ADDR_MASK ), _next( _hash( _salt, next ) ) {}
 
-        FreeCell* next() const { return _hash( _salt, _next ); }
+        auto next() const -> FreeCell* { return _hash( _salt, _next ); }
     };
 
     ASSERT( sizeof(FreeCell) == sizeof(Cell) );
@@ -37,7 +42,7 @@ class SimpleAllocator
     FreeCell* _free_list;
     size_t _gc_count;
 
-    static void _mark( std::set<pcell_t>& live, pcell_t pcell );
+    static auto _mark( std::set<pcell_t>& live, pcell_t pcell ) -> void;
 public:
     typedef std::initializer_list<pcell_t*> Roots;
 
@@ -54,11 +59,11 @@ public:
 		delete[] _page;
 	}
 
-    void gc( const Roots& roots );
+    auto gc( const Roots& roots ) -> void;
 
-    size_t gc_count() const { return _gc_count; }
+    auto gc_count() const -> size_t { return _gc_count; }
 
-    void* allocate( const Roots& roots )
+    auto allocate( const Roots& roots ) -> void*
     {
         if( _free_list == 0 )
             gc( roots );
@@ -68,7 +73,7 @@ public:
         return p;
     }
 
-    size_t num_allocated() const
+    auto num_allocated() const -> size_t
     {
         size_t n = _ncells;
         for( const FreeCell* p = _free_list; p != 0; p = p->next() )
@@ -77,7 +82,7 @@ public:
         return n;
     }
 
-    const Cell* new_Cell( const elem_t& head, const elem_t& tail, const Roots& roots={} )
+    auto new_Cell( const elem_t& head, const elem_t& tail, const Roots& roots={} ) -> const Cell*
     {
         return new ( allocate( roots ) ) Cell( head, tail );
     }

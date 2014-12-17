@@ -14,7 +14,10 @@ struct Tester
     typedef typename Env::kistream kistream;
     typedef typename Env::kostream::KManip KManip;
 
-    static elem_t parse( Allocator& allocator, const std::string& in )
+    typedef typename Env::Scheme::pcell_t pcell_t;
+    typedef typename Env::Scheme::elem_t elem_t;
+
+    static auto parse( Allocator& allocator, const std::string& in ) -> elem_t
     {
         std::istringstream iss( in );
         elem_t elem = null<elem_t>();
@@ -22,7 +25,7 @@ struct Tester
         return elem;
     }
 
-    static void test_ostream()
+    static auto test_ostream() -> void
     {TEST
         Allocator a( 1024 );
 
@@ -43,7 +46,7 @@ struct Tester
         test( oss_deep.str() == expected_deep, "Incorrect deep printing found '" + oss_deep.str() + "'\nExpected '" + expected_deep + "'" );
     }
 
-    static void test_io( const std::string& in, KManip m=flat, std::string out="" )
+    static auto test_io( const std::string& in, KManip m=flat, std::string out="" ) -> void
     {
         if( out.empty() )
             out = in;
@@ -57,7 +60,7 @@ struct Tester
     }
 
     template<class SubType=AnyType>
-    static void test_io_error( const std::string& in, const std::string& msg )
+    static auto test_io_error( const std::string& in, const std::string& msg ) -> void
     {
         Allocator a( 1024 );
 
@@ -75,7 +78,7 @@ struct Tester
         test( false, "IO failed for: '" + in + "'\nExpected error: '" + msg + "'\nFound:    '" + oss.str() + "'" );
     }
 
-    static void test_stream()
+    static auto test_stream() -> void
     {TEST
         test_io( "3" );
         test_io( " 3 ", flat, "3" );
@@ -98,7 +101,7 @@ struct Tester
         test_io_error( "[[] 2]", "Unexpected empty cell" );
     }
 
-    static void test_gc()
+    static auto test_gc() -> void
     {TEST
         try
         {
@@ -159,7 +162,7 @@ struct Tester
         }
     }
 
-    static void run_tests()
+    static auto run_tests() -> void
     {
         std::cout << "TEST: " << TYPENAME( Env );
 
@@ -169,7 +172,7 @@ struct Tester
     }
 };
 
-void run_tests()
+auto run_tests() -> void
 {
     Tester< Env<SimpleScheme, SimpleAllocator> >::run_tests();
 }

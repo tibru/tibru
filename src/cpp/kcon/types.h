@@ -87,13 +87,6 @@ inline bool is_singleton( const SimpleScheme::pcell_t& p )
     return (p != null<SimpleScheme::pcell_t>()) && (p->tail() == null<SimpleScheme::elem_t>());
 }
 
-typedef SimpleScheme::value_t value_t;
-typedef SimpleScheme::byte_t byte_t;
-typedef SimpleScheme::pcell_t pcell_t;
-typedef SimpleScheme::elem_t elem_t;
-typedef SimpleScheme::Cell Cell;
-
-
 }	//namespace
 
 /*

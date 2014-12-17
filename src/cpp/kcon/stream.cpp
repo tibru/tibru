@@ -9,7 +9,7 @@ template<class T>
 using kstack = Env<SimpleScheme, SimpleAllocator>::kstack<T>;
 
 template<class Scheme>
-kostream<Scheme>& kostream<Scheme>::operator<<( pcell_t pcell )
+auto kostream<Scheme>::operator<<( pcell_t pcell ) -> kostream<Scheme>&
 {
 	_os << '[';
 	_format( pcell );
@@ -18,14 +18,14 @@ kostream<Scheme>& kostream<Scheme>::operator<<( pcell_t pcell )
 }
 
 template<class Scheme>
-kostream<Scheme>& kostream<Scheme>::operator<<( byte_t value )
+auto kostream<Scheme>::operator<<( byte_t value ) -> kostream<Scheme>&
 {
 	_format( value );
 	return *this;
 }
 
 template<class Scheme>
-kostream<Scheme>& kostream<Scheme>::operator<<( elem_t elem )
+auto kostream<Scheme>::operator<<( elem_t elem ) -> kostream<Scheme>&
 {
     if( elem.is_pcell() )
         return kostream<Scheme>::operator<<( elem.pcell() );
@@ -33,15 +33,9 @@ kostream<Scheme>& kostream<Scheme>::operator<<( elem_t elem )
         return kostream<Scheme>::operator<<( elem.byte() );
 }
 
-struct Tail
-{
-    elem_t elem;
-    size_t len;
-};
-
 //complicated but avoids recursion on c-stack
 template<class Scheme>
-void kostream<Scheme>::_format( pcell_t pcell )
+auto kostream<Scheme>::_format( pcell_t pcell )
 {
     std::stack<Tail> tails;
     Tail tail{ pcell, 0 };
@@ -102,13 +96,13 @@ void kostream<Scheme>::_format( pcell_t pcell )
 }
 
 template<class Scheme>
-void kostream<Scheme>::_format( byte_t value )
+auto kostream<Scheme>::_format( byte_t value )
 {
     _os << short(value);
 }
 
 template<class Scheme, class Allocator>
-byte_t kistream<Scheme,Allocator>::_parse_byte()
+auto kistream<Scheme,Allocator>::_parse_byte() -> byte_t
 {
     value_t value;
     if( !(_is >> value) || (value >= 256) )
@@ -118,7 +112,7 @@ byte_t kistream<Scheme,Allocator>::_parse_byte()
 }
 
 template<class Scheme, class Allocator>
-pcell_t kistream<Scheme,Allocator>::_parse_elems()
+auto kistream<Scheme,Allocator>::_parse_elems() -> pcell_t
 {
 	pcell_t tail = null<pcell_t>();
 	kstack<pcell_t> tails( _alloc );
@@ -160,7 +154,7 @@ pcell_t kistream<Scheme,Allocator>::_parse_elems()
 }
 
 template<class Scheme, class Allocator>
-pcell_t kistream<Scheme,Allocator>::_reverse_and_reduce( pcell_t pcell )
+auto kistream<Scheme,Allocator>::_reverse_and_reduce( pcell_t pcell ) -> pcell_t
 {
     pcell_t p = pcell;
     elem_t tail = null<pcell_t>();
@@ -220,7 +214,7 @@ pcell_t kistream<Scheme,Allocator>::_reverse_and_reduce( pcell_t pcell )
 }
 
 template<class Scheme, class Allocator>
-elem_t kistream<Scheme, Allocator>::_parse()
+auto kistream<Scheme, Allocator>::_parse() -> elem_t
 {
 	char c;
 	if( !(_is >> c) )
@@ -240,7 +234,7 @@ elem_t kistream<Scheme, Allocator>::_parse()
 }
 
 template<class Scheme, class Allocator>
-kistream<Scheme, Allocator>& kistream<Scheme, Allocator>::operator>>( elem_t& elem )
+auto kistream<Scheme, Allocator>::operator>>( elem_t& elem ) -> kistream<Scheme, Allocator>&
 {
     elem = _parse();
     return *this;

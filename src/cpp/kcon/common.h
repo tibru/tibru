@@ -76,7 +76,7 @@ struct assert_test {};
 #define CONCAT(x,y) x##y
 #define ASSERT( cond ) typedef assert_test< sizeof( ASSERT_FAILED< ( cond ) > ) > APPLY( CONCAT, assert_test_type, __COUNTER__ )
 
-inline std::string extract_type_name( const char* name )
+inline auto extract_type_name( const char* name ) -> auto
 {
     std::string s = name;
     const size_t n = s.find( ';' );
@@ -84,7 +84,7 @@ inline std::string extract_type_name( const char* name )
 }
 
 template<typename T>
-inline std::string type_name()
+inline auto type_name() -> auto
 {
     static std::string s = extract_type_name( __PRETTY_FUNCTION__ );
     return s;

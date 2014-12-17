@@ -4,7 +4,7 @@
 using namespace kcon;
 
 template<class Scheme>
-void SimpleAllocator<Scheme>::_mark( std::set<pcell_t>& live, pcell_t p )
+auto SimpleAllocator<Scheme>::_mark( std::set<pcell_t>& live, pcell_t p ) -> void
 {
     if( live.find( p ) != live.end() )
         return;
@@ -19,7 +19,7 @@ void SimpleAllocator<Scheme>::_mark( std::set<pcell_t>& live, pcell_t p )
 }
 
 template<class Scheme>
-void SimpleAllocator<Scheme>::gc( const Roots& roots )
+auto SimpleAllocator<Scheme>::gc( const Roots& roots ) -> void
 {
     ++_gc_count;
 
@@ -39,5 +39,5 @@ void SimpleAllocator<Scheme>::gc( const Roots& roots )
         throw Error<Runtime,OutOfMemory>( "Out of memory" );
 }
 
-template void SimpleAllocator<SimpleScheme>::_mark( std::set<pcell_t>&, pcell_t );
-template void SimpleAllocator<SimpleScheme>::gc( const Roots& );
+template auto SimpleAllocator<SimpleScheme>::_mark( std::set<pcell_t>&, pcell_t ) -> void;
+template auto SimpleAllocator<SimpleScheme>::gc( const Roots& ) -> void;

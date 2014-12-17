@@ -2,8 +2,8 @@
 #define HEADER_KCON_TESTS
 
 namespace kcon {
-	
-void run_tests();
+
+auto run_tests() -> void;
 
 }	//namespace
 
