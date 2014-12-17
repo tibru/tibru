@@ -27,15 +27,15 @@ auto SimpleAllocator<Scheme>::gc( const Roots& roots ) -> void
     for( auto r : roots )
         _mark( live, *r );
 
-    _free_list = 0;
+    _free_set.clear();
     for( size_t i = 0; i != _ncells; ++i )
     {
-        auto p = reinterpret_cast<Cell*>( &_page[i] );
+        auto p = &_page[i];
         if( live.find( p ) == live.end() )
-            _free_list = new (p) FreeCell( _free_list );
+            _free_set.insert( p );
     }
 
-    if( _free_list == 0 )
+    if( _free_set.empty() )
         throw Error<Runtime,OutOfMemory>( "Out of memory" );
 }
 

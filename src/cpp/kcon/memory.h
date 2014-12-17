@@ -6,6 +6,7 @@
 #include <cstdlib>
 #include <initializer_list>
 #include <set>
+#include <vector>
 
 namespace kcon {
 
@@ -19,45 +20,24 @@ class SimpleAllocator
     typedef typename Scheme::elem_t elem_t;
     typedef typename Scheme::Cell Cell;
 
-    class FreeCell
-    {
-        value_t _salt;
-        FreeCell* _next;
-
-        static auto _hash( value_t salt, FreeCell* p ) -> auto
-        {
-            return reinterpret_cast<FreeCell*>( reinterpret_cast<uintptr_t>( p ) ^ salt );
-        }
-    public:
-        FreeCell( FreeCell* next=0 )
-            : _salt( rand() & ADDR_MASK ), _next( _hash( _salt, next ) ) {}
-
-        auto next() const -> FreeCell* { return _hash( _salt, _next ); }
-    };
-
-    ASSERT( sizeof(FreeCell) == sizeof(Cell) );
-
     const size_t _ncells;
-    FreeCell* _page;
-    FreeCell* _free_list;
+    std::vector<Cell> _page;    //effectively const to avoid reallocation
+    std::set<Cell*> _free_set;
     size_t _gc_count;
 
     static auto _mark( std::set<pcell_t>& live, pcell_t pcell ) -> void;
+
+    SimpleAllocator( SimpleAllocator& );
+    SimpleAllocator& operator=( const SimpleAllocator& );
 public:
     typedef std::initializer_list<pcell_t*> Roots;
 
     SimpleAllocator( size_t ncells )
-        : _ncells( ncells ), _page( new FreeCell[ncells] ), _free_list( 0 ), _gc_count( 0 )
+        : _ncells( ncells ), _page( ncells, Cell( 1, 1 ) ), _free_set(), _gc_count( 0 )
     {
-        assert( reinterpret_cast<uintptr_t>(_page) % sizeof(FreeCell) == 0, "Page not cell aligned" );
         gc({});
         _gc_count = 0;
     }
-
-	~SimpleAllocator()
-	{
-		delete[] _page;
-	}
 
     auto gc( const Roots& roots ) -> void;
 
@@ -65,21 +45,17 @@ public:
 
     auto allocate( const Roots& roots ) -> void*
     {
-        if( _free_list == 0 )
+        if( _free_set.empty() )
             gc( roots );
 
-        void* p = _free_list;
-        _free_list = _free_list->next();
+        void* p = *_free_set.begin();
+        _free_set.erase( _free_set.begin() );
         return p;
     }
 
     auto num_allocated() const -> size_t
     {
-        size_t n = _ncells;
-        for( const FreeCell* p = _free_list; p != 0; p = p->next() )
-            --n;
-
-        return n;
+        return _ncells - _free_set.size();
     }
 
     auto new_Cell( const elem_t& head, const elem_t& tail, const Roots& roots={} ) -> const Cell*
