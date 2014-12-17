@@ -13,25 +13,27 @@ namespace kcon {
 struct OutOfMemory {};
 
 template<class Scheme>
-class SimpleAllocator
+struct SimpleAllocator
 {
     typedef typename Scheme::value_t value_t;
     typedef typename Scheme::pcell_t pcell_t;
     typedef typename Scheme::elem_t elem_t;
     typedef typename Scheme::Cell Cell;
 
+    typedef std::initializer_list<pcell_t*> Roots;
+private:
     const size_t _ncells;
     std::vector<Cell> _page;    //effectively const to avoid reallocation
     std::set<Cell*> _free_set;
     size_t _gc_count;
 
+    auto _moved( elem_t e ) -> elem_t;
+    auto _move( const Roots& roots ) -> void;
     static auto _mark( std::set<pcell_t>& live, pcell_t pcell ) -> void;
 
     SimpleAllocator( SimpleAllocator& );
     SimpleAllocator& operator=( const SimpleAllocator& );
 public:
-    typedef std::initializer_list<pcell_t*> Roots;
-
     SimpleAllocator( size_t ncells )
         : _ncells( ncells ), _page( ncells, Cell( 1, 1 ) ), _free_set(), _gc_count( 0 )
     {
@@ -60,7 +62,9 @@ public:
 
     auto new_Cell( const elem_t& head, const elem_t& tail, const Roots& roots={} ) -> const Cell*
     {
-        return new ( allocate( roots ) ) Cell( head, tail );
+        const Cell* p = new ( allocate( roots ) ) Cell( head, tail );
+        _move( roots );
+        return p;
     }
 };
 
