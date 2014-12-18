@@ -11,21 +11,22 @@ namespace kcon {
 struct OutOfMemory {};
 
 template<class Scheme>
-class TestAllocator
+struct TestAllocator
 {
     typedef typename Scheme::value_t value_t;
     typedef typename Scheme::pcell_t pcell_t;
     typedef typename Scheme::elem_t elem_t;
     typedef typename Scheme::Cell Cell;
 
+    typedef std::initializer_list<pcell_t*> Roots;
+private:
     const size_t _ncells;
     std::set<pcell_t> _allocated;
     size_t _gc_count;
 
     static void _mark( std::set<pcell_t>& live, pcell_t pcell );
+    void _shift( const Roots& roots );
 public:
-    typedef std::initializer_list<pcell_t*> Roots;
-
     TestAllocator( size_t ncells )
         : _ncells( ncells ), _allocated(), _gc_count( 0 ) {}
 
@@ -54,13 +55,15 @@ public:
 };
 
 template<class Scheme>
-class SimpleAllocator
+struct SimpleAllocator
 {
     typedef typename Scheme::value_t value_t;
     typedef typename Scheme::pcell_t pcell_t;
     typedef typename Scheme::elem_t elem_t;
     typedef typename Scheme::Cell Cell;
 
+    typedef std::initializer_list<pcell_t*> Roots;
+private:
     struct FreeCell
     {
         FreeCell* next;
@@ -76,8 +79,6 @@ class SimpleAllocator
 
     static void _mark( std::set<pcell_t>& live, pcell_t pcell );
 public:
-    typedef std::initializer_list<pcell_t*> Roots;
-
     SimpleAllocator( size_t ncells )
         : _ncells( ncells ), _page( new FreeCell[ncells] ), _free_list( 0 ), _gc_count( 0 )
     {
