@@ -27,16 +27,16 @@ void TestAllocator<Scheme>::gc( const Roots& roots )
 template<class Scheme>
 void TestAllocator<Scheme>::_mark( std::set<pcell_t>& live, pcell_t p )
 {
-    if( live.find( p ) != live.end() )
-        return;
+    if( live.find( p ) == live.end() )
+    {
+        live.insert( p );
 
-    live.insert( p );
+        if( p->head().is_pcell() )
+            _mark( live, p->head().pcell() );
 
-    if( p->head().is_pcell() )
-        _mark( live, p->head().pcell() );
-
-    if( p->tail().is_pcell() )
-        _mark( live, p->tail().pcell() );
+        if( p->tail().is_pcell() )
+            _mark( live, p->tail().pcell() );
+    }
 }
 
 /** SimpleAllocator */
@@ -44,16 +44,16 @@ void TestAllocator<Scheme>::_mark( std::set<pcell_t>& live, pcell_t p )
 template<class Scheme>
 void SimpleAllocator<Scheme>::_mark( std::set<pcell_t>& live, pcell_t p )
 {
-    if( live.find( p ) != live.end() )
-        return;
+    if( live.find( p ) == live.end() )
+    {
+        live.insert( p );
 
-    live.insert( p );
+        if( p->head().is_pcell() )
+            _mark( live, p->head().pcell() );
 
-    if( p->head().is_pcell() )
-        _mark( live, p->head().pcell() );
-
-    if( p->tail().is_pcell() )
-        _mark( live, p->tail().pcell() );
+        if( p->tail().is_pcell() )
+            _mark( live, p->tail().pcell() );
+    }
 }
 
 template<class Scheme>
