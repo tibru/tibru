@@ -25,6 +25,13 @@ struct Tester
         return elem;
     }
 
+    static auto print( elem_t e, KManip m=flat ) -> std::string
+    {
+        std::ostringstream oss;
+        kostream( oss ) << m << e;
+        return oss.str();
+    }
+
     static void test_ostream()
     {TEST
         Allocator a( 1024 );
@@ -35,15 +42,13 @@ struct Tester
                             a.new_Cell(3,3),
                             2 ) );
 
-        std::ostringstream oss_flat;
-        kostream( oss_flat ) << flat << p;
+        auto found_flat = print( p, flat );
         auto expected_flat = "[1 [3 3] 2]";
-        test( oss_flat.str() == expected_flat, "Incorrect flat printing found '" + oss_flat.str() + "'\nExpected '" + expected_flat + "'" );
+        test( found_flat == expected_flat, "Incorrect flat printing found '" + found_flat + "'\nExpected '" + expected_flat + "'" );
 
-        std::ostringstream oss_deep;
-        kostream( oss_deep ) << deep << p;
+        auto found_deep = print( p, deep );
         auto expected_deep = "[1 [[3 3] 2]]";
-        test( oss_deep.str() == expected_deep, "Incorrect deep printing found '" + oss_deep.str() + "'\nExpected '" + expected_deep + "'" );
+        test( found_deep == expected_deep, "Incorrect deep printing found '" + found_deep + "'\nExpected '" + expected_deep + "'" );
     }
 
     static void test_io( const std::string& in, KManip m=flat, std::string out="" )
@@ -54,9 +59,9 @@ struct Tester
         Allocator a( 1024 );
         std::ostringstream oss;
 
-        kostream( oss ) << m << parse( a, in );
+        auto found = print( parse( a, in ), m );
 
-        test( oss.str() == out, "IO failed for: '" + in + "'\nExpected: '" + out + "'\nFound:    '" + oss.str() + "'" );
+        test( found == out, "IO failed for: '" + in + "'\nExpected: '" + out + "'\nFound:    '" + found + "'" );
     }
 
     template<class SubType=AnyType>
@@ -64,10 +69,10 @@ struct Tester
     {
         Allocator a( 1024 );
 
-        std::ostringstream oss;
+        std::string found;
         try
         {
-            kostream( oss ) << parse( a, in );
+            found = print( parse( a, in ) );
         }
         catch( const Error<Syntax,SubType>& e )
         {
@@ -75,7 +80,7 @@ struct Tester
             return pass();
         }
 
-        test( false, "IO failed for: '" + in + "'\nExpected error: '" + msg + "'\nFound:    '" + oss.str() + "'" );
+        test( false, "IO failed for: '" + in + "'\nExpected error: '" + msg + "'\nFound:    '" + found + "'" );
     }
 
     static void test_stream()
@@ -172,8 +177,8 @@ struct Tester
     {
         std::cout << "TEST: " << TYPENAME( Env );
 
-        //test_stream();
-        //test_ostream();
+        test_stream();
+        test_ostream();
         test_gc();
 
         std::cout << "\n\n";
