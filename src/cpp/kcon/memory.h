@@ -5,6 +5,7 @@
 #include <cstdint>
 #include <initializer_list>
 #include <set>
+#include <vector>
 
 namespace kcon {
 
@@ -18,7 +19,7 @@ struct TestAllocator
     typedef typename Scheme::elem_t elem_t;
     typedef typename Scheme::Cell Cell;
 
-    typedef std::initializer_list<pcell_t*> Roots;
+    typedef std::vector<pcell_t*> Roots;
 private:
     const size_t _ncells;
     std::set<pcell_t> _allocated;
@@ -40,12 +41,15 @@ public:
 
 	auto gc_count() const -> size_t { return _gc_count; }
 
-    auto new_Cell( const elem_t& head, const elem_t& tail, const Roots& roots={} ) -> const Cell*
+    auto new_Cell( const elem_t& head, const elem_t& tail, Roots roots={} ) -> const Cell*
     {
         if( _allocated.size() == _ncells )
             gc( roots );
 
-        return *_allocated.insert( new Cell( head, tail ) ).first;
+        auto p = *_allocated.insert( new Cell( head, tail ) ).first;
+        roots.push_back( &p );
+        //_shift( roots );
+        return p;
     }
 
     auto num_allocated() const -> size_t

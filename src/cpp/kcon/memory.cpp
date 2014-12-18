@@ -23,8 +23,6 @@ void TestAllocator<Scheme>::gc( const Roots& roots )
 
     if( _allocated.size() == _ncells )
         throw Error<Runtime,OutOfMemory>( "Out of memory" );
-
-    _shift( roots );
 }
 
 template<class Scheme>
@@ -40,13 +38,15 @@ void TestAllocator<Scheme>::_shift( const Roots& roots )
         auto q = new Cell( p->head(), p->tail() );
         _allocated.insert( q );
         old_to_new[p] = q;
-        delete p;
     }
 
     auto move = [&old_to_new]( elem_t e ) { return e.is_pcell() ? old_to_new[e.pcell()] : e; };
 
-    for( auto t : old_to_new )
-        new (t.second) Cell( move( t.second->head() ), move( t.second->tail() ) );
+    for( auto p : old_to_new )
+    {
+        new (p.second) Cell( move( p.second->head() ), move( p.second->tail() ) );
+        delete p.first;
+    }
 
     for( auto& r : roots )
         *r = move( *r ).pcell();

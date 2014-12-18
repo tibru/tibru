@@ -115,12 +115,18 @@ struct Tester
 
         {
             Allocator a( 10 );
-            pcell_t p = a.new_Cell( 1, 1 );
+            pcell_t p = a.new_Cell( 1, 2 );
             a.new_Cell( 1, 1 );
 
             test( a.num_allocated() == 2, "Failed to register allocated cells" );
 
+            test( p->head() == 1, "Cell head changed before GC" );
+            test( p->tail() == 2, "Cell tail changed before GC" );
+
             a.gc({&p});
+
+            test( p->head() == 1, "Cell head changed after GC" );
+            test( p->tail() == 2, "Cell tail changed after GC" );
 
             test( a.num_allocated() == 1, "Failed to cleanup after GC" );
         }
@@ -166,8 +172,8 @@ struct Tester
     {
         std::cout << "TEST: " << TYPENAME( Env );
 
-        test_stream();
-        test_ostream();
+        //test_stream();
+        //test_ostream();
         test_gc();
 
         std::cout << "\n\n";
