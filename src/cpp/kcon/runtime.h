@@ -14,7 +14,7 @@ struct Env
     using Scheme = Schem;
     using Allocator = AllocatorTemplate<Scheme>;
 
-    template<class T> using kstack = container::kstack<Scheme,T>;
+    template<class T> using kstack = container::kstack<Scheme,Allocator,T>;
     using kostream = kcon::kostream<Scheme>;
     using kistream = kcon::kistream<Scheme,Allocator>;
 };

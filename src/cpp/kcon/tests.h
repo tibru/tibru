@@ -3,7 +3,7 @@
 
 namespace kcon {
 
-auto run_tests() -> void;
+void run_tests();
 
 }	//namespace
 

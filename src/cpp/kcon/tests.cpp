@@ -25,7 +25,7 @@ struct Tester
         return elem;
     }
 
-    static auto test_ostream() -> void
+    static void test_ostream()
     {TEST
         Allocator a( 1024 );
 
@@ -46,7 +46,7 @@ struct Tester
         test( oss_deep.str() == expected_deep, "Incorrect deep printing found '" + oss_deep.str() + "'\nExpected '" + expected_deep + "'" );
     }
 
-    static auto test_io( const std::string& in, KManip m=flat, std::string out="" ) -> void
+    static void test_io( const std::string& in, KManip m=flat, std::string out="" )
     {
         if( out.empty() )
             out = in;
@@ -60,7 +60,7 @@ struct Tester
     }
 
     template<class SubType=AnyType>
-    static auto test_io_error( const std::string& in, const std::string& msg ) -> void
+    static void test_io_error( const std::string& in, const std::string& msg )
     {
         Allocator a( 1024 );
 
@@ -78,7 +78,7 @@ struct Tester
         test( false, "IO failed for: '" + in + "'\nExpected error: '" + msg + "'\nFound:    '" + oss.str() + "'" );
     }
 
-    static auto test_stream() -> void
+    static void test_stream()
     {TEST
         test_io( "3" );
         test_io( " 3 ", flat, "3" );
@@ -101,7 +101,7 @@ struct Tester
         test_io_error( "[[] 2]", "Unexpected empty cell" );
     }
 
-    static auto test_gc() -> void
+    static void test_gc()
     {TEST
         try
         {
@@ -162,18 +162,21 @@ struct Tester
         }
     }
 
-    static auto run_tests() -> void
+    static void run_tests()
     {
         std::cout << "TEST: " << TYPENAME( Env );
 
         test_stream();
         test_ostream();
         test_gc();
+
+        std::cout << "\n\n";
     }
 };
 
-auto run_tests() -> void
+void run_tests()
 {
+    Tester< Env<SimpleScheme, TestAllocator> >::run_tests();
     Tester< Env<SimpleScheme, SimpleAllocator> >::run_tests();
 }
 

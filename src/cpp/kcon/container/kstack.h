@@ -3,7 +3,7 @@
 
 namespace kcon { namespace container {
 
-template<class Scheme>
+template<class Scheme, class Allocator>
 class basic_kstack
 {
 protected:
@@ -18,7 +18,7 @@ protected:
 public:
     pcell_t& items() { return _items; }
 
-    void push( elem_t item, Allocator::Roots roots )
+    void push( elem_t item, typename Allocator::Roots roots )
     {
         _items = _alloc.new_Cell( item, _items, roots );
     }
@@ -31,16 +31,16 @@ public:
     bool empty() const { return _items == null<pcell_t>(); }
 };
 
-template<class Scheme, class T>
+template<class Scheme, class Allocator, class T>
 struct kstack;
 
-template<class Scheme>
-struct kstack<Scheme,typename Scheme::elem_t> : basic_kstack<Scheme>
+template<class Scheme, class Allocator>
+struct kstack<Scheme, Allocator, typename Scheme::elem_t> : basic_kstack<Scheme,Allocator>
 {
     typedef typename Scheme::elem_t elem_t;
 
     kstack( Allocator& alloc )
-        : basic_kstack<Scheme>( alloc ) {}
+        : basic_kstack<Scheme, Allocator>( alloc ) {}
 
     auto top() -> elem_t
     {
@@ -48,13 +48,13 @@ struct kstack<Scheme,typename Scheme::elem_t> : basic_kstack<Scheme>
     }
 };
 
-template<class Scheme>
-struct kstack<Scheme,typename Scheme::pcell_t> : basic_kstack<Scheme>
+template<class Scheme, class Allocator>
+struct kstack<Scheme, Allocator, typename Scheme::pcell_t> : basic_kstack<Scheme,Allocator>
 {
     typedef typename Scheme::pcell_t pcell_t;
 
     kstack( Allocator& alloc )
-        : basic_kstack<Scheme>( alloc ) {}
+        : basic_kstack<Scheme, Allocator>( alloc ) {}
 
     auto top() -> pcell_t
     {

@@ -242,3 +242,4 @@ auto kistream<Scheme, Allocator>::operator>>( elem_t& elem ) -> kistream<Scheme,
 
 template class kostream<SimpleScheme>;
 template class kistream<SimpleScheme,SimpleAllocator<SimpleScheme>>;
+template class kistream<SimpleScheme,TestAllocator<SimpleScheme>>;

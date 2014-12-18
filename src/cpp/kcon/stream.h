@@ -3,6 +3,7 @@
 
 #include "types.h"
 #include "memory.h"
+#include "container/kstack.h"   //remove
 #include <ostream>
 #include <istream>
 #include <sstream>
@@ -78,6 +79,9 @@ class kistream
     typedef typename Scheme::byte_t byte_t;
     typedef typename Scheme::pcell_t pcell_t;
     typedef typename Scheme::elem_t elem_t;
+
+    template<class T>
+    using kstack = kcon::container::kstack<Scheme,Allocator,T>; //remove
 
     std::istream& _is;
     Allocator& _alloc;
