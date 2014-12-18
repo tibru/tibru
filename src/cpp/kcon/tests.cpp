@@ -145,6 +145,9 @@ struct Tester
 
             test( a.gc_count() > 0, "GC failed to run with 2 roots" );
             test( a.num_allocated() == 12, "Failed to hold all cells in GC" );
+
+            test( print( p ) == "[0 [1 [2 3] 4] 5 6]", "Complex tree (1) altered by GC" );
+            test( print( q ) == "[0 [1 [2 3] 4] 5 6]", "Complex tree (2) altered by GC" );
         }
 
         {
@@ -156,6 +159,15 @@ struct Tester
 
             test( a.gc_count() > 0, "GC failed to run with 1 root" );
             test( a.num_allocated() == 6, "Failed to hold and cleanup all cells in GC" );
+
+            test( print( p ) == "[0 [1 [2 3] 4] 5 6]", "Complex tree (3) altered by GC" );
+
+            pcell_t t = p->tail().pcell();
+
+            a.gc({&t});
+
+            test( a.num_allocated() == 5, "Failed to hold and cleanup tail cells in GC" );
+            test( print( t ) == "[[1 [2 3] 4] 5 6]", "Complex tree tail altered by GC" );
         }
 
 
