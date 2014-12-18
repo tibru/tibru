@@ -70,7 +70,7 @@ void SimpleAllocator<Scheme>::gc( const Roots& roots )
     {
         auto p = reinterpret_cast<Cell*>( &_page[i] );
         if( live.find( p ) == live.end() )
-            _free_list = new (p) FreeCell( _free_list );
+            _free_list = new (p) FreeCell{ _free_list, 0 };
     }
 
     if( _free_list == 0 )

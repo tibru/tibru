@@ -3,7 +3,6 @@
 
 #include "types.h"
 #include <cstdint>
-#include <cstdlib>
 #include <initializer_list>
 #include <set>
 
@@ -62,20 +61,10 @@ class SimpleAllocator
     typedef typename Scheme::elem_t elem_t;
     typedef typename Scheme::Cell Cell;
 
-    class FreeCell
+    struct FreeCell
     {
-        value_t _salt;
-        FreeCell* _next;
-
-        static auto _hash( value_t salt, FreeCell* p ) -> auto
-        {
-            return reinterpret_cast<FreeCell*>( reinterpret_cast<uintptr_t>( p ) ^ salt );
-        }
-    public:
-        FreeCell( FreeCell* next=0 )
-            : _salt( rand() & ADDR_MASK ), _next( _hash( _salt, next ) ) {}
-
-        auto next() const -> FreeCell* { return _hash( _salt, _next ); }
+        FreeCell* next;
+        value_t _;
     };
 
     ASSERT( sizeof(FreeCell) == sizeof(Cell) );
@@ -112,14 +101,14 @@ public:
             gc( roots );
 
         void* p = _free_list;
-        _free_list = _free_list->next();
+        _free_list = _free_list->next;
         return p;
     }
 
     auto num_allocated() const -> size_t
     {
         size_t n = _ncells;
-        for( const FreeCell* p = _free_list; p != 0; p = p->next() )
+        for( const FreeCell* p = _free_list; p != 0; p = p->next )
             --n;
 
         return n;
