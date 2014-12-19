@@ -3,7 +3,7 @@
 
 namespace kcon { namespace container {
 
-template<class System, template<class> class SchemeT, class Allocator>
+template<class System, MetaScheme class SchemeT, class Allocator>
 class basic_kstack
 {
 protected:
@@ -31,10 +31,10 @@ public:
     bool empty() const { return _items.is_undef(); }
 };
 
-template<class System, template<class> class SchemeT, class Allocator, class T>
+template<class System, MetaScheme class SchemeT, class Allocator, class T>
 struct kstack;
 
-template<class System, template<class> class SchemeT, class Allocator>
+template<class System, MetaScheme class SchemeT, class Allocator>
 struct kstack<System, SchemeT, Allocator, typename SchemeT<System>::elem_t> : basic_kstack<System, SchemeT, Allocator>
 {
     typedef typename SchemeT<System>::elem_t elem_t;
@@ -53,7 +53,7 @@ struct kstack<System, SchemeT, Allocator, typename SchemeT<System>::elem_t> : ba
     }
 };
 
-template<class System, template<class> class SchemeT, class Allocator>
+template<class System, MetaScheme class SchemeT, class Allocator>
 struct kstack<System, SchemeT, Allocator, typename SchemeT<System>::pcell_t> : basic_kstack<System, SchemeT, Allocator>
 {
     typedef typename SchemeT<System>::pcell_t pcell_t;

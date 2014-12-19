@@ -13,7 +13,7 @@ namespace kcon {
 struct Syntax;
 struct EOS;
 
-template<class System, template<class> class SchemeT>
+template<class System, MetaScheme class SchemeT>
 class kostream
 {
     typedef typename SchemeT<System>::byte_t byte_t;
@@ -60,25 +60,27 @@ public:
     }
 };
 
-template<class System, template<class> class SchemeT>
+template<class System, MetaScheme class SchemeT>
 inline auto flat( kostream<System, SchemeT>& kos ) -> kostream<System, SchemeT>&
 {
     return kos.setflatten( true );
 }
 
-template<class System, template<class> class SchemeT>
+template<class System, MetaScheme class SchemeT>
 inline auto deep( kostream<System, SchemeT>& kos ) -> kostream<System, SchemeT>&
 {
     return kos.setflatten( false );
 }
 
-template<class System, template<class> class SchemeT, class Allocator>
+template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT>
 class kistream
 {
-    typedef typename SchemeT<System>::value_t value_t;
-    typedef typename SchemeT<System>::byte_t byte_t;
-    typedef typename SchemeT<System>::pcell_t pcell_t;
-    typedef typename SchemeT<System>::elem_t elem_t;
+    typedef SchemeT<System> Scheme;
+    typedef typename Scheme::value_t value_t;
+    typedef typename Scheme::byte_t byte_t;
+    typedef typename Scheme::pcell_t pcell_t;
+    typedef typename Scheme::elem_t elem_t;
+    typedef AllocatorT<System,SchemeT> Allocator;
 
     template<class T>
     using kstack = kcon::container::kstack<System, SchemeT, Allocator, T>; //remove

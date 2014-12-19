@@ -24,8 +24,8 @@ typedef Params<>::Assert<false> Debug;
 
 template<
     class System,
-    template<class System> class SchemeT,
-    template<class System, template<class> class SchemeTemplate> class AllocatorT
+    MetaScheme class SchemeT,
+    MetaAllocator class AllocatorT
 >
 struct Env
 {
@@ -34,7 +34,7 @@ struct Env
 
     template<class T> using kstack = container::kstack<System, SchemeT, Allocator, T>;
     using kostream = kcon::kostream<System, SchemeT>;
-    using kistream = kcon::kistream<System, SchemeT,Allocator>;
+    using kistream = kcon::kistream<System, SchemeT, AllocatorT>;
 };
 
 }   //namespace

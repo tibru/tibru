@@ -11,13 +11,15 @@ namespace kcon {
 
 struct OutOfMemory {};
 
+#define MetaAllocator template<class System, template<class> class SchemeTemplate>
+
 /**
     TestAllocator
     Simple but inefficient allocator for testing.
     It shifts all the cells on each memory allocation to test that the roots are correctly defined
 **/
 
-template<class System, template<class> class Scheme>
+template<class System, MetaScheme class Scheme>
 struct TestAllocator
 {
     typedef typename Scheme<System>::value_t value_t;
@@ -70,7 +72,7 @@ public:
     Cells are never moved in memory
 **/
 
-template<class System, template<class> class Scheme>
+template<class System, MetaScheme class Scheme>
 struct SimpleAllocator
 {
     typedef typename Scheme<System>::value_t value_t;

@@ -6,8 +6,8 @@ using namespace kcon;
 
 /** TestAllocator */
 
-template<class System, template<class> class Scheme>
-void TestAllocator<System,Scheme>::gc( const Roots& roots )
+template<class System, MetaScheme class SchemeT>
+void TestAllocator<System, SchemeT>::gc( const Roots& roots )
 {
     ++_gc_count;
 
@@ -28,8 +28,8 @@ void TestAllocator<System,Scheme>::gc( const Roots& roots )
 
 
 
-template<class System, template<class> class Scheme>
-void TestAllocator<System,Scheme>::_shift( const Roots& roots )
+template<class System, MetaScheme class SchemeT>
+void TestAllocator<System, SchemeT>::_shift( const Roots& roots )
 {
     std::set<pcell_t> all;
     all.swap( _allocated );
@@ -56,8 +56,8 @@ void TestAllocator<System,Scheme>::_shift( const Roots& roots )
             *r = move( *r ).pcell();
 }
 
-template<class System, template<class> class Scheme>
-void TestAllocator<System,Scheme>::_mark( std::set<pcell_t>& live, pcell_t p )
+template<class System, MetaScheme class SchemeT>
+void TestAllocator<System, SchemeT>::_mark( std::set<pcell_t>& live, pcell_t p )
 {
     if( live.find( p ) == live.end() )
     {
@@ -75,8 +75,8 @@ void TestAllocator<System,Scheme>::_mark( std::set<pcell_t>& live, pcell_t p )
 
 /** SimpleAllocator */
 
-template<class System, template<class> class Scheme>
-void SimpleAllocator<System,Scheme>::_mark( std::set<pcell_t>& live, pcell_t p )
+template<class System, MetaScheme class SchemeT>
+void SimpleAllocator<System, SchemeT>::_mark( std::set<pcell_t>& live, pcell_t p )
 {
     if( live.find( p ) == live.end() )
     {
@@ -90,8 +90,8 @@ void SimpleAllocator<System,Scheme>::_mark( std::set<pcell_t>& live, pcell_t p )
     }
 }
 
-template<class System, template<class> class Scheme>
-void SimpleAllocator<System,Scheme>::gc( const Roots& roots )
+template<class System, MetaScheme class SchemeT>
+void SimpleAllocator<System, SchemeT>::gc( const Roots& roots )
 {
     ++_gc_count;
 

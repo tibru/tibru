@@ -9,6 +9,8 @@ namespace kcon {
 const uintptr_t TAG_MASK = 2 * sizeof(void*) - 1;
 const uintptr_t ADDR_MASK = ~TAG_MASK;
 
+#define MetaScheme template<class System>
+
 template<class System>
 struct SimpleScheme
 {
