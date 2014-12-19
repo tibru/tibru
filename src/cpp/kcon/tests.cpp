@@ -172,14 +172,31 @@ struct Tester
 
         {
             //Test with minimal memory to create memory churn
+            for( auto i : range(1,8) )
+            {
+                try
+                {
+                    Allocator a( i );
+                    parse( a, "[0 [1 [2 3] 4] 5 6]", {} );
+                    fail( "Parsed in low memory enviroment" );
+                }
+                catch( const Error<Runtime,OutOfMemory>& )
+                {
+                    pass();
+                }
+            }
+        }
+
+        {
+            //Test with minimal memory to create memory churn
             Allocator a( 1024 );
             elem_t p = parse( a, "[0 [1 [2 3] 4] 5 6]", {} );
 
-            test( a.gc_count() == 0, "GC ran during parse" );
-            //test( a.gc_count() == 1, "GC failed to run during parse" );
+            //test( a.gc_count() > 0, "GC failed to run during low memory parse" );
 
             a.gc({&p});
 
+            test( print( p ) == "[0 [1 [2 3] 4] 5 6]", "Low memory parse tree tail altered by GC" );
             test( a.num_allocated() == 6, "Failed to hold and cleanup all cells in GC" );
         }
     }
