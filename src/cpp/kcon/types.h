@@ -10,9 +10,6 @@ const uintptr_t TAG_MASK = 2 * sizeof(void*) - 1;
 const uintptr_t ADDR_MASK = ~TAG_MASK;
 
 template<class T>
-T null();
-
-template<class T>
 bool is_singleton( const T& p );
 
 struct SimpleScheme
@@ -25,16 +22,21 @@ struct SimpleScheme
 
     class elem_t
     {
+        static const value_t UNDEF = 256;
+
         union {
             value_t _value;
             pcell_t _pcell;
         };
     public:
+        elem_t() : _value( UNDEF ) {}
         elem_t( byte_t b ) : _value( b ) {}
         elem_t( pcell_t p ) : _pcell( p ) {}
 
-        bool is_byte() const { return _value < 256; }
-        bool is_pcell() const { return !is_byte(); }
+        bool is_undef() const { return _value == UNDEF; }
+        bool is_def() const { return _value != UNDEF; }
+        bool is_byte() const { return _value < UNDEF; }
+        bool is_pcell() const { return _value > UNDEF; }
 
         byte_t byte() const
         {
@@ -75,15 +77,9 @@ struct SimpleScheme
 };
 
 template<>
-inline SimpleScheme::elem_t null<SimpleScheme::elem_t>()
-{
-    return reinterpret_cast<SimpleScheme::pcell_t>( 256 );
-}
-
-template<>
 inline bool is_singleton( const SimpleScheme::elem_t& e )
 {
-    return (e != null<SimpleScheme::elem_t>()) && (e->tail() == null<SimpleScheme::elem_t>());
+    return e.is_def() && e->tail().is_undef();
 }
 
 }	//namespace

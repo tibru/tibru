@@ -14,21 +14,21 @@ protected:
     elem_t _items;
 
     basic_kstack( Allocator& alloc )
-        : _alloc( alloc ), _items( null<elem_t>() ) {}
+        : _alloc( alloc ), _items() {}
+
+    void _push( elem_t item, const typename Allocator::Roots& roots )
+    {
+        _items = _alloc.new_Cell( item, _items, roots );
+    }
 public:
     elem_t& items() { return _items; }
 
-    void push( elem_t item, const typename Allocator::Roots& roots )
-    {
-        _items = _alloc.new_Cell( item, _items.pcell(), roots );
-    }
-
     void pop()
     {
-        _items = _items.pcell()->tail().pcell();
+        _items = _items.pcell()->tail();
     }
 
-    bool empty() const { return _items == null<elem_t>(); }
+    bool empty() const { return _items.is_undef(); }
 };
 
 template<class Scheme, class Allocator, class T>
@@ -41,6 +41,11 @@ struct kstack<Scheme, Allocator, typename Scheme::elem_t> : basic_kstack<Scheme,
 
     kstack( Allocator& alloc )
         : basic_kstack<Scheme, Allocator>( alloc ) {}
+
+    void push( elem_t item, const typename Allocator::Roots& roots )
+    {
+        this->_push( item, roots );
+    }
 
     auto top() -> elem_t
     {
@@ -55,6 +60,11 @@ struct kstack<Scheme, Allocator, typename Scheme::pcell_t> : basic_kstack<Scheme
 
     kstack( Allocator& alloc )
         : basic_kstack<Scheme, Allocator>( alloc ) {}
+
+    void push( pcell_t item, const typename Allocator::Roots& roots )
+    {
+        this->_push( item, roots );
+    }
 
     auto top() -> pcell_t
     {

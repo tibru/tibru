@@ -20,7 +20,7 @@ struct Tester
     static auto parse( Allocator& allocator, const std::string& in, const typename Allocator::Roots& roots ) -> elem_t
     {
         std::istringstream iss( in );
-        elem_t elem = null<elem_t>();
+        elem_t elem;
         kistream( iss, allocator, roots ) >> elem;
         return elem;
     }

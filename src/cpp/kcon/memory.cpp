@@ -43,7 +43,7 @@ void TestAllocator<Scheme>::_shift( const Roots& roots )
         old_to_new[p] = q;
     }
 
-    auto move = [&old_to_new]( elem_t e ) { return e.is_pcell() && (e != null<elem_t>()) ? old_to_new[e.pcell()] : e; };
+    auto move = [&old_to_new]( elem_t e ) { return e.is_pcell() ? old_to_new[e.pcell()] : e; };
 
     for( auto p : old_to_new )
     {
@@ -63,11 +63,11 @@ void TestAllocator<Scheme>::_mark( std::set<pcell_t>& live, pcell_t p )
     {
         live.insert( p );
 
-        assert( p->head() != null<elem_t>(), "Found null head during GC" );
+        assert( p->head().is_def(), "Found undef head during GC" );
         if( p->head().is_pcell() )
             _mark( live, p->head().pcell() );
 
-        assert( p->tail() != null<elem_t>(), "Found null tail during GC" );
+        assert( p->tail().is_def(), "Found undef tail during GC" );
         if( p->tail().is_pcell() )
             _mark( live, p->tail().pcell() );
     }

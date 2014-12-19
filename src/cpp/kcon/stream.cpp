@@ -42,10 +42,10 @@ auto kostream<Scheme>::_format( pcell_t pcell )
 
     while( true )
     {
-        if( tail.elem.is_byte() || (tail.elem == null<elem_t>()) )
+        if( tail.elem.is_byte() || tail.elem.is_undef() )
         {
-            if( tail.elem == null<elem_t>() )
-                _os << "<null>";
+            if( tail.elem.is_undef() )
+                _os << "<undef>";
             else
                 _format( tail.elem.byte() );
 
@@ -112,10 +112,10 @@ auto kistream<Scheme,Allocator>::_parse_byte() -> byte_t
 }
 
 template<class Scheme, class Allocator>
-auto kistream<Scheme,Allocator>::_parse_elems() -> pcell_t
+auto kistream<Scheme,Allocator>::_parse_elems() -> elem_t
 {
-	elem_t tail = null<elem_t>();
-	kstack<pcell_t> tails( _alloc );
+	elem_t tail;
+	kstack<elem_t> tails( _alloc );
 
 	std::vector<elem_t*> roots = _roots;
     roots.insert( roots.end(), {&tail,&tails.items()} );
@@ -125,16 +125,17 @@ auto kistream<Scheme,Allocator>::_parse_elems() -> pcell_t
 	{
 		if( c == ']' )
 		{
-		    if( tail == null<elem_t>() )
+		    if( tail.is_undef() )
                 throw Error<Syntax>( "Unexpected empty cell" );
 
 		    if( is_singleton( tail ) )
                 throw Error<Syntax>( "Unexpected singleton" );
 
 			if( tails.empty() )
-				return tail.pcell();
+				return tail;
 
-			pcell_t elems = tail.pcell();
+			elem_t elems = tail;
+
 			tail = tails.top();
 			tails.pop();
 			tail = _alloc.new_Cell( elems, tail, roots );
@@ -142,7 +143,7 @@ auto kistream<Scheme,Allocator>::_parse_elems() -> pcell_t
 		else if( c == '[' )
 		{
 			tails.push( tail, roots );
-			tail = null<elem_t>();
+			tail = elem_t();
 		}
 		else if( isdigit( c ) )
 		{
@@ -157,19 +158,19 @@ auto kistream<Scheme,Allocator>::_parse_elems() -> pcell_t
 }
 
 template<class Scheme, class Allocator>
-auto kistream<Scheme,Allocator>::_reverse_and_reduce( pcell_t pcell ) -> pcell_t
+auto kistream<Scheme,Allocator>::_reverse_and_reduce( elem_t e ) -> elem_t
 {
-    elem_t p = pcell;
-    elem_t tail = null<elem_t>();
+    elem_t p = e;
+    elem_t tail;
 	kstack<elem_t> tails( _alloc );
-	kstack<pcell_t> pcells( _alloc );
+	kstack<elem_t> pcells( _alloc );
 
 	std::vector<elem_t*> roots = _roots;
     roots.insert( roots.end(), {&p,&tail,&tails.items(),&pcells.items()} );
 
-    while( !((p == null<elem_t>()) && pcells.empty()) )
+    while( !pcells.empty() || p.is_def() )
     {
-        if( p == null<elem_t>() )
+        if( p.is_undef() )
         {
         	assert( tail.is_pcell(), "Expected recursive cell tail" );
 
@@ -178,7 +179,7 @@ auto kistream<Scheme,Allocator>::_reverse_and_reduce( pcell_t pcell ) -> pcell_t
             p = pcells.top(); pcells.pop();
             tail = tails.top(); tails.pop();
 
-			if( tail == null<elem_t>() )
+			if( tail.is_undef() )
 				tail = head;
 			else if( tail.is_byte() )
 				tail = _alloc.new_Cell( head, tail.byte(), roots );
@@ -187,35 +188,35 @@ auto kistream<Scheme,Allocator>::_reverse_and_reduce( pcell_t pcell ) -> pcell_t
         }
         else
         {
-            assert( p->tail().is_pcell(), "Expected tail to be cell in reverse and reduce" );
+            assert( !p->tail().is_byte(), "Expected tail not to be a byte in reverse and reduce" );
 
             if( p->head().is_pcell() )
             {
-                pcells.push( p->tail().pcell(), roots );
+                pcells.push( p->tail(), roots );
                 tails.push( tail, roots );
 
-                p = p->head().pcell();
-                tail = null<elem_t>();
+                p = p->head();
+                tail = elem_t();
             }
             else
             {
                 assert( p->head().is_byte(), "" );
                 const byte_t head = p->head().byte();
 
-                if( tail== null<elem_t>() )
+                if( tail.is_undef() )
                     tail = head;
                 else if( tail.is_byte() )
                     tail = _alloc.new_Cell( head, tail.byte(), roots );
                 else
                     tail = _alloc.new_Cell( head, tail.pcell(), roots );
 
-                p = p->tail().pcell();
+                p = p->tail();
             }
         }
     }
 
     assert( tails.empty(), "Cell and tail stack mismatch" );
-	return tail.pcell();
+	return tail;
 }
 
 template<class Scheme, class Allocator>
