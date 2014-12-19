@@ -11,6 +11,12 @@ namespace kcon {
 
 struct OutOfMemory {};
 
+/**
+    TestAllocator
+    Simple but inefficient allocator for testing.
+    It shifts all the cells on each memory allocation to test that the roots are correctly defined
+**/
+
 template<class Scheme>
 struct TestAllocator
 {
@@ -57,6 +63,12 @@ public:
         return _allocated.size();
     }
 };
+
+/**
+    SimpleAllocator
+    Simple semi-efficient allocator that uses a fixed page of cells
+    Cells are never moved in memory
+**/
 
 template<class Scheme>
 struct SimpleAllocator
