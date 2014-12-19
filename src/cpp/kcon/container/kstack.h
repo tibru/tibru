@@ -3,12 +3,14 @@
 
 namespace kcon { namespace container {
 
-template<class System, MetaScheme class SchemeT, class Allocator>
+template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT>
 class basic_kstack
 {
 protected:
-    typedef typename SchemeT<System>::pcell_t pcell_t;
-    typedef typename SchemeT<System>::elem_t elem_t;
+    typedef SchemeT<System> Scheme;
+    typedef typename Scheme::pcell_t pcell_t;
+    typedef typename Scheme::elem_t elem_t;
+    typedef AllocatorT<System, SchemeT> Allocator;
 
     Allocator& _alloc;
     elem_t _items;
@@ -31,16 +33,17 @@ public:
     bool empty() const { return _items.is_undef(); }
 };
 
-template<class System, MetaScheme class SchemeT, class Allocator, class T>
+template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT, class T>
 struct kstack;
 
-template<class System, MetaScheme class SchemeT, class Allocator>
-struct kstack<System, SchemeT, Allocator, typename SchemeT<System>::elem_t> : basic_kstack<System, SchemeT, Allocator>
+template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT>
+struct kstack<System, SchemeT, AllocatorT, typename SchemeT<System>::elem_t> : basic_kstack<System, SchemeT, AllocatorT>
 {
     typedef typename SchemeT<System>::elem_t elem_t;
+    typedef AllocatorT<System, SchemeT> Allocator;
 
     kstack( Allocator& alloc )
-        : basic_kstack<System, SchemeT, Allocator>( alloc ) {}
+        : basic_kstack<System, SchemeT, AllocatorT>( alloc ) {}
 
     void push( elem_t item, const typename Allocator::Roots& roots )
     {
@@ -53,13 +56,14 @@ struct kstack<System, SchemeT, Allocator, typename SchemeT<System>::elem_t> : ba
     }
 };
 
-template<class System, MetaScheme class SchemeT, class Allocator>
-struct kstack<System, SchemeT, Allocator, typename SchemeT<System>::pcell_t> : basic_kstack<System, SchemeT, Allocator>
+template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT>
+struct kstack<System, SchemeT, AllocatorT, typename SchemeT<System>::pcell_t> : basic_kstack<System, SchemeT, AllocatorT>
 {
     typedef typename SchemeT<System>::pcell_t pcell_t;
+    typedef AllocatorT<System, SchemeT> Allocator;
 
     kstack( Allocator& alloc )
-        : basic_kstack<System, SchemeT, Allocator>( alloc ) {}
+        : basic_kstack<System, SchemeT, AllocatorT>( alloc ) {}
 
     void push( pcell_t item, const typename Allocator::Roots& roots )
     {

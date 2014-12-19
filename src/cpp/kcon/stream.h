@@ -16,9 +16,10 @@ struct EOS;
 template<class System, MetaScheme class SchemeT>
 class kostream
 {
-    typedef typename SchemeT<System>::byte_t byte_t;
-    typedef typename SchemeT<System>::pcell_t pcell_t;
-    typedef typename SchemeT<System>::elem_t elem_t;
+    typedef SchemeT<System> Scheme;
+    typedef typename Scheme::byte_t byte_t;
+    typedef typename Scheme::pcell_t pcell_t;
+    typedef typename Scheme::elem_t elem_t;
 
 	std::ostream& _os;
 	bool _flatten;
@@ -83,7 +84,7 @@ class kistream
     typedef AllocatorT<System,SchemeT> Allocator;
 
     template<class T>
-    using kstack = kcon::container::kstack<System, SchemeT, Allocator, T>; //remove
+    using kstack = kcon::container::kstack<System, SchemeT, AllocatorT, T>; //remove
 
     std::istream& _is;
     Allocator& _alloc;
