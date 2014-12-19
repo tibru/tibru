@@ -9,9 +9,6 @@ namespace kcon {
 const uintptr_t TAG_MASK = 2 * sizeof(void*) - 1;
 const uintptr_t ADDR_MASK = ~TAG_MASK;
 
-template<class T>
-bool is_singleton( const T& p );
-
 struct SimpleScheme
 {
     struct Cell;
@@ -75,12 +72,6 @@ struct SimpleScheme
         elem_t tail() const { return _tail; }
     };
 };
-
-template<>
-inline bool is_singleton( const SimpleScheme::elem_t& e )
-{
-    return e.is_def() && e->tail().is_undef();
-}
 
 }	//namespace
 

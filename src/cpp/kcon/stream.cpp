@@ -128,7 +128,7 @@ auto kistream<Scheme,Allocator>::_parse_elems() -> elem_t
 		    if( tail.is_undef() )
                 throw Error<Syntax>( "Unexpected empty cell" );
 
-		    if( is_singleton( tail ) )
+		    if( tail->tail().is_undef() )
                 throw Error<Syntax>( "Unexpected singleton" );
 
 			if( tails.empty() )
