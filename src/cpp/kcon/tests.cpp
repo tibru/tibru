@@ -7,7 +7,7 @@
 
 namespace kcon {
 
-//using container::range;
+using container::range;
 
 template<class Env>
 struct Tester
@@ -175,7 +175,7 @@ struct Tester
 
         {
             //Test with minimal memory to create memory churn
-            for( auto i : range(1,8) )
+            /*for( auto i : range(1,8) )
             {
                 try
                 {
@@ -187,7 +187,7 @@ struct Tester
                 {
                     pass();
                 }
-            }
+            }*/
         }
 
         {

@@ -29,6 +29,9 @@
 		<Unit filename="kcon/container/kstack.h">
 			<Option virtualFolder="container/" />
 		</Unit>
+		<Unit filename="kcon/container/range.h">
+			<Option virtualFolder="container/" />
+		</Unit>
 		<Unit filename="kcon/kcon.cpp" />
 		<Unit filename="kcon/memory.cpp" />
 		<Unit filename="kcon/memory.h" />
