@@ -32,9 +32,9 @@ struct Env
     using Scheme = SchemeT<System>;
     using Allocator = AllocatorT<System, SchemeT>;
 
-    template<class T> using kstack = container::kstack<Scheme,Allocator,T>;
-    using kostream = kcon::kostream<System, Scheme>;
-    using kistream = kcon::kistream<System, Scheme,Allocator>;
+    template<class T> using kstack = container::kstack<System, SchemeT, Allocator, T>;
+    using kostream = kcon::kostream<System, SchemeT>;
+    using kistream = kcon::kistream<System, SchemeT,Allocator>;
 };
 
 }   //namespace

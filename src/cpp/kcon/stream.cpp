@@ -5,8 +5,8 @@
 
 using namespace kcon;
 
-template<class System, class Scheme>
-auto kostream<System, Scheme>::operator<<( pcell_t pcell ) -> kostream&
+template<class System, template<class> class SchemeT>
+auto kostream<System, SchemeT>::operator<<( pcell_t pcell ) -> kostream&
 {
 	_os << '[';
 	_format( pcell );
@@ -14,15 +14,15 @@ auto kostream<System, Scheme>::operator<<( pcell_t pcell ) -> kostream&
 	return *this;
 }
 
-template<class System, class Scheme>
-auto kostream<System, Scheme>::operator<<( byte_t value ) -> kostream&
+template<class System, template<class> class SchemeT>
+auto kostream<System, SchemeT>::operator<<( byte_t value ) -> kostream&
 {
 	_format( value );
 	return *this;
 }
 
-template<class System, class Scheme>
-auto kostream<System, Scheme>::operator<<( elem_t elem ) -> kostream&
+template<class System, template<class> class SchemeT>
+auto kostream<System, SchemeT>::operator<<( elem_t elem ) -> kostream&
 {
     if( elem.is_pcell() )
         return kostream::operator<<( elem.pcell() );
@@ -31,8 +31,8 @@ auto kostream<System, Scheme>::operator<<( elem_t elem ) -> kostream&
 }
 
 //complicated but avoids recursion on c-stack
-template<class System, class Scheme>
-auto kostream<System, Scheme>::_format( pcell_t pcell )
+template<class System, template<class> class SchemeT>
+auto kostream<System, SchemeT>::_format( pcell_t pcell )
 {
     std::stack<Tail> tails;
     Tail tail{ pcell, 0 };
@@ -92,14 +92,14 @@ auto kostream<System, Scheme>::_format( pcell_t pcell )
     }
 }
 
-template<class System, class Scheme>
-auto kostream<System, Scheme>::_format( byte_t value )
+template<class System, template<class> class SchemeT>
+auto kostream<System, SchemeT>::_format( byte_t value )
 {
     _os << short(value);
 }
 
-template<class System, class Scheme, class Allocator>
-auto kistream<System, Scheme, Allocator>::_parse_byte() -> byte_t
+template<class System, template<class> class SchemeT, class Allocator>
+auto kistream<System, SchemeT, Allocator>::_parse_byte() -> byte_t
 {
     value_t value;
     if( !(_is >> value) || (value >= 256) )
@@ -108,8 +108,8 @@ auto kistream<System, Scheme, Allocator>::_parse_byte() -> byte_t
     return static_cast<byte_t>( value );
 }
 
-template<class System, class Scheme, class Allocator>
-auto kistream<System, Scheme, Allocator>::_parse_elems() -> elem_t
+template<class System, template<class> class SchemeT, class Allocator>
+auto kistream<System, SchemeT, Allocator>::_parse_elems() -> elem_t
 {
 	elem_t tail;
 	kstack<elem_t> tails( _alloc );
@@ -154,8 +154,8 @@ auto kistream<System, Scheme, Allocator>::_parse_elems() -> elem_t
 	throw Error<Syntax,EOS>( "Unexpected end of input" );
 }
 
-template<class System, class Scheme, class Allocator>
-auto kistream<System, Scheme, Allocator>::_reverse_and_reduce( elem_t e ) -> elem_t
+template<class System, template<class> class SchemeT, class Allocator>
+auto kistream<System, SchemeT, Allocator>::_reverse_and_reduce( elem_t e ) -> elem_t
 {
     elem_t p = e;
     elem_t tail;
@@ -216,8 +216,8 @@ auto kistream<System, Scheme, Allocator>::_reverse_and_reduce( elem_t e ) -> ele
 	return tail;
 }
 
-template<class System, class Scheme, class Allocator>
-auto kistream<System, Scheme, Allocator>::_parse() -> elem_t
+template<class System, template<class> class SchemeT, class Allocator>
+auto kistream<System, SchemeT, Allocator>::_parse() -> elem_t
 {
 	char c;
 	if( !(_is >> c) )
@@ -236,13 +236,13 @@ auto kistream<System, Scheme, Allocator>::_parse() -> elem_t
         throw Error<Syntax>( "Unexpected '"s + c + "'" );
 }
 
-template<class System, class Scheme, class Allocator>
-auto kistream<System, Scheme, Allocator>::operator>>( elem_t& elem ) -> kistream&
+template<class System, template<class> class SchemeT, class Allocator>
+auto kistream<System, SchemeT, Allocator>::operator>>( elem_t& elem ) -> kistream&
 {
     elem = _parse();
     return *this;
 }
 
-template class kostream< Debug, SimpleScheme<Debug> >;
-template class kistream< Debug, SimpleScheme<Debug>, SimpleAllocator< Debug, SimpleScheme > >;
-template class kistream< Debug, SimpleScheme<Debug>, TestAllocator< Debug, SimpleScheme > >;
+template class kostream< Debug, SimpleScheme >;
+template class kistream< Debug, SimpleScheme, SimpleAllocator< Debug, SimpleScheme > >;
+template class kistream< Debug, SimpleScheme, TestAllocator< Debug, SimpleScheme > >;

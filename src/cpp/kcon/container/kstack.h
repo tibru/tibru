@@ -3,12 +3,12 @@
 
 namespace kcon { namespace container {
 
-template<class Scheme, class Allocator>
+template<class System, template<class> class SchemeT, class Allocator>
 class basic_kstack
 {
 protected:
-    typedef typename Scheme::pcell_t pcell_t;
-    typedef typename Scheme::elem_t elem_t;
+    typedef typename SchemeT<System>::pcell_t pcell_t;
+    typedef typename SchemeT<System>::elem_t elem_t;
 
     Allocator& _alloc;
     elem_t _items;
@@ -31,16 +31,16 @@ public:
     bool empty() const { return _items.is_undef(); }
 };
 
-template<class Scheme, class Allocator, class T>
+template<class System, template<class> class SchemeT, class Allocator, class T>
 struct kstack;
 
-template<class Scheme, class Allocator>
-struct kstack<Scheme, Allocator, typename Scheme::elem_t> : basic_kstack<Scheme,Allocator>
+template<class System, template<class> class SchemeT, class Allocator>
+struct kstack<System, SchemeT, Allocator, typename SchemeT<System>::elem_t> : basic_kstack<System, SchemeT, Allocator>
 {
-    typedef typename Scheme::elem_t elem_t;
+    typedef typename SchemeT<System>::elem_t elem_t;
 
     kstack( Allocator& alloc )
-        : basic_kstack<Scheme, Allocator>( alloc ) {}
+        : basic_kstack<System, SchemeT, Allocator>( alloc ) {}
 
     void push( elem_t item, const typename Allocator::Roots& roots )
     {
@@ -53,13 +53,13 @@ struct kstack<Scheme, Allocator, typename Scheme::elem_t> : basic_kstack<Scheme,
     }
 };
 
-template<class Scheme, class Allocator>
-struct kstack<Scheme, Allocator, typename Scheme::pcell_t> : basic_kstack<Scheme,Allocator>
+template<class System, template<class> class SchemeT, class Allocator>
+struct kstack<System, SchemeT, Allocator, typename SchemeT<System>::pcell_t> : basic_kstack<System, SchemeT, Allocator>
 {
-    typedef typename Scheme::pcell_t pcell_t;
+    typedef typename SchemeT<System>::pcell_t pcell_t;
 
     kstack( Allocator& alloc )
-        : basic_kstack<Scheme, Allocator>( alloc ) {}
+        : basic_kstack<System, SchemeT, Allocator>( alloc ) {}
 
     void push( pcell_t item, const typename Allocator::Roots& roots )
     {

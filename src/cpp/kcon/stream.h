@@ -13,12 +13,12 @@ namespace kcon {
 struct Syntax;
 struct EOS;
 
-template<class System, class Scheme>
+template<class System, template<class> class SchemeT>
 class kostream
 {
-    typedef typename Scheme::byte_t byte_t;
-    typedef typename Scheme::pcell_t pcell_t;
-    typedef typename Scheme::elem_t elem_t;
+    typedef typename SchemeT<System>::byte_t byte_t;
+    typedef typename SchemeT<System>::pcell_t pcell_t;
+    typedef typename SchemeT<System>::elem_t elem_t;
 
 	std::ostream& _os;
 	bool _flatten;
@@ -60,28 +60,28 @@ public:
     }
 };
 
-template<class System, class Scheme>
-inline kostream<System, Scheme>& flat( kostream<System, Scheme>& kos )
+template<class System, template<class> class SchemeT>
+inline auto flat( kostream<System, SchemeT>& kos ) -> kostream<System, SchemeT>&
 {
     return kos.setflatten( true );
 }
 
-template<class System, class Scheme>
-inline kostream<System, Scheme>& deep( kostream<System, Scheme>& kos )
+template<class System, template<class> class SchemeT>
+inline auto deep( kostream<System, SchemeT>& kos ) -> kostream<System, SchemeT>&
 {
     return kos.setflatten( false );
 }
 
-template<class System, class Scheme, class Allocator>
+template<class System, template<class> class SchemeT, class Allocator>
 class kistream
 {
-    typedef typename Scheme::value_t value_t;
-    typedef typename Scheme::byte_t byte_t;
-    typedef typename Scheme::pcell_t pcell_t;
-    typedef typename Scheme::elem_t elem_t;
+    typedef typename SchemeT<System>::value_t value_t;
+    typedef typename SchemeT<System>::byte_t byte_t;
+    typedef typename SchemeT<System>::pcell_t pcell_t;
+    typedef typename SchemeT<System>::elem_t elem_t;
 
     template<class T>
-    using kstack = kcon::container::kstack<Scheme, Allocator, T>; //remove
+    using kstack = kcon::container::kstack<System, SchemeT, Allocator, T>; //remove
 
     std::istream& _is;
     Allocator& _alloc;
