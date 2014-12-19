@@ -7,7 +7,7 @@
 
 namespace kcon {
 
-using container::range;
+//using container::range;
 
 template<class Env>
 struct Tester

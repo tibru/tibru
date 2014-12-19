@@ -4,6 +4,7 @@
 
 using namespace kcon;
 
+<<<<<<< HEAD
 /** TestAllocator */
 
 template<class System, MetaScheme class SchemeT>
@@ -30,6 +31,36 @@ void TestAllocator<System, SchemeT>::gc( const Roots& roots )
 
 template<class System, MetaScheme class SchemeT>
 void TestAllocator<System, SchemeT>::_shift( const Roots& roots )
+=======
+template<class Scheme>
+auto SimpleAllocator<Scheme>::_moved( elem_t e ) -> elem_t
+{
+    return e;
+}
+
+template<class Scheme>
+auto SimpleAllocator<Scheme>::_move( const Roots& roots ) -> void
+{
+    std::vector<Cell> new_page = _page;
+
+    //update child nodes
+    for( auto p = new_page.begin(); p != new_page.end(); ++p )
+        new (&*p) Cell( _moved( p->head() ), _moved( p->tail() ) );
+
+    //update free set
+    for( typename std::set<Cell*>::iterator p = _free_set.begin(); p != _free_set.end(); ++p )
+        *p = _moved( *p ).pcell();
+
+    //update roots
+    for( auto p = roots.begin(); p != roots.end(); ++p )
+        *p = _moved( **p );
+
+    _page = new_page;
+}
+
+template<class Scheme>
+auto SimpleAllocator<Scheme>::_mark( std::set<pcell_t>& live, pcell_t p ) -> void
+>>>>>>> 4edd44c6763ff556930f29ca9467a9495fdb8e21
 {
     std::set<pcell_t> all;
     all.swap( _allocated );
@@ -100,17 +131,27 @@ void SimpleAllocator<System, SchemeT>::gc( const Roots& roots )
         if( r->is_pcell() )
             _mark( live, r->pcell() );
 
-    _free_list = 0;
+    _free_set.clear();
     for( size_t i = 0; i != _ncells; ++i )
     {
-        auto p = reinterpret_cast<Cell*>( &_page[i] );
+        auto p = &_page[i];
         if( live.find( p ) == live.end() )
+<<<<<<< HEAD
             _free_list = new (p) FreeCell{ _free_list, 0 };
+=======
+            _free_set.insert( p );
+>>>>>>> 4edd44c6763ff556930f29ca9467a9495fdb8e21
     }
 
-    if( _free_list == 0 )
+    if( _free_set.empty() )
         throw Error<Runtime,OutOfMemory>( "Out of memory" );
 }
 
+<<<<<<< HEAD
 template class TestAllocator< Debug, SimpleScheme >;
 template class SimpleAllocator< Debug, SimpleScheme >;
+=======
+template auto SimpleAllocator<SimpleScheme>::_move( const Roots& roots ) -> void;
+template auto SimpleAllocator<SimpleScheme>::_mark( std::set<pcell_t>&, pcell_t ) -> void;
+template auto SimpleAllocator<SimpleScheme>::gc( const Roots& ) -> void;
+>>>>>>> 4edd44c6763ff556930f29ca9467a9495fdb8e21
