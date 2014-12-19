@@ -98,28 +98,6 @@ auto operator+( const std::string& s, const T& t ) -> std::string
 
 #define here(x) std::cout << "here" << x << std::endl;
 
-struct range
-{
-    class const_iterator
-    {
-        size_t _value;
-    public:
-        const_iterator( size_t n ) : _value( n ) {}
-        size_t operator*() const { return _value; }
-        bool operator!=( const_iterator i ) const { return _value != i._value; }
-        const_iterator operator++() { _value++; return *this; }
-    };
-private:
-    const const_iterator _begin;
-    const const_iterator _end;
-public:
-    range( size_t n ) : _begin( 0 ), _end( n ) {}
-    range( size_t begin, size_t end ) : _begin( begin ), _end( end ) {}
-
-    const_iterator begin() const { return _begin; }
-    const_iterator end() const { return _end; }
-};
-
 }	//namespace
 
 #endif

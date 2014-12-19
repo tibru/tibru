@@ -1,5 +1,5 @@
-#ifndef HEADER_KCON_CONTAIMER_KSTACK
-#define HEADER_KCON_CONTAIMER_KSTACK
+#ifndef HEADER_KCON_CONTAINER_KSTACK
+#define HEADER_KCON_CONTAINER_KSTACK
 
 namespace kcon { namespace container {
 

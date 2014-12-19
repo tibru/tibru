@@ -2,9 +2,12 @@
 #include "memory.h"
 #include "runtime.h"
 #include "stream.h"
+#include "container/range.h"
 #include <sstream>
 
 namespace kcon {
+
+using container::range;
 
 template<class Env>
 struct Tester
