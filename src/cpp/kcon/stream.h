@@ -13,7 +13,7 @@ namespace kcon {
 struct Syntax;
 struct EOS;
 
-template<class Scheme>
+template<class System, class Scheme>
 class kostream
 {
     typedef typename Scheme::byte_t byte_t;
@@ -60,19 +60,19 @@ public:
     }
 };
 
-template<class Scheme>
-inline kostream<Scheme>& flat( kostream<Scheme>& kos )
+template<class System, class Scheme>
+inline kostream<System, Scheme>& flat( kostream<System, Scheme>& kos )
 {
     return kos.setflatten( true );
 }
 
-template<class Scheme>
-inline kostream<Scheme>& deep( kostream<Scheme>& kos )
+template<class System, class Scheme>
+inline kostream<System, Scheme>& deep( kostream<System, Scheme>& kos )
 {
     return kos.setflatten( false );
 }
 
-template<class Scheme, class Allocator>
+template<class System, class Scheme, class Allocator>
 class kistream
 {
     typedef typename Scheme::value_t value_t;
@@ -81,7 +81,7 @@ class kistream
     typedef typename Scheme::elem_t elem_t;
 
     template<class T>
-    using kstack = kcon::container::kstack<Scheme,Allocator,T>; //remove
+    using kstack = kcon::container::kstack<Scheme, Allocator, T>; //remove
 
     std::istream& _is;
     Allocator& _alloc;

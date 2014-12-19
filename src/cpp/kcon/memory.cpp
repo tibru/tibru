@@ -6,8 +6,8 @@ using namespace kcon;
 
 /** TestAllocator */
 
-template<class Scheme>
-void TestAllocator<Scheme>::gc( const Roots& roots )
+template<class System, class Scheme>
+void TestAllocator<System,Scheme>::gc( const Roots& roots )
 {
     ++_gc_count;
 
@@ -28,8 +28,8 @@ void TestAllocator<Scheme>::gc( const Roots& roots )
 
 
 
-template<class Scheme>
-void TestAllocator<Scheme>::_shift( const Roots& roots )
+template<class System, class Scheme>
+void TestAllocator<System,Scheme>::_shift( const Roots& roots )
 {
     std::set<pcell_t> all;
     all.swap( _allocated );
@@ -56,18 +56,18 @@ void TestAllocator<Scheme>::_shift( const Roots& roots )
             *r = move( *r ).pcell();
 }
 
-template<class Scheme>
-void TestAllocator<Scheme>::_mark( std::set<pcell_t>& live, pcell_t p )
+template<class System, class Scheme>
+void TestAllocator<System,Scheme>::_mark( std::set<pcell_t>& live, pcell_t p )
 {
     if( live.find( p ) == live.end() )
     {
         live.insert( p );
 
-        assert( p->head().is_def(), "Found undef head during GC" );
+        System::assert( p->head().is_def(), "Found undef head during GC" );
         if( p->head().is_pcell() )
             _mark( live, p->head().pcell() );
 
-        assert( p->tail().is_def(), "Found undef tail during GC" );
+        System::assert( p->tail().is_def(), "Found undef tail during GC" );
         if( p->tail().is_pcell() )
             _mark( live, p->tail().pcell() );
     }
@@ -75,8 +75,8 @@ void TestAllocator<Scheme>::_mark( std::set<pcell_t>& live, pcell_t p )
 
 /** SimpleAllocator */
 
-template<class Scheme>
-void SimpleAllocator<Scheme>::_mark( std::set<pcell_t>& live, pcell_t p )
+template<class System, class Scheme>
+void SimpleAllocator<System,Scheme>::_mark( std::set<pcell_t>& live, pcell_t p )
 {
     if( live.find( p ) == live.end() )
     {
@@ -90,8 +90,8 @@ void SimpleAllocator<Scheme>::_mark( std::set<pcell_t>& live, pcell_t p )
     }
 }
 
-template<class Scheme>
-void SimpleAllocator<Scheme>::gc( const Roots& roots )
+template<class System, class Scheme>
+void SimpleAllocator<System,Scheme>::gc( const Roots& roots )
 {
     ++_gc_count;
 
@@ -112,5 +112,5 @@ void SimpleAllocator<Scheme>::gc( const Roots& roots )
         throw Error<Runtime,OutOfMemory>( "Out of memory" );
 }
 
-template class TestAllocator<SimpleScheme>;
-template class SimpleAllocator<SimpleScheme>;
+template class TestAllocator< Debug, SimpleScheme<Debug> >;
+template class SimpleAllocator< Debug, SimpleScheme<Debug> >;

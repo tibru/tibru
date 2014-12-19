@@ -17,7 +17,7 @@ struct OutOfMemory {};
     It shifts all the cells on each memory allocation to test that the roots are correctly defined
 **/
 
-template<class Scheme>
+template<class System, class Scheme>
 struct TestAllocator
 {
     typedef typename Scheme::value_t value_t;
@@ -70,7 +70,7 @@ public:
     Cells are never moved in memory
 **/
 
-template<class Scheme>
+template<class System, class Scheme>
 struct SimpleAllocator
 {
     typedef typename Scheme::value_t value_t;
@@ -98,7 +98,7 @@ public:
     SimpleAllocator( size_t ncells )
         : _ncells( ncells ), _page( new FreeCell[ncells] ), _free_list( 0 ), _gc_count( 0 )
     {
-        assert( reinterpret_cast<uintptr_t>(_page) % sizeof(FreeCell) == 0, "Page not cell aligned" );
+        System::assert( reinterpret_cast<uintptr_t>(_page) % sizeof(FreeCell) == 0, "Page not cell aligned" );
         gc({});
         _gc_count = 0;
     }

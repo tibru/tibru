@@ -39,12 +39,6 @@ struct Error : Error<Type>
 struct Assertion;
 struct Test;
 
-inline void assert( bool cond, const std::string& msg )
-{
-	if( !cond )
-		throw Error<Assertion>( msg );
-}
-
 inline void fail( const std::string& msg )
 {
 	throw Error<Test>( msg );

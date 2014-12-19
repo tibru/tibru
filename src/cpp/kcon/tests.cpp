@@ -198,8 +198,8 @@ struct Tester
 
 void run_tests()
 {
-    Tester< Env<SimpleScheme, TestAllocator> >::run_tests();
-    Tester< Env<SimpleScheme, SimpleAllocator> >::run_tests();
+    Tester< Env< Debug, SimpleScheme, TestAllocator > >::run_tests();
+    Tester< Env< Debug, SimpleScheme, SimpleAllocator > >::run_tests();
 }
 
 }	//namespace

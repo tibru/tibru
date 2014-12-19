@@ -8,15 +8,29 @@ namespace kcon {
 
 struct Runtime;
 
-template<class Schem, template<class> class AllocatorTemplate>
+template<bool AssertFlag=false>
+struct Params
+{
+    template<bool flag> struct Assert : Params<flag> {};
+
+    static void assert( bool cond, const std::string& msg )
+    {
+        if( AssertFlag && !cond )
+            throw Error<Assertion>( msg );
+    }
+};
+
+typedef Params<>::Assert<false> Debug;
+
+template<class Sys, template<class> class Schem, template<class, class> class AllocatorTemplate>
 struct Env
 {
-    using Scheme = Schem;
-    using Allocator = AllocatorTemplate<Scheme>;
+    using Scheme = Schem<Sys>;
+    using Allocator = AllocatorTemplate<Sys, Scheme>;
 
     template<class T> using kstack = container::kstack<Scheme,Allocator,T>;
-    using kostream = kcon::kostream<Scheme>;
-    using kistream = kcon::kistream<Scheme,Allocator>;
+    using kostream = kcon::kostream<Sys, Scheme>;
+    using kistream = kcon::kistream<Sys, Scheme,Allocator>;
 };
 
 }   //namespace

@@ -9,6 +9,7 @@ namespace kcon {
 const uintptr_t TAG_MASK = 2 * sizeof(void*) - 1;
 const uintptr_t ADDR_MASK = ~TAG_MASK;
 
+template<class System>
 struct SimpleScheme
 {
     struct Cell;
@@ -37,7 +38,7 @@ struct SimpleScheme
 
         byte_t byte() const
         {
-            assert( is_byte(), "elem_t is not a byte" );
+            System::assert( is_byte(), "elem_t is not a byte" );
             return static_cast<byte_t>( _value );
         }
 
@@ -48,7 +49,7 @@ struct SimpleScheme
 
         pcell_t pcell() const
         {
-            assert( is_pcell(), "elem_t is not a pcell" );
+            System::assert( is_pcell(), "elem_t is not a pcell" );
             return _pcell;
         }
 

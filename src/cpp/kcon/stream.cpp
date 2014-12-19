@@ -5,11 +5,8 @@
 
 using namespace kcon;
 
-template<class T>
-using kstack = Env<SimpleScheme, SimpleAllocator>::kstack<T>;
-
-template<class Scheme>
-auto kostream<Scheme>::operator<<( pcell_t pcell ) -> kostream<Scheme>&
+template<class System, class Scheme>
+auto kostream<System, Scheme>::operator<<( pcell_t pcell ) -> kostream&
 {
 	_os << '[';
 	_format( pcell );
@@ -17,25 +14,25 @@ auto kostream<Scheme>::operator<<( pcell_t pcell ) -> kostream<Scheme>&
 	return *this;
 }
 
-template<class Scheme>
-auto kostream<Scheme>::operator<<( byte_t value ) -> kostream<Scheme>&
+template<class System, class Scheme>
+auto kostream<System, Scheme>::operator<<( byte_t value ) -> kostream&
 {
 	_format( value );
 	return *this;
 }
 
-template<class Scheme>
-auto kostream<Scheme>::operator<<( elem_t elem ) -> kostream<Scheme>&
+template<class System, class Scheme>
+auto kostream<System, Scheme>::operator<<( elem_t elem ) -> kostream&
 {
     if( elem.is_pcell() )
-        return kostream<Scheme>::operator<<( elem.pcell() );
+        return kostream::operator<<( elem.pcell() );
     else
-        return kostream<Scheme>::operator<<( elem.byte() );
+        return kostream::operator<<( elem.byte() );
 }
 
 //complicated but avoids recursion on c-stack
-template<class Scheme>
-auto kostream<Scheme>::_format( pcell_t pcell )
+template<class System, class Scheme>
+auto kostream<System, Scheme>::_format( pcell_t pcell )
 {
     std::stack<Tail> tails;
     Tail tail{ pcell, 0 };
@@ -95,14 +92,14 @@ auto kostream<Scheme>::_format( pcell_t pcell )
     }
 }
 
-template<class Scheme>
-auto kostream<Scheme>::_format( byte_t value )
+template<class System, class Scheme>
+auto kostream<System, Scheme>::_format( byte_t value )
 {
     _os << short(value);
 }
 
-template<class Scheme, class Allocator>
-auto kistream<Scheme,Allocator>::_parse_byte() -> byte_t
+template<class System, class Scheme, class Allocator>
+auto kistream<System, Scheme, Allocator>::_parse_byte() -> byte_t
 {
     value_t value;
     if( !(_is >> value) || (value >= 256) )
@@ -111,8 +108,8 @@ auto kistream<Scheme,Allocator>::_parse_byte() -> byte_t
     return static_cast<byte_t>( value );
 }
 
-template<class Scheme, class Allocator>
-auto kistream<Scheme,Allocator>::_parse_elems() -> elem_t
+template<class System, class Scheme, class Allocator>
+auto kistream<System, Scheme, Allocator>::_parse_elems() -> elem_t
 {
 	elem_t tail;
 	kstack<elem_t> tails( _alloc );
@@ -157,8 +154,8 @@ auto kistream<Scheme,Allocator>::_parse_elems() -> elem_t
 	throw Error<Syntax,EOS>( "Unexpected end of input" );
 }
 
-template<class Scheme, class Allocator>
-auto kistream<Scheme,Allocator>::_reverse_and_reduce( elem_t e ) -> elem_t
+template<class System, class Scheme, class Allocator>
+auto kistream<System, Scheme, Allocator>::_reverse_and_reduce( elem_t e ) -> elem_t
 {
     elem_t p = e;
     elem_t tail;
@@ -172,7 +169,7 @@ auto kistream<Scheme,Allocator>::_reverse_and_reduce( elem_t e ) -> elem_t
     {
         if( p.is_undef() )
         {
-        	assert( tail.is_pcell(), "Expected recursive cell tail" );
+        	System::assert( tail.is_pcell(), "Expected recursive cell tail" );
 
             pcell_t head = tail.pcell();
 
@@ -188,7 +185,7 @@ auto kistream<Scheme,Allocator>::_reverse_and_reduce( elem_t e ) -> elem_t
         }
         else
         {
-            assert( !p->tail().is_byte(), "Expected tail not to be a byte in reverse and reduce" );
+            System::assert( !p->tail().is_byte(), "Expected tail not to be a byte in reverse and reduce" );
 
             if( p->head().is_pcell() )
             {
@@ -200,7 +197,7 @@ auto kistream<Scheme,Allocator>::_reverse_and_reduce( elem_t e ) -> elem_t
             }
             else
             {
-                assert( p->head().is_byte(), "" );
+                System::assert( p->head().is_byte(), "" );
                 const byte_t head = p->head().byte();
 
                 if( tail.is_undef() )
@@ -215,12 +212,12 @@ auto kistream<Scheme,Allocator>::_reverse_and_reduce( elem_t e ) -> elem_t
         }
     }
 
-    assert( tails.empty(), "Cell and tail stack mismatch" );
+    System::assert( tails.empty(), "Cell and tail stack mismatch" );
 	return tail;
 }
 
-template<class Scheme, class Allocator>
-auto kistream<Scheme, Allocator>::_parse() -> elem_t
+template<class System, class Scheme, class Allocator>
+auto kistream<System, Scheme, Allocator>::_parse() -> elem_t
 {
 	char c;
 	if( !(_is >> c) )
@@ -239,13 +236,13 @@ auto kistream<Scheme, Allocator>::_parse() -> elem_t
         throw Error<Syntax>( "Unexpected '"s + c + "'" );
 }
 
-template<class Scheme, class Allocator>
-auto kistream<Scheme, Allocator>::operator>>( elem_t& elem ) -> kistream<Scheme, Allocator>&
+template<class System, class Scheme, class Allocator>
+auto kistream<System, Scheme, Allocator>::operator>>( elem_t& elem ) -> kistream&
 {
     elem = _parse();
     return *this;
 }
 
-template class kostream<SimpleScheme>;
-template class kistream<SimpleScheme,SimpleAllocator<SimpleScheme>>;
-template class kistream<SimpleScheme,TestAllocator<SimpleScheme>>;
+template class kostream< Debug, SimpleScheme<Debug> >;
+template class kistream< Debug, SimpleScheme<Debug>, SimpleAllocator< Debug, SimpleScheme<Debug> > >;
+template class kistream< Debug, SimpleScheme<Debug>, TestAllocator< Debug, SimpleScheme<Debug> > >;
