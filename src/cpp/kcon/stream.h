@@ -3,7 +3,7 @@
 
 #include "types.h"
 #include "memory.h"
-#include "container/kstack.h"   //remove
+#include "container/kstack.h"
 #include <ostream>
 #include <istream>
 #include <sstream>
@@ -84,7 +84,7 @@ class kistream
     typedef AllocatorT<System,SchemeT> Allocator;
 
     template<class T>
-    using kstack = kcon::container::kstack<System, SchemeT, AllocatorT, T>; //remove
+    using kstack = kcon::container::kstack<System, SchemeT, AllocatorT, T>;
 
     std::istream& _is;
     Allocator& _alloc;
