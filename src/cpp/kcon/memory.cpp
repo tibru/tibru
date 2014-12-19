@@ -6,7 +6,7 @@ using namespace kcon;
 
 /** TestAllocator */
 
-template<class System, class Scheme>
+template<class System, template<class> class Scheme>
 void TestAllocator<System,Scheme>::gc( const Roots& roots )
 {
     ++_gc_count;
@@ -28,7 +28,7 @@ void TestAllocator<System,Scheme>::gc( const Roots& roots )
 
 
 
-template<class System, class Scheme>
+template<class System, template<class> class Scheme>
 void TestAllocator<System,Scheme>::_shift( const Roots& roots )
 {
     std::set<pcell_t> all;
@@ -56,7 +56,7 @@ void TestAllocator<System,Scheme>::_shift( const Roots& roots )
             *r = move( *r ).pcell();
 }
 
-template<class System, class Scheme>
+template<class System, template<class> class Scheme>
 void TestAllocator<System,Scheme>::_mark( std::set<pcell_t>& live, pcell_t p )
 {
     if( live.find( p ) == live.end() )
@@ -75,7 +75,7 @@ void TestAllocator<System,Scheme>::_mark( std::set<pcell_t>& live, pcell_t p )
 
 /** SimpleAllocator */
 
-template<class System, class Scheme>
+template<class System, template<class> class Scheme>
 void SimpleAllocator<System,Scheme>::_mark( std::set<pcell_t>& live, pcell_t p )
 {
     if( live.find( p ) == live.end() )
@@ -90,7 +90,7 @@ void SimpleAllocator<System,Scheme>::_mark( std::set<pcell_t>& live, pcell_t p )
     }
 }
 
-template<class System, class Scheme>
+template<class System, template<class> class Scheme>
 void SimpleAllocator<System,Scheme>::gc( const Roots& roots )
 {
     ++_gc_count;
@@ -112,5 +112,5 @@ void SimpleAllocator<System,Scheme>::gc( const Roots& roots )
         throw Error<Runtime,OutOfMemory>( "Out of memory" );
 }
 
-template class TestAllocator< Debug, SimpleScheme<Debug> >;
-template class SimpleAllocator< Debug, SimpleScheme<Debug> >;
+template class TestAllocator< Debug, SimpleScheme >;
+template class SimpleAllocator< Debug, SimpleScheme >;

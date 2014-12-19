@@ -22,15 +22,19 @@ struct Params
 
 typedef Params<>::Assert<false> Debug;
 
-template<class Sys, template<class> class Schem, template<class, class> class AllocatorTemplate>
+template<
+    class System,
+    template<class System> class SchemeT,
+    template<class System, template<class> class SchemeTemplate> class AllocatorT
+>
 struct Env
 {
-    using Scheme = Schem<Sys>;
-    using Allocator = AllocatorTemplate<Sys, Scheme>;
+    using Scheme = SchemeT<System>;
+    using Allocator = AllocatorT<System, SchemeT>;
 
     template<class T> using kstack = container::kstack<Scheme,Allocator,T>;
-    using kostream = kcon::kostream<Sys, Scheme>;
-    using kistream = kcon::kistream<Sys, Scheme,Allocator>;
+    using kostream = kcon::kostream<System, Scheme>;
+    using kistream = kcon::kistream<System, Scheme,Allocator>;
 };
 
 }   //namespace

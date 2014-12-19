@@ -17,13 +17,13 @@ struct OutOfMemory {};
     It shifts all the cells on each memory allocation to test that the roots are correctly defined
 **/
 
-template<class System, class Scheme>
+template<class System, template<class> class Scheme>
 struct TestAllocator
 {
-    typedef typename Scheme::value_t value_t;
-    typedef typename Scheme::pcell_t pcell_t;
-    typedef typename Scheme::elem_t elem_t;
-    typedef typename Scheme::Cell Cell;
+    typedef typename Scheme<System>::value_t value_t;
+    typedef typename Scheme<System>::pcell_t pcell_t;
+    typedef typename Scheme<System>::elem_t elem_t;
+    typedef typename Scheme<System>::Cell Cell;
 
     typedef std::vector<elem_t*> Roots;
 private:
@@ -70,13 +70,13 @@ public:
     Cells are never moved in memory
 **/
 
-template<class System, class Scheme>
+template<class System, template<class> class Scheme>
 struct SimpleAllocator
 {
-    typedef typename Scheme::value_t value_t;
-    typedef typename Scheme::pcell_t pcell_t;
-    typedef typename Scheme::elem_t elem_t;
-    typedef typename Scheme::Cell Cell;
+    typedef typename Scheme<System>::value_t value_t;
+    typedef typename Scheme<System>::pcell_t pcell_t;
+    typedef typename Scheme<System>::elem_t elem_t;
+    typedef typename Scheme<System>::Cell Cell;
 
     typedef std::vector<elem_t*> Roots;
 private:
