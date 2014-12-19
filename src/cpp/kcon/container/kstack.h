@@ -11,21 +11,21 @@ protected:
     typedef typename Scheme::elem_t elem_t;
 
     Allocator& _alloc;
-    pcell_t _items;
+    elem_t _items;
 
     basic_kstack( Allocator& alloc )
         : _alloc( alloc ), _items( null<pcell_t>() ) {}
 public:
-    pcell_t& items() { return _items; }
+    elem_t& items() { return _items; }
 
-    void push( elem_t item, typename Allocator::Roots roots )
+    void push( elem_t item, const typename Allocator::Roots& roots )
     {
-        _items = _alloc.new_Cell( item, _items, roots );
+        _items = _alloc.new_Cell( item, _items.pcell(), roots );
     }
 
     void pop()
     {
-        _items = _items->tail().pcell();
+        _items = _items.pcell()->tail().pcell();
     }
 
     bool empty() const { return _items == null<pcell_t>(); }

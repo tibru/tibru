@@ -17,11 +17,11 @@ struct Tester
     typedef typename Env::Scheme::pcell_t pcell_t;
     typedef typename Env::Scheme::elem_t elem_t;
 
-    static auto parse( Allocator& allocator, const std::string& in ) -> elem_t
+    static auto parse( Allocator& allocator, const std::string& in, const typename Allocator::Roots& roots ) -> elem_t
     {
         std::istringstream iss( in );
         elem_t elem = null<elem_t>();
-        kistream( iss, allocator ) >> elem;
+        kistream( iss, allocator, roots ) >> elem;
         return elem;
     }
 
@@ -39,8 +39,8 @@ struct Tester
         pcell_t p = a.new_Cell(
                         1,
                         a.new_Cell(
-                            a.new_Cell(3,3),
-                            2 ) );
+                            a.new_Cell(3,3, {}),
+                            2, {} ), {} );
 
         auto found_flat = print( p, flat );
         auto expected_flat = "[1 [3 3] 2]";
@@ -59,7 +59,7 @@ struct Tester
         Allocator a( 1024 );
         std::ostringstream oss;
 
-        auto found = print( parse( a, in ), m );
+        auto found = print( parse( a, in, {} ), m );
 
         test( found == out, "IO failed for: '" + in + "'\nExpected: '" + out + "'\nFound:    '" + found + "'" );
     }
@@ -72,7 +72,7 @@ struct Tester
         std::string found;
         try
         {
-            found = print( parse( a, in ) );
+            found = print( parse( a, in, {} ) );
         }
         catch( const Error<Syntax,SubType>& e )
         {
@@ -111,7 +111,7 @@ struct Tester
         try
         {
             Allocator a( 1 );
-            pcell_t p = a.new_Cell( 1, 1 );
+            elem_t p = a.new_Cell( 1, 1, {} );
             a.new_Cell( 1, 1, {&p} );
 
             fail( "Failed to catch out of memory" );
@@ -120,26 +120,26 @@ struct Tester
 
         {
             Allocator a( 10 );
-            pcell_t p = a.new_Cell( 1, 2 );
-            a.new_Cell( 1, 1 );
+            elem_t p = a.new_Cell( 1, 2, {} );
+            a.new_Cell( 1, 1, {&p} );
 
             test( a.num_allocated() == 2, "Failed to register allocated cells" );
 
-            test( p->head() == 1, "Cell head changed before GC" );
-            test( p->tail() == 2, "Cell tail changed before GC" );
+            test( p->head().is_byte() && p->head().byte() == 1, "Cell head incorrect before GC" );
+            test( p->tail().is_byte() && p->tail().byte() == 2, "Cell tail incorrect before GC" );
 
             a.gc({&p});
 
-            test( p->head() == 1, "Cell head changed after GC" );
-            test( p->tail() == 2, "Cell tail changed after GC" );
+            test( p->head().is_byte() && p->head().byte() == 1, "Cell head incorrect after GC" );
+            test( p->tail().is_byte() && p->tail().byte() == 2, "Cell tail incorrect after GC" );
 
             test( a.num_allocated() == 1, "Failed to cleanup after GC" );
         }
 
         {
             Allocator a( 1024 );
-            pcell_t p = parse( a, "[0 [1 [2 3] 4] 5 6]" ).pcell();
-            pcell_t q = parse( a, "[0 [1 [2 3] 4] 5 6]" ).pcell();
+            elem_t p = parse( a, "[0 [1 [2 3] 4] 5 6]", {} ).pcell();
+            elem_t q = parse( a, "[0 [1 [2 3] 4] 5 6]", {&p} ).pcell();
 
             a.gc({&p,&q});
 
@@ -152,8 +152,8 @@ struct Tester
 
         {
             Allocator a( 1024 );
-            pcell_t p = parse( a, "[0 [1 [2 3] 4] 5 6]" ).pcell();
-            parse( a, "[0 [1 [2 3] 4] 5 6]" ).pcell();
+            elem_t p = parse( a, "[0 [1 [2 3] 4] 5 6]", {} ).pcell();
+            parse( a, "[0 [1 [2 3] 4] 5 6]", {&p} ).pcell();
 
             a.gc({&p});
 
@@ -162,7 +162,7 @@ struct Tester
 
             test( print( p ) == "[0 [1 [2 3] 4] 5 6]", "Complex tree (3) altered by GC" );
 
-            pcell_t t = p->tail().pcell();
+            elem_t t = p->tail();
 
             a.gc({&t});
 
@@ -170,11 +170,10 @@ struct Tester
             test( print( t ) == "[[1 [2 3] 4] 5 6]", "Complex tree tail altered by GC" );
         }
 
-
         {
             //Test with minimal memory to create memory churn
             Allocator a( 1024 );
-            pcell_t p = parse( a, "[0 [1 [2 3] 4] 5 6]" ).pcell();
+            elem_t p = parse( a, "[0 [1 [2 3] 4] 5 6]", {} );
 
             test( a.gc_count() == 0, "GC ran during parse" );
             //test( a.gc_count() == 1, "GC failed to run during parse" );

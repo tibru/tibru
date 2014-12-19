@@ -114,8 +114,11 @@ auto kistream<Scheme,Allocator>::_parse_byte() -> byte_t
 template<class Scheme, class Allocator>
 auto kistream<Scheme,Allocator>::_parse_elems() -> pcell_t
 {
-	pcell_t tail = null<pcell_t>();
+	elem_t tail = null<pcell_t>();
 	kstack<pcell_t> tails( _alloc );
+
+	std::vector<elem_t*> roots = _roots;
+    roots.insert( roots.end(), {&tail,&tails.items()} );
 
 	char c;
 	while( _is >> c )
@@ -129,22 +132,22 @@ auto kistream<Scheme,Allocator>::_parse_elems() -> pcell_t
                 throw Error<Syntax>( "Unexpected singleton" );
 
 			if( tails.empty() )
-				return tail;
+				return tail.pcell();
 
-			pcell_t elems = tail;
+			pcell_t elems = tail.pcell();
 			tail = tails.top();
 			tails.pop();
-			tail = _alloc.new_Cell( elems, tail, {&tails.items()} );
+			tail = _alloc.new_Cell( elems, tail, roots );
 		}
 		else if( c == '[' )
 		{
-			tails.push( tail, {&tails.items(), &tail} );
+			tails.push( tail, roots );
 			tail = null<pcell_t>();
 		}
 		else if( isdigit( c ) )
 		{
 			_is.putback( c );
-			tail = _alloc.new_Cell( _parse_byte(), tail, {&tails.items()} );
+			tail = _alloc.new_Cell( _parse_byte(), tail, roots );
 		}
 		else
 			throw Error<Syntax>( "Unexpected '"s + c + "'" );
@@ -156,14 +159,17 @@ auto kistream<Scheme,Allocator>::_parse_elems() -> pcell_t
 template<class Scheme, class Allocator>
 auto kistream<Scheme,Allocator>::_reverse_and_reduce( pcell_t pcell ) -> pcell_t
 {
-    pcell_t p = pcell;
-    elem_t tail = null<pcell_t>();
+    elem_t p = pcell;
+    elem_t tail = null<elem_t>();
 	kstack<elem_t> tails( _alloc );
 	kstack<pcell_t> pcells( _alloc );
 
-    while( !((p == null<pcell_t>()) && pcells.empty()) )
+	std::vector<elem_t*> roots = _roots;
+    roots.insert( roots.end(), {&p,&tail,&tails.items(),&pcells.items()} );
+
+    while( !((p == null<elem_t>()) && pcells.empty()) )
     {
-        if( p == null<pcell_t>() )
+        if( p == null<elem_t>() )
         {
         	assert( tail.is_pcell(), "Expected recursive cell tail" );
 
@@ -175,9 +181,9 @@ auto kistream<Scheme,Allocator>::_reverse_and_reduce( pcell_t pcell ) -> pcell_t
 			if( tail == null<elem_t>() )
 				tail = head;
 			else if( tail.is_byte() )
-				tail = _alloc.new_Cell( head, tail.byte() );
+				tail = _alloc.new_Cell( head, tail.byte(), roots );
 			else
-            	tail = _alloc.new_Cell( head, tail.pcell() );
+            	tail = _alloc.new_Cell( head, tail.pcell(), roots );
         }
         else
         {
@@ -185,8 +191,8 @@ auto kistream<Scheme,Allocator>::_reverse_and_reduce( pcell_t pcell ) -> pcell_t
 
             if( p->head().is_pcell() )
             {
-                pcells.push( p->tail().pcell(), {&p, &pcells.items()} );
-                tails.push( tail, {&p, &pcells.items()} );
+                pcells.push( p->tail().pcell(), roots );
+                tails.push( tail, roots );
 
                 p = p->head().pcell();
                 tail = null<pcell_t>();
@@ -199,9 +205,9 @@ auto kistream<Scheme,Allocator>::_reverse_and_reduce( pcell_t pcell ) -> pcell_t
                 if( tail== null<elem_t>() )
                     tail = head;
                 else if( tail.is_byte() )
-                    tail = _alloc.new_Cell( head, tail.byte() );
+                    tail = _alloc.new_Cell( head, tail.byte(), roots );
                 else
-                    tail = _alloc.new_Cell( head, tail.pcell() );
+                    tail = _alloc.new_Cell( head, tail.pcell(), roots );
 
                 p = p->tail().pcell();
             }
@@ -209,7 +215,6 @@ auto kistream<Scheme,Allocator>::_reverse_and_reduce( pcell_t pcell ) -> pcell_t
     }
 
     assert( tails.empty(), "Cell and tail stack mismatch" );
-
 	return tail.pcell();
 }
 

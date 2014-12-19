@@ -85,14 +85,15 @@ class kistream
 
     std::istream& _is;
     Allocator& _alloc;
+    std::vector<elem_t*> _roots;
 
     auto _parse_byte() -> byte_t;
 	auto _parse_elems() -> pcell_t;
 	auto _reverse_and_reduce( pcell_t p ) -> pcell_t;
 	auto _parse() -> elem_t;
 public:
-    kistream( std::istream& is, Allocator& alloc )
-        : _is( is ), _alloc( alloc ) {}
+    kistream( std::istream& is, Allocator& alloc, const std::vector<elem_t*>& roots )
+        : _is( is ), _alloc( alloc ), _roots( roots ) {}
 
 	auto operator>>( elem_t& elem ) -> kistream&;
 };

@@ -42,6 +42,11 @@ struct SimpleScheme
             return static_cast<byte_t>( _value );
         }
 
+        pcell_t operator->() const
+        {
+            return pcell();
+        }
+
         pcell_t pcell() const
         {
             assert( is_pcell(), "elem_t is not a pcell" );
@@ -82,9 +87,9 @@ inline SimpleScheme::elem_t null<SimpleScheme::elem_t>()
 }
 
 template<>
-inline bool is_singleton( const SimpleScheme::pcell_t& p )
+inline bool is_singleton( const SimpleScheme::elem_t& e )
 {
-    return (p != null<SimpleScheme::pcell_t>()) && (p->tail() == null<SimpleScheme::elem_t>());
+    return (e != null<SimpleScheme::elem_t>()) && (e->tail() == null<SimpleScheme::elem_t>());
 }
 
 }	//namespace

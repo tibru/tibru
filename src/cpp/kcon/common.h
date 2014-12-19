@@ -4,6 +4,7 @@
 #include <exception>
 #include <string>
 #include <iostream>
+#include <sstream>
 
 namespace kcon {
 
@@ -91,6 +92,16 @@ inline auto type_name() -> auto
 }
 
 #define TYPENAME( ... ) type_name<__VA_ARGS__>()
+
+template<class T>
+auto operator+( const std::string& s, const T& t ) -> std::string
+{
+    std::ostringstream oss;
+    oss << s << t;
+    return oss.str();
+}
+
+#define here(x) std::cout << "here" << x << std::endl;
 
 }	//namespace
 
