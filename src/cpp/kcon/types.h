@@ -75,15 +75,9 @@ struct SimpleScheme
 };
 
 template<>
-inline SimpleScheme::pcell_t null<SimpleScheme::pcell_t>()
-{
-    return reinterpret_cast<SimpleScheme::pcell_t>( 256 );
-}
-
-template<>
 inline SimpleScheme::elem_t null<SimpleScheme::elem_t>()
 {
-    return null<SimpleScheme::pcell_t>();
+    return reinterpret_cast<SimpleScheme::pcell_t>( 256 );
 }
 
 template<>

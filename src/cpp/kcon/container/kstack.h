@@ -14,7 +14,7 @@ protected:
     elem_t _items;
 
     basic_kstack( Allocator& alloc )
-        : _alloc( alloc ), _items( null<pcell_t>() ) {}
+        : _alloc( alloc ), _items( null<elem_t>() ) {}
 public:
     elem_t& items() { return _items; }
 
@@ -28,7 +28,7 @@ public:
         _items = _items.pcell()->tail().pcell();
     }
 
-    bool empty() const { return _items == null<pcell_t>(); }
+    bool empty() const { return _items == null<elem_t>(); }
 };
 
 template<class Scheme, class Allocator, class T>

@@ -43,7 +43,7 @@ void TestAllocator<Scheme>::_shift( const Roots& roots )
         old_to_new[p] = q;
     }
 
-    auto move = [&old_to_new]( elem_t e ) { return e.is_pcell() && (e.pcell() != null<pcell_t>()) ? old_to_new[e.pcell()] : e; };
+    auto move = [&old_to_new]( elem_t e ) { return e.is_pcell() && (e != null<elem_t>()) ? old_to_new[e.pcell()] : e; };
 
     for( auto p : old_to_new )
     {

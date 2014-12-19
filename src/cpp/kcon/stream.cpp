@@ -114,7 +114,7 @@ auto kistream<Scheme,Allocator>::_parse_byte() -> byte_t
 template<class Scheme, class Allocator>
 auto kistream<Scheme,Allocator>::_parse_elems() -> pcell_t
 {
-	elem_t tail = null<pcell_t>();
+	elem_t tail = null<elem_t>();
 	kstack<pcell_t> tails( _alloc );
 
 	std::vector<elem_t*> roots = _roots;
@@ -125,7 +125,7 @@ auto kistream<Scheme,Allocator>::_parse_elems() -> pcell_t
 	{
 		if( c == ']' )
 		{
-		    if( tail == null<pcell_t>() )
+		    if( tail == null<elem_t>() )
                 throw Error<Syntax>( "Unexpected empty cell" );
 
 		    if( is_singleton( tail ) )
@@ -142,7 +142,7 @@ auto kistream<Scheme,Allocator>::_parse_elems() -> pcell_t
 		else if( c == '[' )
 		{
 			tails.push( tail, roots );
-			tail = null<pcell_t>();
+			tail = null<elem_t>();
 		}
 		else if( isdigit( c ) )
 		{
@@ -195,7 +195,7 @@ auto kistream<Scheme,Allocator>::_reverse_and_reduce( pcell_t pcell ) -> pcell_t
                 tails.push( tail, roots );
 
                 p = p->head().pcell();
-                tail = null<pcell_t>();
+                tail = null<elem_t>();
             }
             else
             {
