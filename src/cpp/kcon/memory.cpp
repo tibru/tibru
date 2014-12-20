@@ -43,6 +43,7 @@ void TestAllocator<System, SchemeT>::_shift( const Roots& roots )
     for( auto p : all )
     {
         auto q = new Cell( 199, 201 );
+        System::assert( is_valid_pointer( q ), "Invalid cell address" );
         _allocated.insert( q );
         old_to_new[p] = q;
     }

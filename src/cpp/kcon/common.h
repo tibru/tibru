@@ -98,27 +98,16 @@ auto operator+( const std::string& s, const T& t ) -> std::string
 
 #define here(x) std::cout << "here" << x << std::endl;
 
-}	//namespace
-
 const uintptr_t HI_ADDR_BIT = ~(uintptr_t(-1) >> 1);
 const uintptr_t THREE_GB = 0xC0000000;
 const uintptr_t MAX_POINTER = sizeof(void*) == 8 ? HI_ADDR_BIT : THREE_GB;
 
-inline bool is_valid_pointer( void* p ) { return reinterpret_cast<uintptr_t>(p) < MAX_POINTER; }
+inline bool is_valid_pointer( const void* p ) { return reinterpret_cast<uintptr_t>(p) < MAX_POINTER; }
 
-void* operator_new( size_t size ) throw(std::bad_alloc);
-void operator_delete( void* p, size_t size ) throw(std::bad_alloc);
 
-#ifndef NO_REPLACE_NEW
-inline void* operator new( size_t size ) throw(std::bad_alloc)
-{
-    void* p = operator_new( size );
+}	//namespace
 
-    if( !is_valid_pointer(p) )
-        throw std::bad_alloc();
 
-    return p;
-}
-#endif
+
 
 #endif

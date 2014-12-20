@@ -92,7 +92,9 @@ public:
         if( _allocated.size() == _ncells )
             gc( roots );
 
-        elem_t e = *_allocated.insert( new Cell( head, tail ) ).first;
+		elem_t e = new Cell( head, tail );	//switch pcell_t
+		System::assert( is_valid_pointer( e.pcell() ), "Invalid cell address" );
+        _allocated.insert( e.pcell() );
         roots.push_back( &e );
         _shift( roots );
         return e.pcell();
@@ -143,6 +145,8 @@ public:
     SimpleAllocator( size_t ncells )
         : _ncells( ncells ), _page( new FreeCell[ncells] ), _free_list( 0 ), _gc_count( 0 )
     {
+    	System::assert( is_valid_pointer( _page ), "Invalid page address" );
+    	System::assert( is_valid_pointer( _page + ncells ), "Invalid page address" );
         System::assert( reinterpret_cast<uintptr_t>(_page) % sizeof(FreeCell) == 0, "Page not cell aligned" );
         gc({});
         _gc_count = 0;
