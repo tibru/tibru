@@ -111,11 +111,13 @@ auto kistream<System, SchemeT, AllocatorT>::_parse_byte() -> byte_t
 template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT>
 auto kistream<System, SchemeT, AllocatorT>::_parse_elems() -> elem_t
 {
-	elem_t tail;
-	kstack<elem_t> tails( _alloc );
+    elem_t tail;
+    kstack<elem_t> tails( _alloc );
+
+	auto_root<elem_t> auto_tail( _alloc, tail );
+	auto_root<elem_t> auto_tails( _alloc, tails.items() );
 
 	std::vector<elem_t*> roots = _roots;
-    roots.insert( roots.end(), {&tail,&tails.items()} );
 
 	char c;
 	while( _is >> c )

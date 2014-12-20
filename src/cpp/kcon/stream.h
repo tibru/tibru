@@ -84,6 +84,9 @@ class kistream
     typedef AllocatorT<System,SchemeT> Allocator;
 
     template<class T>
+    using auto_root = typename Allocator::template auto_root<T>;
+
+    template<class T>
     using kstack = kcon::container::kstack<System, SchemeT, AllocatorT, T>;
 
     std::istream& _is;

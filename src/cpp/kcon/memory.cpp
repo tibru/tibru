@@ -18,6 +18,10 @@ void TestAllocator<System, SchemeT>::gc( const Roots& roots )
         if( r->is_pcell() )
             _mark( _allocated, r->pcell() );
 
+    for( auto r : _elem_roots )
+        if( r->is_pcell() )
+            _mark( _allocated, r->pcell() );
+
     for( auto p : all )
         if( _allocated.find( p ) == _allocated.end() )
             delete p;
@@ -52,6 +56,10 @@ void TestAllocator<System, SchemeT>::_shift( const Roots& roots )
     }
 
     for( auto r : roots )
+        if( r->is_pcell() )
+            *r = move( *r ).pcell();
+
+    for( auto r : _elem_roots )
         if( r->is_pcell() )
             *r = move( *r ).pcell();
 }
@@ -97,6 +105,10 @@ void SimpleAllocator<System, SchemeT>::gc( const Roots& roots )
 
     std::set<pcell_t> live;
     for( auto r : roots )
+        if( r->is_pcell() )
+            _mark( live, r->pcell() );
+
+    for( auto r : _elem_roots )
         if( r->is_pcell() )
             _mark( live, r->pcell() );
 

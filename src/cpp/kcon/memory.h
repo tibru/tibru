@@ -13,6 +13,37 @@ struct OutOfMemory {};
 
 #define MetaAllocator template<class System, template<class> class SchemeTemplate>
 
+/** Auto register roots with allocator instance **/
+
+template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT, class T>
+class auto_root
+{
+    typedef AllocatorT<System,SchemeT> Allocator;
+
+    Allocator& _alloc;
+    T& _root;
+
+    auto_root( const auto_root& );
+    auto_root& operator=( const auto_root& );
+public:
+    auto_root( Allocator& alloc, T& root )
+        : _alloc( alloc ), _root( root )
+    {
+        _alloc.push_root( &_root );
+    }
+
+    ~auto_root()
+    {
+        _alloc.pop_root( &_root );
+    }
+
+    auto_root& operator=( const T& t )
+    {
+        (T&) *this = t;
+        return *this;
+    }
+};
+
 /**
     TestAllocator
     Simple but inefficient allocator for testing.
@@ -28,10 +59,14 @@ struct TestAllocator
     typedef typename Scheme::elem_t elem_t;
     typedef typename Scheme::Cell Cell;
 
+    template<class T>
+    using auto_root = auto_root< System, SchemeT, TestAllocator, T>;
+
     typedef std::vector<elem_t*> Roots;
 private:
     const size_t _ncells;
     std::set<pcell_t> _allocated;
+    std::vector<elem_t*> _elem_roots;
     size_t _gc_count;
 
     static void _mark( std::set<pcell_t>& live, pcell_t pcell );
@@ -45,6 +80,9 @@ public:
 		for( auto p : _allocated )
             delete p;
 	}
+
+	void push_root( elem_t* root ) { _elem_roots.push_back( root ); }
+	void pop_root( elem_t* root ) { System::assert( _elem_roots.back() == root, "Out of order root pop" ); _elem_roots.pop_back(); }
 
 	void gc( const Roots& roots );
 
@@ -82,6 +120,9 @@ struct SimpleAllocator
     typedef typename Scheme::elem_t elem_t;
     typedef typename Scheme::Cell Cell;
 
+    template<class T>
+    using auto_root = auto_root< System, SchemeT, SimpleAllocator, T>;
+
     typedef std::vector<elem_t*> Roots;
 private:
     struct FreeCell
@@ -95,6 +136,7 @@ private:
     const size_t _ncells;
     FreeCell* _page;
     FreeCell* _free_list;
+    std::vector<elem_t*> _elem_roots;
     size_t _gc_count;
 
     static void _mark( std::set<pcell_t>& live, pcell_t pcell );
@@ -111,6 +153,9 @@ public:
 	{
 		delete[] _page;
 	}
+
+	void push_root( elem_t* root ) { _elem_roots.push_back( root ); }
+	void pop_root( elem_t* root ) { System::assert( _elem_roots.back() == root, "Out of order root pop" ); _elem_roots.pop_back(); }
 
     void gc( const Roots& roots );
 
