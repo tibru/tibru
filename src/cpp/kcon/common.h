@@ -75,7 +75,7 @@ struct assert_test {};
 inline auto extract_type_name( const char* name ) -> auto
 {
     std::string s = name;
-    const size_t n = s.find( ';' );
+    const size_t n = std::min( s.find( ';' ), s.find( ']' ) );
     return s.substr( 33, n-33 );
 }
 
