@@ -9,7 +9,7 @@ using namespace kcon;
 template<class System, MetaScheme class SchemeT>
 void TestAllocator<System, SchemeT>::gc( const Roots& roots )
 {
-    ++_gc_count;
+    ++this->_gc_count;
 
     std::set<pcell_t> all;
     all.swap( _allocated );
@@ -18,7 +18,7 @@ void TestAllocator<System, SchemeT>::gc( const Roots& roots )
         if( r->is_pcell() )
             _mark( _allocated, r->pcell() );
 
-    for( auto r : _elem_roots )
+    for( auto r : this->_elem_roots )
         if( r->is_pcell() )
             _mark( _allocated, r->pcell() );
 
@@ -26,7 +26,7 @@ void TestAllocator<System, SchemeT>::gc( const Roots& roots )
         if( _allocated.find( p ) == _allocated.end() )
             delete p;
 
-    if( _allocated.size() == _ncells )
+    if( _allocated.size() == this->_ncells )
         throw Error<Runtime,OutOfMemory>( "Out of memory" );
 }
 
@@ -60,7 +60,7 @@ void TestAllocator<System, SchemeT>::_shift( const Roots& roots )
         if( r->is_pcell() )
             *r = move( *r ).pcell();
 
-    for( auto r : _elem_roots )
+    for( auto r : this->_elem_roots )
         if( r->is_pcell() )
             *r = move( *r ).pcell();
 }
@@ -102,19 +102,19 @@ void SimpleAllocator<System, SchemeT>::_mark( std::set<pcell_t>& live, pcell_t p
 template<class System, MetaScheme class SchemeT>
 void SimpleAllocator<System, SchemeT>::gc( const Roots& roots )
 {
-    ++_gc_count;
+    ++this->_gc_count;
 
     std::set<pcell_t> live;
     for( auto r : roots )
         if( r->is_pcell() )
             _mark( live, r->pcell() );
 
-    for( auto r : _elem_roots )
+    for( auto r : this->_elem_roots )
         if( r->is_pcell() )
             _mark( live, r->pcell() );
 
     _free_list = 0;
-    for( size_t i = 0; i != _ncells; ++i )
+    for( size_t i = 0; i != this->_ncells; ++i )
     {
         auto p = reinterpret_cast<Cell*>( &_page[i] );
         if( live.find( p ) == live.end() )

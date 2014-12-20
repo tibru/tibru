@@ -43,6 +43,26 @@ public:
     }
 };
 
+template<class System, MetaScheme class SchemeT>
+class AllocatorBase
+{
+protected:
+	typedef SchemeT<System> Scheme;
+	typedef typename Scheme::elem_t elem_t;
+	
+	const size_t _ncells;
+	size_t _gc_count;
+	std::vector<elem_t*> _elem_roots;
+	
+	AllocatorBase( size_t ncells )
+		: _ncells( ncells ), _gc_count( 0 ) {}
+public:
+    auto gc_count() const -> size_t { return _gc_count; }
+    
+    void push_root( elem_t* root ) { _elem_roots.push_back( root ); }
+	void pop_root( elem_t* root ) { System::assert( _elem_roots.back() == root, "Out of order root pop" ); _elem_roots.pop_back(); }
+};
+
 /**
     TestAllocator
     Simple but inefficient allocator for testing.
@@ -50,7 +70,7 @@ public:
 **/
 
 template<class System, MetaScheme class SchemeT>
-struct TestAllocator
+struct TestAllocator : AllocatorBase< System, SchemeT >
 {
     typedef SchemeT<System> Scheme;
     typedef typename Scheme::value_t value_t;
@@ -63,16 +83,13 @@ struct TestAllocator
 
     typedef std::vector<elem_t*> Roots;
 private:
-    const size_t _ncells;
     std::set<pcell_t> _allocated;
-    std::vector<elem_t*> _elem_roots;
-    size_t _gc_count;
 
     static void _mark( std::set<pcell_t>& live, pcell_t pcell );
     void _shift( const Roots& roots );
 public:
     TestAllocator( size_t ncells )
-        : _ncells( ncells ), _allocated(), _gc_count( 0 ) {}
+        : AllocatorBase<System, SchemeT>( ncells ), _allocated() {}
 
 	~TestAllocator()
 	{
@@ -80,16 +97,11 @@ public:
             delete p;
 	}
 
-	void push_root( elem_t* root ) { _elem_roots.push_back( root ); }
-	void pop_root( elem_t* root ) { System::assert( _elem_roots.back() == root, "Out of order root pop" ); _elem_roots.pop_back(); }
-
 	void gc( const Roots& roots );
-
-	auto gc_count() const -> size_t { return _gc_count; }
 
     auto new_Cell( const elem_t& head, const elem_t& tail, Roots roots ) -> const Cell*
     {
-        if( _allocated.size() == _ncells )
+        if( _allocated.size() == this->_ncells )
             gc( roots );
 
 		elem_t e = new Cell( head, tail );	//switch pcell_t
@@ -113,7 +125,7 @@ public:
 **/
 
 template<class System, MetaScheme class SchemeT>
-struct SimpleAllocator
+struct SimpleAllocator : AllocatorBase<System, SchemeT>
 {
     typedef SchemeT<System> Scheme;
     typedef typename Scheme::value_t value_t;
@@ -134,22 +146,19 @@ private:
 
     ASSERT( sizeof(FreeCell) == sizeof(Cell) );
 
-    const size_t _ncells;
     FreeCell* _page;
     FreeCell* _free_list;
-    std::vector<elem_t*> _elem_roots;
-    size_t _gc_count;
 
     static void _mark( std::set<pcell_t>& live, pcell_t pcell );
 public:
     SimpleAllocator( size_t ncells )
-        : _ncells( ncells ), _page( new FreeCell[ncells] ), _free_list( 0 ), _gc_count( 0 )
+        : AllocatorBase<System, SchemeT>( ncells ), _page( new FreeCell[ncells] ), _free_list( 0 )
     {
     	System::assert( is_valid_pointer( _page ), "Invalid page address" );
     	System::assert( is_valid_pointer( _page + ncells ), "Invalid page address" );
         System::assert( reinterpret_cast<uintptr_t>(_page) % sizeof(FreeCell) == 0, "Page not cell aligned" );
         gc({});
-        _gc_count = 0;
+        this->_gc_count = 0;
     }
 
 	~SimpleAllocator()
@@ -157,12 +166,7 @@ public:
 		delete[] _page;
 	}
 
-	void push_root( elem_t* root ) { _elem_roots.push_back( root ); }
-	void pop_root( elem_t* root ) { System::assert( _elem_roots.back() == root, "Out of order root pop" ); _elem_roots.pop_back(); }
-
     void gc( const Roots& roots );
-
-    auto gc_count() const -> size_t { return _gc_count; }
 
     auto allocate( const Roots& roots ) -> void*
     {
@@ -176,7 +180,7 @@ public:
 
     auto num_allocated() const -> size_t
     {
-        size_t n = _ncells;
+        size_t n = this->_ncells;
         for( const FreeCell* p = _free_list; p != 0; p = p->next )
             --n;
 
