@@ -16,25 +16,24 @@ struct OutOfMemory {};
 /** Auto register roots with allocator instance **/
 
 template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT, class T>
-class auto_root
+class auto_root : public T
 {
     typedef AllocatorT<System,SchemeT> Allocator;
 
     Allocator& _alloc;
-    T& _root;
 
     auto_root( const auto_root& );
     auto_root& operator=( const auto_root& );
 public:
-    auto_root( Allocator& alloc, T& root )
-        : _alloc( alloc ), _root( root )
+    auto_root( Allocator& alloc, const T& root=T() )
+        : T( root ), _alloc( alloc )
     {
-        _alloc.push_root( &_root );
+        _alloc.push_root( this );
     }
 
     ~auto_root()
     {
-        _alloc.pop_root( &_root );
+        _alloc.pop_root( this );
     }
 
     auto_root& operator=( const T& t )

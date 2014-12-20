@@ -13,11 +13,10 @@ protected:
     typedef AllocatorT<System, SchemeT> Allocator;
 
     Allocator& _alloc;
-    elem_t _items;
-    typename Allocator::template auto_root<elem_t> _auto_items;
+    typename Allocator::template auto_root<elem_t> _items;
 
     basic_kstack( Allocator& alloc )
-        : _alloc( alloc ), _items(), _auto_items( _alloc, _items ) {}
+        : _alloc( alloc ), _items( _alloc ) {}
 
     void _push( elem_t item, const typename Allocator::Roots& roots )
     {
