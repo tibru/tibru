@@ -115,7 +115,7 @@ auto kistream<System, SchemeT, AllocatorT>::_parse_elems() -> elem_t
     kstack<elem_t> tails( _alloc );
 
 	auto_root<elem_t> auto_tail( _alloc, tail );
-	auto_root<elem_t> auto_tails( _alloc, tails.items() );
+	//auto_root<elem_t> auto_tails( _alloc, tails.items() );
 
 	std::vector<elem_t*> roots = _roots;
 
@@ -165,7 +165,7 @@ auto kistream<System, SchemeT, AllocatorT>::_reverse_and_reduce( elem_t e ) -> e
 	kstack<elem_t> pcells( _alloc );
 
 	std::vector<elem_t*> roots = _roots;
-    roots.insert( roots.end(), {&p,&tail,&tails.items(),&pcells.items()} );
+    roots.insert( roots.end(), {&p,&tail} );
 
     while( !pcells.empty() || p.is_def() )
     {

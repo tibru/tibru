@@ -25,6 +25,7 @@
 			<Add option="-Wall" />
 			<Add option="-fexceptions" />
 		</Compiler>
+		<Unit filename="kcon/common.cpp" />
 		<Unit filename="kcon/common.h" />
 		<Unit filename="kcon/container/kstack.h">
 			<Option virtualFolder="container/" />

@@ -14,17 +14,16 @@ protected:
 
     Allocator& _alloc;
     elem_t _items;
+    typename Allocator::template auto_root<elem_t> _auto_items;
 
     basic_kstack( Allocator& alloc )
-        : _alloc( alloc ), _items() {}
+        : _alloc( alloc ), _items(), _auto_items( _alloc, _items ) {}
 
     void _push( elem_t item, const typename Allocator::Roots& roots )
     {
         _items = _alloc.new_Cell( item, _items, roots );
     }
 public:
-    elem_t& items() { return _items; }
-
     void pop()
     {
         _items = _items.pcell()->tail();
