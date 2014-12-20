@@ -137,7 +137,9 @@ public:
 
     auto new_Cell( const elem_t& head, const elem_t& tail, const Roots& roots={} ) -> const Cell*
     {
+        //assert 1 free
         return new ( allocate( roots ) ) Cell( head, tail );
+        //reserve 1 roots + p
     }
 };
 
