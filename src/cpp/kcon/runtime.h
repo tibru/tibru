@@ -9,15 +9,15 @@ namespace kcon {
 struct Runtime;
 
 template<bool AssertF=false>
-struct ParamsT
+struct Params
 {
     static const bool AssertFlag = AssertF;
 
-    template<bool flag> struct Assert : ParamsT<flag> {};
+    template<bool flag> struct Assert : Params<flag> {};
 };
 
 template<class Params>
-struct SystemT
+struct System
 {
     static void assert( bool cond, const std::string& msg )
     {
@@ -33,7 +33,7 @@ struct SystemT
     }
 };
 
-typedef SystemT< ParamsT<>::Assert<false> > Debug;
+typedef System< Params<>::Assert<false> > Debug;
 
 template<
     class System,
