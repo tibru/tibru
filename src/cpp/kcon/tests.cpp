@@ -162,19 +162,23 @@ struct Tester
 
         {
             Allocator a( 1024 );
-            auto_root<elem_t> p( parse( a, "[0 [1 [2 3] 4] 5 6]" ) );
-            parse( a, "[0 [1 [2 3] 4] 5 6]" );
+            elem_t pp = parse( a, "[0 [1 [2 3] 4] 5 6]" ).value;
+            {
+            	auto_root<elem_t> p( a, pp );
+            	parse( a, "[0 [1 [2 3] 4] 5 6]" );
 
-            a.gc({&p});
+            	a.gc({});
 
-            test( a.gc_count() > 0, "GC failed to run with 1 root" );
-            test( a.num_allocated() == 6, "Failed to hold and cleanup all cells in GC" );
+	            test( a.gc_count() > 0, "GC failed to run with 1 root" );
+ 	           test( a.num_allocated() == 6, "Failed to hold and cleanup all cells in GC" );
 
-            test( print( p ) == "[0 [1 [2 3] 4] 5 6]", "Complex tree (3) altered by GC" );
+	            test( print( p ) == "[0 [1 [2 3] 4] 5 6]", "Complex tree (3) altered by GC" );
+	            pp = p;
+            }
+            
+            auto_root<elem_t> t( a, pp->tail() );
 
-            elem_t t = p->tail();
-
-            a.gc({&t});
+            a.gc({});
 
             test( a.num_allocated() == 5, "Failed to hold and cleanup tail cells in GC" );
             test( print( t ) == "[[1 [2 3] 4] 5 6]", "Complex tree tail altered by GC" );
