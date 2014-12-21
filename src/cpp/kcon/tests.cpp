@@ -69,7 +69,7 @@ struct Tester
         Allocator a( 1024 );
         std::ostringstream oss;
 
-        auto found = print( parse( a, in ).value, m );
+        auto found = print( parse( a, in ), m );
 
         test( found == out, "IO failed for: '" + in + "'\nExpected: '" + out + "'\nFound:    '" + found + "'" );
     }
@@ -82,7 +82,7 @@ struct Tester
         std::string found;
         try
         {
-            found = print( parse( a, in ).value );
+            found = print( parse( a, in ) );
         }
         catch( const Error<Syntax,SubType>& e )
         {
@@ -162,7 +162,7 @@ struct Tester
 
         {
             Allocator a( 1024 );
-            elem_t pp = parse( a, "[0 [1 [2 3] 4] 5 6]" ).value;
+            elem_t pp = parse( a, "[0 [1 [2 3] 4] 5 6]" );
             {
             	auto_root<elem_t> p( a, pp );
             	parse( a, "[0 [1 [2 3] 4] 5 6]" );
