@@ -102,9 +102,6 @@ const uintptr_t HI_ADDR_BIT = ~(uintptr_t(-1) >> 1);
 const uintptr_t THREE_GB = 0xC0000000;
 const uintptr_t MAX_POINTER = sizeof(void*) == 8 ? HI_ADDR_BIT : THREE_GB;
 
-inline bool is_valid_pointer( const void* p ) { return reinterpret_cast<uintptr_t>(p) < MAX_POINTER; }
-
-
 }	//namespace
 
 

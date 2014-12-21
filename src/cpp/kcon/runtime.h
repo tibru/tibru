@@ -18,6 +18,13 @@ struct Params
         if( AssertFlag && !cond )
             throw Error<Assertion>( msg );
     }
+
+    template<class T>
+    static T* check_address( T* p )
+    {
+        assert( reinterpret_cast<uintptr_t>(p) < MAX_POINTER, "Invalid address" );
+        return p;
+    }
 };
 
 typedef Params<>::Assert<false> Debug;

@@ -49,16 +49,16 @@ class AllocatorBase
 protected:
 	typedef SchemeT<System> Scheme;
 	typedef typename Scheme::elem_t elem_t;
-	
+
 	const size_t _ncells;
 	size_t _gc_count;
 	std::vector<elem_t*> _elem_roots;
-	
+
 	AllocatorBase( size_t ncells )
 		: _ncells( ncells ), _gc_count( 0 ) {}
 public:
     auto gc_count() const -> size_t { return _gc_count; }
-    
+
     void push_root( elem_t* root ) { _elem_roots.push_back( root ); }
 	void pop_root( elem_t* root ) { System::assert( _elem_roots.back() == root, "Out of order root pop" ); _elem_roots.pop_back(); }
 };
@@ -104,8 +104,7 @@ public:
         if( _allocated.size() == this->_ncells )
             gc( roots );
 
-		elem_t e = new Cell( head, tail );	//switch pcell_t
-		System::assert( is_valid_pointer( e.pcell() ), "Invalid cell address" );
+		elem_t e = System::check_address( new Cell( head, tail ) );	//switch pcell_t
         _allocated.insert( e.pcell() );
         roots.push_back( &e );
         _shift( roots );
@@ -154,8 +153,8 @@ public:
     SimpleAllocator( size_t ncells )
         : AllocatorBase<System, SchemeT>( ncells ), _page( new FreeCell[ncells] ), _free_list( 0 )
     {
-    	System::assert( is_valid_pointer( _page ), "Invalid page address" );
-    	System::assert( is_valid_pointer( _page + ncells ), "Invalid page address" );
+    	System::check_address( _page );
+    	System::check_address( _page + ncells - 1 );
         System::assert( reinterpret_cast<uintptr_t>(_page) % sizeof(FreeCell) == 0, "Page not cell aligned" );
         gc({});
         this->_gc_count = 0;
