@@ -93,7 +93,7 @@ struct Tester
         test( false, "IO failed for: '" + in + "'\nExpected error: '" + msg + "'\nFound:    '" + found + "'" );
     }
 
-    static void test_stream()
+    static void test_iostream()
     {TEST
         test_io( "3" );
         test_io( " 3 ", flat, "3" );
@@ -215,8 +215,8 @@ struct Tester
     {
         std::cout << "TEST: " << TYPENAME( Env );
 
-        test_stream();
         test_ostream();
+        test_iostream();
         test_gc();
 
         std::cout << "\n\n";
