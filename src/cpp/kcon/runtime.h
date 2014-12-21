@@ -8,14 +8,20 @@ namespace kcon {
 
 struct Runtime;
 
-template<bool AssertFlag=false>
-struct Params
+template<bool AssertF=false>
+struct ParamsT
 {
-    template<bool flag> struct Assert : Params<flag> {};
+    static const bool AssertFlag = AssertF;
 
+    template<bool flag> struct Assert : ParamsT<flag> {};
+};
+
+template<class Params>
+struct SystemT
+{
     static void assert( bool cond, const std::string& msg )
     {
-        if( AssertFlag && !cond )
+        if( Params::AssertFlag && !cond )
             throw Error<Assertion>( msg );
     }
 
@@ -27,7 +33,7 @@ struct Params
     }
 };
 
-typedef Params<>::Assert<false> Debug;
+typedef SystemT< ParamsT<>::Assert<false> > Debug;
 
 template<
     class System,
