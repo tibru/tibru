@@ -114,8 +114,6 @@ auto kistream<System, SchemeT, AllocatorT>::_parse_elems() -> elem_t
     auto_root<elem_t> tail( _alloc );
     kstack<elem_t> tails( _alloc );
 
-	std::vector<elem_t*> roots = _roots;
-
 	char c;
 	while( _is >> c )
 	{
@@ -134,17 +132,17 @@ auto kistream<System, SchemeT, AllocatorT>::_parse_elems() -> elem_t
 
 			tail = tails.top();
 			tails.pop();
-			tail = _alloc.new_Cell( elems, tail, roots );
+			tail = _alloc.new_Cell( elems, tail );
 		}
 		else if( c == '[' )
 		{
-			tails.push( tail, roots );
+			tails.push( tail );
 			tail = elem_t();
 		}
 		else if( isdigit( c ) )
 		{
 			_is.putback( c );
-			tail = _alloc.new_Cell( _parse_byte(), tail, roots );
+			tail = _alloc.new_Cell( _parse_byte(), tail );
 		}
 		else
 			throw Error<Syntax>( "Unexpected '"s + c + "'" );
@@ -161,7 +159,7 @@ auto kistream<System, SchemeT, AllocatorT>::_reverse_and_reduce( elem_t e ) -> e
 	kstack<elem_t> tails( _alloc );
 	kstack<elem_t> pcells( _alloc );
 
-	std::vector<elem_t*> roots = _roots;
+	std::vector<elem_t*> roots = {};
     roots.insert( roots.end(), {&p,&tail} );
 
     while( !pcells.empty() || p.is_def() )

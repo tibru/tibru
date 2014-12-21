@@ -43,7 +43,7 @@ struct kstack<System, SchemeT, AllocatorT, typename SchemeT<System>::elem_t> : b
     kstack( Allocator& alloc )
         : basic_kstack<System, SchemeT, AllocatorT>( alloc ) {}
 
-    void push( elem_t item, const typename Allocator::Roots& roots )
+    void push( elem_t item, const typename Allocator::Roots& roots={} )
     {
         this->_push( item, roots );
     }
@@ -63,7 +63,7 @@ struct kstack<System, SchemeT, AllocatorT, typename SchemeT<System>::pcell_t> : 
     kstack( Allocator& alloc )
         : basic_kstack<System, SchemeT, AllocatorT>( alloc ) {}
 
-    void push( pcell_t item, const typename Allocator::Roots& roots )
+    void push( pcell_t item, const typename Allocator::Roots& roots={} )
     {
         this->_push( item, roots );
     }

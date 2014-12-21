@@ -11,22 +11,40 @@ namespace kcon {
 
 struct OutOfMemory {};
 
-#define MetaAllocator template<class System, template<class> class SchemeTemplate>
+#define MetaAllocator template<class System, template<class> class SchemeT>
 
 /** Auto register roots with allocator instance **/
 
 template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT, class T>
+struct auto_root_ref
+{
+    typedef AllocatorT<System, SchemeT> Allocator;
+
+    Allocator& alloc;
+    T value;
+
+    auto_root_ref( Allocator& a, const T& v )
+        : alloc( a ), value( v ) {}
+};
+
+template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT, class T>
 class auto_root : public T
 {
-    typedef AllocatorT<System,SchemeT> Allocator;
+    typedef AllocatorT<System, SchemeT> Allocator;
 
     Allocator& _alloc;
 
-    auto_root( const auto_root& );
+    explicit auto_root( const auto_root& );
     auto_root& operator=( const auto_root& );
 public:
     auto_root( Allocator& alloc, const T& root=T() )
         : T( root ), _alloc( alloc )
+    {
+        _alloc.push_root( this );
+    }
+
+    auto_root( const auto_root_ref<System, SchemeT, AllocatorT, T>& r )
+        : T( r.value ), _alloc( r.alloc )
     {
         _alloc.push_root( this );
     }
@@ -43,7 +61,7 @@ public:
     }
 };
 
-template<class System, MetaScheme class SchemeT>
+template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT>
 class AllocatorBase
 {
 protected:
@@ -61,6 +79,12 @@ public:
 
     void push_root( elem_t* root ) { _elem_roots.push_back( root ); }
 	void pop_root( elem_t* root ) { System::assert( _elem_roots.back() == root, "Out of order root pop" ); _elem_roots.pop_back(); }
+
+    template<class T>
+    using auto_root = auto_root< System, SchemeT, AllocatorT, T>;
+
+    template<class T>
+    using auto_root_ref = auto_root_ref< System, SchemeT, AllocatorT, T>;
 };
 
 /**
@@ -70,16 +94,13 @@ public:
 **/
 
 template<class System, MetaScheme class SchemeT>
-struct TestAllocator : AllocatorBase< System, SchemeT >
+struct TestAllocator : AllocatorBase< System, SchemeT, TestAllocator >
 {
     typedef SchemeT<System> Scheme;
     typedef typename Scheme::value_t value_t;
     typedef typename Scheme::pcell_t pcell_t;
     typedef typename Scheme::elem_t elem_t;
     typedef typename Scheme::Cell Cell;
-
-    template<class T>
-    using auto_root = auto_root< System, SchemeT, TestAllocator, T>;
 
     typedef std::vector<elem_t*> Roots;
 private:
@@ -89,7 +110,7 @@ private:
     void _shift( const Roots& roots );
 public:
     TestAllocator( size_t ncells )
-        : AllocatorBase<System, SchemeT>( ncells ), _allocated() {}
+        : AllocatorBase<System, SchemeT, TestAllocator>( ncells ), _allocated() {}
 
 	~TestAllocator()
 	{
@@ -99,7 +120,7 @@ public:
 
 	void gc( const Roots& roots );
 
-    auto new_Cell( const elem_t& head, const elem_t& tail, Roots roots ) -> const Cell*
+    auto new_Cell( const elem_t& head, const elem_t& tail, Roots roots={} ) -> const Cell*
     {
         if( _allocated.size() == this->_ncells )
             gc( roots );
@@ -124,16 +145,13 @@ public:
 **/
 
 template<class System, MetaScheme class SchemeT>
-struct SimpleAllocator : AllocatorBase<System, SchemeT>
+struct SimpleAllocator : AllocatorBase<System, SchemeT, SimpleAllocator>
 {
     typedef SchemeT<System> Scheme;
     typedef typename Scheme::value_t value_t;
     typedef typename Scheme::pcell_t pcell_t;
     typedef typename Scheme::elem_t elem_t;
     typedef typename Scheme::Cell Cell;
-
-    template<class T>
-    using auto_root = auto_root< System, SchemeT, SimpleAllocator, T>;
 
     typedef std::vector<elem_t*> Roots;
 private:
@@ -151,7 +169,7 @@ private:
     static void _mark( std::set<pcell_t>& live, pcell_t pcell );
 public:
     SimpleAllocator( size_t ncells )
-        : AllocatorBase<System, SchemeT>( ncells ), _page( new FreeCell[ncells] ), _free_list( 0 )
+        : AllocatorBase<System, SchemeT, SimpleAllocator>( ncells ), _page( new FreeCell[ncells] ), _free_list( 0 )
     {
     	System::check_address( _page );
     	System::check_address( _page + ncells - 1 );

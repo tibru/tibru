@@ -20,12 +20,19 @@ struct Tester
     typedef typename Env::Scheme::pcell_t pcell_t;
     typedef typename Env::Scheme::elem_t elem_t;
 
-    static auto parse( Allocator& allocator, const std::string& in, const typename Allocator::Roots& roots ) -> elem_t
+    template<class T>
+    using auto_root_ref = typename Allocator::template auto_root_ref<T>;
+
+    template<class T>
+    using auto_root = typename Allocator::template auto_root<T>;
+
+    static auto parse( Allocator& allocator, const std::string& in ) -> auto_root_ref<elem_t>
     {
         std::istringstream iss( in );
         elem_t elem;
-        kistream( iss, allocator, roots ) >> elem;
-        return elem;
+        kistream( iss, allocator ) >> elem;
+        auto_root_ref<elem_t> r( allocator, elem );
+        return r;
     }
 
     static auto print( elem_t e, KManip m=flat ) -> std::string
@@ -62,7 +69,7 @@ struct Tester
         Allocator a( 1024 );
         std::ostringstream oss;
 
-        auto found = print( parse( a, in, {} ), m );
+        auto found = print( parse( a, in ).value, m );
 
         test( found == out, "IO failed for: '" + in + "'\nExpected: '" + out + "'\nFound:    '" + found + "'" );
     }
@@ -75,7 +82,7 @@ struct Tester
         std::string found;
         try
         {
-            found = print( parse( a, in, {} ) );
+            found = print( parse( a, in ).value );
         }
         catch( const Error<Syntax,SubType>& e )
         {
@@ -141,8 +148,8 @@ struct Tester
 
         {
             Allocator a( 1024 );
-            elem_t p = parse( a, "[0 [1 [2 3] 4] 5 6]", {} ).pcell();
-            elem_t q = parse( a, "[0 [1 [2 3] 4] 5 6]", {&p} ).pcell();
+            auto_root<elem_t> p( parse( a, "[0 [1 [2 3] 4] 5 6]" ) );
+            auto_root<elem_t> q( parse( a, "[0 [1 [2 3] 4] 5 6]" ) );
 
             a.gc({&p,&q});
 
@@ -155,8 +162,8 @@ struct Tester
 
         {
             Allocator a( 1024 );
-            elem_t p = parse( a, "[0 [1 [2 3] 4] 5 6]", {} ).pcell();
-            parse( a, "[0 [1 [2 3] 4] 5 6]", {&p} ).pcell();
+            auto_root<elem_t> p( parse( a, "[0 [1 [2 3] 4] 5 6]" ) );
+            parse( a, "[0 [1 [2 3] 4] 5 6]" );
 
             a.gc({&p});
 
@@ -193,7 +200,7 @@ struct Tester
         {
             //Test with minimal memory to create memory churn
             Allocator a( 1024 );
-            elem_t p = parse( a, "[0 [1 [2 3] 4] 5 6]", {} );
+            auto_root<elem_t> p( parse( a, "[0 [1 [2 3] 4] 5 6]" ) );
 
             //test( a.gc_count() > 0, "GC failed to run during low memory parse" );
 
