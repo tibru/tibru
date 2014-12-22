@@ -166,10 +166,8 @@ public:
 
     auto new_Cell( const elem_t& head, const elem_t& tail ) -> const Cell*
     {
-        if( _free_list == 0 )   //remove
-            gc();
-
         System::assert( _free_list != 0, "SimpleAllocator failed to reserve cell" );
+
         void* p = _free_list;
          _free_list = _free_list->next;
 
