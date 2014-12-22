@@ -128,7 +128,7 @@ private:
     struct FreeCell
     {
         FreeCell* next;
-        value_t _;
+        elem_t _;
     };
 
     ASSERT( sizeof(FreeCell) == sizeof(Cell) );

@@ -38,7 +38,7 @@ void TestAllocator<System, SchemeT>::_shift()
 
     for( auto p : all )
     {
-        auto q = System::check_address( new Cell( 199, 201 ) );
+        auto q = System::check_address( new Cell( elem_t(), elem_t() ) );
         _allocated.insert( q );
         old_to_new[p] = q;
     }
@@ -48,6 +48,7 @@ void TestAllocator<System, SchemeT>::_shift()
     for( auto p : old_to_new )
     {
         new (p.second) Cell( move( p.first->head() ), move( p.first->tail() ) );
+        new ((Cell*) p.first) Cell( elem_t(), elem_t() );
         delete p.first;
     }
 
@@ -105,7 +106,7 @@ void SimpleAllocator<System, SchemeT>::gc()
     {
         auto p = reinterpret_cast<Cell*>( &_page[i] );
         if( live.find( p ) == live.end() )
-            _free_list = new (p) FreeCell{ _free_list, 0 };
+            _free_list = new (p) FreeCell{ _free_list, elem_t() };
     }
 
     if( _free_list == 0 )
