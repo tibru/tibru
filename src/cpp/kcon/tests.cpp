@@ -31,8 +31,7 @@ struct Tester
         std::istringstream iss( in );
         elem_t elem;
         kistream( iss, allocator ) >> elem;
-        auto_root_ref<elem_t> r( allocator, elem );
-        return r;
+        return auto_root_ref<elem_t>( allocator, elem );
     }
 
     static auto print( elem_t e, KManip m=flat ) -> std::string
@@ -175,7 +174,7 @@ struct Tester
 	            test( print( p ) == "[0 [1 [2 3] 4] 5 6]", "Complex tree (3) altered by GC" );
 	            pp = p;
             }
-            
+
             auto_root<elem_t> t( a, pp->tail() );
 
             a.gc({});

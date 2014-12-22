@@ -15,54 +15,12 @@ struct OutOfMemory {};
 
 /** Auto register roots with allocator instance **/
 
-template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT, class T>
-struct auto_root_ref : T
-{
-    typedef AllocatorT<System, SchemeT> Allocator;
-
-    Allocator& alloc;
-
-    auto_root_ref( Allocator& a, const T& root )
-        : T( root ), alloc( a ) {}
-};
-
-template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT, class T>
-class auto_root : public auto_root_ref<System, SchemeT, AllocatorT, T>
-{
-    typedef AllocatorT<System, SchemeT> Allocator;
-
-    explicit auto_root( const auto_root& );
-    auto_root& operator=( const auto_root& );
-public:
-    auto_root( Allocator& alloc, const T& root=T() )
-        : auto_root_ref<System, SchemeT, AllocatorT, T>( alloc, root )
-    {
-        this->alloc.push_root( this );
-    }
-
-    auto_root( const auto_root_ref<System, SchemeT, AllocatorT, T>& r )
-        : auto_root_ref<System, SchemeT, AllocatorT, T>( r )
-    {
-        this->alloc.push_root( this );
-    }
-
-    ~auto_root()
-    {
-        this->alloc.pop_root( this );
-    }
-
-    auto_root& operator=( const T& t )
-    {
-        (T&) *this = t;
-        return *this;
-    }
-};
-
 template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT>
 class AllocatorBase
 {
 protected:
 	typedef SchemeT<System> Scheme;
+	typedef AllocatorT<System, SchemeT> Allocator;
 	typedef typename Scheme::elem_t elem_t;
 
 	const size_t _ncells;
@@ -78,10 +36,31 @@ public:
 	void pop_root( elem_t* root ) { System::assert( _elem_roots.back() == root, "Out of order root pop" ); _elem_roots.pop_back(); }
 
     template<class T>
-    using auto_root = auto_root< System, SchemeT, AllocatorT, T>;
+    struct auto_root_ref : T
+    {
+        Allocator& alloc;
+
+        auto_root_ref( Allocator& a, const T& root ) : T( root ), alloc( a ) {}
+    };
 
     template<class T>
-    using auto_root_ref = auto_root_ref< System, SchemeT, AllocatorT, T>;
+    class auto_root : public auto_root_ref<T>
+    {
+        explicit auto_root( const auto_root& );
+        auto_root& operator=( const auto_root& );
+    public:
+        typedef auto_root_ref<T> ref;
+
+        auto_root( Allocator& alloc, const T& root=T() ) : ref( alloc, root ) { this->alloc.push_root( this ); }
+        auto_root( const auto_root_ref<T>& r ) : ref( r ) { this->alloc.push_root( this ); }
+        ~auto_root() { this->alloc.pop_root( this ); }
+
+        auto_root& operator=( const T& t )
+        {
+            (T&) *this = t;
+            return *this;
+        }
+    };
 };
 
 /**
