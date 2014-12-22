@@ -18,7 +18,11 @@ class Shell
     std::ostream& _out;
 
     Allocator _alloc;
+
+    void read_command( elpa_istream& eis );
 public:
+    struct MoreToRead {};
+
     Shell( std::istream& in, std::ostream& out )
         : _in( in ), _out( out ), _alloc( 1024 ) {}
 

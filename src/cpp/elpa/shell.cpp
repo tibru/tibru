@@ -5,12 +5,27 @@
 using namespace elpa;
 
 template<class Env>
+void Shell<Env>::read_command( elpa_istream& eis )
+{
+    try
+    {
+        elem_t elem;
+        eis >> elem;
+
+        elpa_ostream( _out ) << elem << std::endl;
+    }
+    catch( const Error<Syntax,EOS>& )
+    {
+        throw MoreToRead();
+    }
+}
+
+template<class Env>
 void Shell<Env>::go()
 {
     while( true )
     {
         std::string input;
-        elem_t elem;
 
         std::string prompt = ">>> ";
         while( true )
@@ -25,8 +40,8 @@ void Shell<Env>::go()
 
                 std::istringstream iss( input );
 
-
-                elpa_istream( iss, _alloc ) >> elem;
+                elpa_istream eis( iss, _alloc );
+                read_command( eis );
 
                 char c;
                 while( iss >> c )
@@ -35,12 +50,10 @@ void Shell<Env>::go()
 
                 break;
             }
-            catch( const Error<Syntax,EOS>& )
+            catch( const MoreToRead& )
             {
             }
         }
-
-        elpa_ostream( _out ) << elem << std::endl;
     }
 }
 
