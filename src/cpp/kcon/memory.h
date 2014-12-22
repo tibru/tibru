@@ -164,23 +164,29 @@ public:
         return n;
     }
 
-    auto new_Cell( const elem_t& head, const elem_t& tail ) -> const Cell*
+    auto _next() -> void*
     {
         System::assert( _free_list != 0, "SimpleAllocator failed to reserve cell" );
 
         void* p = _free_list;
-         _free_list = _free_list->next;
+        _free_list = _free_list->next;
+        return p;
+    }
 
-        elem_t e = new (p) Cell( head, tail );
+    auto new_Cell( const elem_t& head, const elem_t& tail ) -> const Cell*
+    {
+        pcell_t p = new (_next()) Cell( head, tail );
 
         if( _free_list == 0 )
         {
-            this->push_root( &e );
+            elem_t e = p;
+            this->push_root( &e);
             gc();
             this->pop_root( &e );
+            p = e.pcell();
         }
 
-        return e.pcell();
+        return p;
     }
 };
 
