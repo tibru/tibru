@@ -45,11 +45,11 @@ struct Tester
     {TEST
         Allocator a( 1024 );
 
-        pcell_t p = a.new_Cell(
+        auto_root<elem_t> p( a, a.new_Cell(
                         1,
                         a.new_Cell(
-                            a.new_Cell(3,3, {}),
-                            2, {} ), {} );
+                            a.new_Cell( 3, 3 ),
+                            2 ) ) );
 
         auto found_flat = print( p, flat );
         auto expected_flat = "[1 [3 3] 2]";
@@ -120,8 +120,8 @@ struct Tester
         try
         {
             Allocator a( 1 );
-            elem_t p = a.new_Cell( 1, 1, {} );
-            a.new_Cell( 1, 1, {&p} );
+            auto_root<elem_t> p( a, a.new_Cell( 1, 1 ) );
+            a.new_Cell( 1, 1 );
 
             fail( "Failed to catch out of memory" );
         }
@@ -129,15 +129,15 @@ struct Tester
 
         {
             Allocator a( 10 );
-            elem_t p = a.new_Cell( 1, 2, {} );
-            a.new_Cell( 1, 1, {&p} );
+            auto_root<elem_t> p( a, a.new_Cell( 1, 2 ) );
+            a.new_Cell( 1, 1 );
 
             test( a.num_allocated() == 2, "Failed to register allocated cells" );
 
             test( p->head().is_byte() && p->head().byte() == 1, "Cell head incorrect before GC" );
             test( p->tail().is_byte() && p->tail().byte() == 2, "Cell tail incorrect before GC" );
 
-            a.gc({&p});
+            a.gc();
 
             test( p->head().is_byte() && p->head().byte() == 1, "Cell head incorrect after GC" );
             test( p->tail().is_byte() && p->tail().byte() == 2, "Cell tail incorrect after GC" );
@@ -150,7 +150,7 @@ struct Tester
             auto_root<elem_t> p( parse( a, "[0 [1 [2 3] 4] 5 6]" ) );
             auto_root<elem_t> q( parse( a, "[0 [1 [2 3] 4] 5 6]" ) );
 
-            a.gc({&p,&q});
+            a.gc();
 
             test( a.gc_count() > 0, "GC failed to run with 2 roots" );
             test( a.num_allocated() == 12, "Failed to hold all cells in GC" );
@@ -166,7 +166,7 @@ struct Tester
             	auto_root<elem_t> p( a, pp );
             	parse( a, "[0 [1 [2 3] 4] 5 6]" );
 
-            	a.gc({});
+            	a.gc();
 
 	            test( a.gc_count() > 0, "GC failed to run with 1 root" );
  	           test( a.num_allocated() == 6, "Failed to hold and cleanup all cells in GC" );
@@ -177,7 +177,7 @@ struct Tester
 
             auto_root<elem_t> t( a, pp->tail() );
 
-            a.gc({});
+            a.gc();
 
             test( a.num_allocated() == 5, "Failed to hold and cleanup tail cells in GC" );
             test( print( t ) == "[[1 [2 3] 4] 5 6]", "Complex tree tail altered by GC" );
@@ -207,7 +207,7 @@ struct Tester
 
             //test( a.gc_count() > 0, "GC failed to run during low memory parse" );
 
-            a.gc({&p});
+            a.gc();
 
             test( print( p ) == "[0 [1 [2 3] 4] 5 6]", "Low memory parse tree tail altered by GC" );
             test( a.num_allocated() == 6, "Failed to hold and cleanup all cells in GC" );

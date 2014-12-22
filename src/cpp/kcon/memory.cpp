@@ -7,16 +7,12 @@ using namespace kcon;
 /** TestAllocator */
 
 template<class System, MetaScheme class SchemeT>
-void TestAllocator<System, SchemeT>::gc( const Roots& roots )
+void TestAllocator<System, SchemeT>::gc()
 {
     ++this->_gc_count;
 
     std::set<pcell_t> all;
     all.swap( _allocated );
-
-    for( auto r : roots )
-        if( r->is_pcell() )
-            _mark( _allocated, r->pcell() );
 
     for( auto r : this->_elem_roots )
         if( r->is_pcell() )
@@ -33,7 +29,7 @@ void TestAllocator<System, SchemeT>::gc( const Roots& roots )
 
 
 template<class System, MetaScheme class SchemeT>
-void TestAllocator<System, SchemeT>::_shift( const Roots& roots )
+void TestAllocator<System, SchemeT>::_shift()
 {
     std::set<pcell_t> all;
     all.swap( _allocated );
@@ -54,10 +50,6 @@ void TestAllocator<System, SchemeT>::_shift( const Roots& roots )
         new (p.second) Cell( move( p.first->head() ), move( p.first->tail() ) );
         delete p.first;
     }
-
-    for( auto r : roots )
-        if( r->is_pcell() )
-            *r = move( *r ).pcell();
 
     for( auto r : this->_elem_roots )
         if( r->is_pcell() )
@@ -99,15 +91,11 @@ void SimpleAllocator<System, SchemeT>::_mark( std::set<pcell_t>& live, pcell_t p
 }
 
 template<class System, MetaScheme class SchemeT>
-void SimpleAllocator<System, SchemeT>::gc( const Roots& roots )
+void SimpleAllocator<System, SchemeT>::gc()
 {
     ++this->_gc_count;
 
     std::set<pcell_t> live;
-    for( auto r : roots )
-        if( r->is_pcell() )
-            _mark( live, r->pcell() );
-
     for( auto r : this->_elem_roots )
         if( r->is_pcell() )
             _mark( live, r->pcell() );

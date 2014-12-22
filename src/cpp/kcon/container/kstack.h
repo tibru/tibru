@@ -18,9 +18,9 @@ protected:
     basic_kstack( Allocator& alloc )
         : _alloc( alloc ), _items( _alloc ) {}
 
-    void _push( elem_t item, const typename Allocator::Roots& roots )
+    void _push( elem_t item )
     {
-        _items = _alloc.new_Cell( item, _items, roots );
+        _items = _alloc.new_Cell( item, _items );
     }
 public:
     void pop()
@@ -43,9 +43,9 @@ struct kstack<System, SchemeT, AllocatorT, typename SchemeT<System>::elem_t> : b
     kstack( Allocator& alloc )
         : basic_kstack<System, SchemeT, AllocatorT>( alloc ) {}
 
-    void push( elem_t item, const typename Allocator::Roots& roots={} )
+    void push( elem_t item )
     {
-        this->_push( item, roots );
+        this->_push( item );
     }
 
     auto top() -> elem_t

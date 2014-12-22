@@ -28,7 +28,10 @@ protected:
 	std::vector<elem_t*> _elem_roots;
 
 	AllocatorBase( size_t ncells )
-		: _ncells( ncells ), _gc_count( 0 ) {}
+		: _ncells( ncells ), _gc_count( 0 )
+    {
+        System::assert( ncells > 0, "Allocator must allocate at least one cell" );
+    }
 public:
     auto gc_count() const -> size_t { return _gc_count; }
 
@@ -54,12 +57,7 @@ public:
         auto_root( Allocator& alloc, const T& root=T() ) : ref( alloc, root ) { this->alloc.push_root( this ); }
         auto_root( const auto_root_ref<T>& r ) : ref( r ) { this->alloc.push_root( this ); }
         ~auto_root() { this->alloc.pop_root( this ); }
-
-        auto_root& operator=( const T& t )
-        {
-            (T&) *this = t;
-            return *this;
-        }
+        auto_root& operator=( const T& t ) { (T&) *this = t; return *this; }
     };
 };
 
@@ -77,13 +75,11 @@ struct TestAllocator : AllocatorBase< System, SchemeT, TestAllocator >
     typedef typename Scheme::pcell_t pcell_t;
     typedef typename Scheme::elem_t elem_t;
     typedef typename Scheme::Cell Cell;
-
-    typedef std::vector<elem_t*> Roots;
 private:
     std::set<pcell_t> _allocated;
 
     static void _mark( std::set<pcell_t>& live, pcell_t pcell );
-    void _shift( const Roots& roots );
+    void _shift();
 public:
     TestAllocator( size_t ncells )
         : AllocatorBase<System, SchemeT, TestAllocator>( ncells ), _allocated() {}
@@ -94,17 +90,17 @@ public:
             delete p;
 	}
 
-	void gc( const Roots& roots );
+	void gc();
 
-    auto new_Cell( const elem_t& head, const elem_t& tail, Roots roots={} ) -> const Cell*
+    auto new_Cell( const elem_t& head, const elem_t& tail ) -> const Cell*
     {
-        if( _allocated.size() == this->_ncells )
-            gc( roots );
-
 		elem_t e = System::check_address( new Cell( head, tail ) );	//switch pcell_t
-        _allocated.insert( e.pcell() );
-        roots.push_back( &e );
-        _shift( roots );
+		_allocated.insert( e.pcell() );
+        this->push_root( &e );
+        _shift();
+        if( _allocated.size() == this->_ncells )
+            gc();
+        this->pop_root( &e );
         return e.pcell();
     }
 
@@ -128,8 +124,6 @@ struct SimpleAllocator : AllocatorBase<System, SchemeT, SimpleAllocator>
     typedef typename Scheme::pcell_t pcell_t;
     typedef typename Scheme::elem_t elem_t;
     typedef typename Scheme::Cell Cell;
-
-    typedef std::vector<elem_t*> Roots;
 private:
     struct FreeCell
     {
@@ -150,7 +144,7 @@ public:
     	System::check_address( _page );
     	System::check_address( _page + ncells - 1 );
         System::assert( reinterpret_cast<uintptr_t>(_page) % sizeof(FreeCell) == 0, "Page not cell aligned" );
-        gc({});
+        gc();
         this->_gc_count = 0;
     }
 
@@ -159,17 +153,7 @@ public:
 		delete[] _page;
 	}
 
-    void gc( const Roots& roots );
-
-    auto allocate( const Roots& roots ) -> void*
-    {
-        if( _free_list == 0 )
-            gc( roots );
-
-        void* p = _free_list;
-        _free_list = _free_list->next;
-        return p;
-    }
+    void gc();
 
     auto num_allocated() const -> size_t
     {
@@ -180,11 +164,25 @@ public:
         return n;
     }
 
-    auto new_Cell( const elem_t& head, const elem_t& tail, const Roots& roots={} ) -> const Cell*
+    auto new_Cell( const elem_t& head, const elem_t& tail ) -> const Cell*
     {
-        //assert 1 free
-        return new ( allocate( roots ) ) Cell( head, tail );
-        //reserve 1 roots + p
+        if( _free_list == 0 )   //remove
+            gc();
+
+        System::assert( _free_list != 0, "SimpleAllocator failed to reserve cell" );
+        void* p = _free_list;
+         _free_list = _free_list->next;
+
+        elem_t e = new (p) Cell( head, tail );
+
+        if( _free_list == 0 )
+        {
+            this->push_root( &e );
+            gc();
+            this->pop_root( &e );
+        }
+
+        return e.pcell();
     }
 };
 

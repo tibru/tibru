@@ -154,8 +154,8 @@ auto kistream<System, SchemeT, AllocatorT>::_parse_elems() -> elem_t
 template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT>
 auto kistream<System, SchemeT, AllocatorT>::_reverse_and_reduce( elem_t e ) -> elem_t
 {
-    elem_t p = e;
-    elem_t tail;
+    auto_root<elem_t> p( _alloc, e );
+    auto_root<elem_t> tail( _alloc );
 	kstack<elem_t> tails( _alloc );
 	kstack<elem_t> pcells( _alloc );
 
@@ -176,9 +176,9 @@ auto kistream<System, SchemeT, AllocatorT>::_reverse_and_reduce( elem_t e ) -> e
 			if( tail.is_undef() )
 				tail = head;
 			else if( tail.is_byte() )
-				tail = _alloc.new_Cell( head, tail.byte(), roots );
+				tail = _alloc.new_Cell( head, tail.byte() );
 			else
-            	tail = _alloc.new_Cell( head, tail.pcell(), roots );
+            	tail = _alloc.new_Cell( head, tail.pcell() );
         }
         else
         {
@@ -186,8 +186,8 @@ auto kistream<System, SchemeT, AllocatorT>::_reverse_and_reduce( elem_t e ) -> e
 
             if( p->head().is_pcell() )
             {
-                pcells.push( p->tail(), roots );
-                tails.push( tail, roots );
+                pcells.push( p->tail() );
+                tails.push( tail );
 
                 p = p->head();
                 tail = elem_t();
@@ -200,9 +200,9 @@ auto kistream<System, SchemeT, AllocatorT>::_reverse_and_reduce( elem_t e ) -> e
                 if( tail.is_undef() )
                     tail = head;
                 else if( tail.is_byte() )
-                    tail = _alloc.new_Cell( head, tail.byte(), roots );
+                    tail = _alloc.new_Cell( head, tail.byte() );
                 else
-                    tail = _alloc.new_Cell( head, tail.pcell(), roots );
+                    tail = _alloc.new_Cell( head, tail.pcell() );
 
                 p = p->tail();
             }
