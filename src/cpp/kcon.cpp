@@ -1,6 +1,6 @@
-#include "../elpa/tests.h"
-#include "../elpa/runtime.h"
-#include "../elpa/shell.h"
+#include "elpa/tests.h"
+#include "elpa/runtime.h"
+#include "elpa/shell.h"
 #include <iostream>
 
 using namespace elpa;

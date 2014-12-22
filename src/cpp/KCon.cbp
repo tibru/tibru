@@ -64,7 +64,7 @@
 		<Unit filename="elpa/types.h">
 			<Option virtualFolder="elpa/" />
 		</Unit>
-		<Unit filename="kcon/kcon.cpp" />
+		<Unit filename="kcon.cpp" />
 		<Extensions>
 			<code_completion />
 			<debugger />
