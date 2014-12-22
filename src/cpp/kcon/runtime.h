@@ -48,6 +48,10 @@ struct Env
     template<class T> using kstack = container::kstack<System, SchemeT, AllocatorT, T>;
     using kostream = kcon::kostream<System, SchemeT>;
     using kistream = kcon::kistream<System, SchemeT, AllocatorT>;
+
+    using byte_t = typename Scheme::byte_t;
+    using pcell_t = typename Scheme::pcell_t;
+    using elem_t = typename Scheme::elem_t;
 };
 
 }   //namespace

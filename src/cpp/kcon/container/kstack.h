@@ -1,6 +1,9 @@
 #ifndef HEADER_KCON_CONTAINER_KSTACK
 #define HEADER_KCON_CONTAINER_KSTACK
 
+#include "../types.h"
+#include "../memory.h"
+
 namespace kcon { namespace container {
 
 template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT>
