@@ -37,6 +37,8 @@
 		<Unit filename="kcon/memory.cpp" />
 		<Unit filename="kcon/memory.h" />
 		<Unit filename="kcon/runtime.h" />
+		<Unit filename="kcon/shell.cpp" />
+		<Unit filename="kcon/shell.h" />
 		<Unit filename="kcon/stream.cpp" />
 		<Unit filename="kcon/stream.h" />
 		<Unit filename="kcon/tests.cpp" />
