@@ -27,30 +27,28 @@ struct auto_root_ref : T
 };
 
 template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT, class T>
-class auto_root : public T
+class auto_root : public auto_root_ref<System, SchemeT, AllocatorT, T>
 {
     typedef AllocatorT<System, SchemeT> Allocator;
-
-    Allocator& _alloc;
 
     explicit auto_root( const auto_root& );
     auto_root& operator=( const auto_root& );
 public:
     auto_root( Allocator& alloc, const T& root=T() )
-        : T( root ), _alloc( alloc )
+        : auto_root_ref<System, SchemeT, AllocatorT, T>( alloc, root )
     {
-        _alloc.push_root( this );
+        this->alloc.push_root( this );
     }
 
     auto_root( const auto_root_ref<System, SchemeT, AllocatorT, T>& r )
-        : T( r ), _alloc( r.alloc )
+        : auto_root_ref<System, SchemeT, AllocatorT, T>( r )
     {
-        _alloc.push_root( this );
+        this->alloc.push_root( this );
     }
 
     ~auto_root()
     {
-        _alloc.pop_root( this );
+        this->alloc.pop_root( this );
     }
 
     auto_root& operator=( const T& t )
