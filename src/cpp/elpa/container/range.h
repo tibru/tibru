@@ -1,7 +1,7 @@
-#ifndef HEADER_KCON_CONTAINER_RANGE
-#define HEADER_KCON_CONTAINER_RANGE
+#ifndef HEADER_ELPA_CONTAINER_RANGE
+#define HEADER_ELPA_CONTAINER_RANGE
 
-namespace kcon { namespace container {
+namespace elpa { namespace container {
 
 template<class T>
 struct basic_range

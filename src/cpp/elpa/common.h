@@ -1,5 +1,5 @@
-#ifndef KCON_COMMON_H
-#define KCON_COMMON_H
+#ifndef ELPA_COMMON_H
+#define ELPA_COMMON_H
 
 #include <exception>
 #include <string>
@@ -7,7 +7,9 @@
 #include <sstream>
 #include <vector>
 
-namespace kcon {
+/** ELPA - ELementary PAirs **/
+
+namespace elpa {
 
 using namespace std::string_literals;
 

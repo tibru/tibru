@@ -2,7 +2,7 @@
 #include "runtime.h"
 #include <map>
 
-using namespace kcon;
+using namespace elpa;
 
 /** TestAllocator */
 

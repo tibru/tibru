@@ -2,7 +2,7 @@
 #include "runtime.h"
 #include <sstream>
 
-using namespace kcon;
+using namespace elpa;
 
 template<class Env>
 void Shell<Env>::go()
@@ -26,7 +26,7 @@ void Shell<Env>::go()
                 std::istringstream iss( input );
 
 
-                kistream( iss, _alloc ) >> elem;
+                elpa_istream( iss, _alloc ) >> elem;
 
                 char c;
                 while( iss >> c )
@@ -40,7 +40,7 @@ void Shell<Env>::go()
             }
         }
 
-        kostream( _out ) << elem << std::endl;
+        elpa_ostream( _out ) << elem << std::endl;
     }
 }
 

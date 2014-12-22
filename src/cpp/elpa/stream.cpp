@@ -3,10 +3,10 @@
 #include "runtime.h"
 #include <stack>
 
-using namespace kcon;
+using namespace elpa;
 
 template<class System, MetaScheme class SchemeT>
-auto kostream<System, SchemeT>::operator<<( pcell_t pcell ) -> kostream&
+auto elpa_ostream<System, SchemeT>::operator<<( pcell_t pcell ) -> elpa_ostream&
 {
 	_os << '[';
 	_format( pcell );
@@ -15,24 +15,24 @@ auto kostream<System, SchemeT>::operator<<( pcell_t pcell ) -> kostream&
 }
 
 template<class System, MetaScheme class SchemeT>
-auto kostream<System, SchemeT>::operator<<( byte_t value ) -> kostream&
+auto elpa_ostream<System, SchemeT>::operator<<( byte_t value ) -> elpa_ostream&
 {
 	_format( value );
 	return *this;
 }
 
 template<class System, MetaScheme class SchemeT>
-auto kostream<System, SchemeT>::operator<<( elem_t elem ) -> kostream&
+auto elpa_ostream<System, SchemeT>::operator<<( elem_t elem ) -> elpa_ostream&
 {
     if( elem.is_pcell() )
-        return kostream::operator<<( elem.pcell() );
+        return elpa_ostream::operator<<( elem.pcell() );
     else
-        return kostream::operator<<( elem.byte() );
+        return elpa_ostream::operator<<( elem.byte() );
 }
 
 //complicated but avoids recursion on c-stack
 template<class System, MetaScheme class SchemeT>
-auto kostream<System, SchemeT>::_format( pcell_t pcell )
+auto elpa_ostream<System, SchemeT>::_format( pcell_t pcell )
 {
     std::stack<Tail> tails;
     Tail tail{ pcell, 0 };
@@ -93,13 +93,13 @@ auto kostream<System, SchemeT>::_format( pcell_t pcell )
 }
 
 template<class System, MetaScheme class SchemeT>
-auto kostream<System, SchemeT>::_format( byte_t value )
+auto elpa_ostream<System, SchemeT>::_format( byte_t value )
 {
     _os << short(value);
 }
 
 template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT>
-auto kistream<System, SchemeT, AllocatorT>::_parse_byte() -> byte_t
+auto elpa_istream<System, SchemeT, AllocatorT>::_parse_byte() -> byte_t
 {
     value_t value;
     if( !(_is >> value) || (value >= 256) )
@@ -109,10 +109,10 @@ auto kistream<System, SchemeT, AllocatorT>::_parse_byte() -> byte_t
 }
 
 template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT>
-auto kistream<System, SchemeT, AllocatorT>::_parse_elems() -> elem_t
+auto elpa_istream<System, SchemeT, AllocatorT>::_parse_elems() -> elem_t
 {
     auto_root<elem_t> tail( _alloc );
-    kstack<elem_t> tails( _alloc );
+    elpa_stack<elem_t> tails( _alloc );
 
 	char c;
 	while( _is >> c )
@@ -152,12 +152,12 @@ auto kistream<System, SchemeT, AllocatorT>::_parse_elems() -> elem_t
 }
 
 template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT>
-auto kistream<System, SchemeT, AllocatorT>::_reverse_and_reduce( elem_t e ) -> elem_t
+auto elpa_istream<System, SchemeT, AllocatorT>::_reverse_and_reduce( elem_t e ) -> elem_t
 {
     auto_root<elem_t> p( _alloc, e );
     auto_root<elem_t> tail( _alloc );
-	kstack<elem_t> tails( _alloc );
-	kstack<elem_t> pcells( _alloc );
+	elpa_stack<elem_t> tails( _alloc );
+	elpa_stack<elem_t> pcells( _alloc );
 
 	std::vector<elem_t*> roots = {};
     roots.insert( roots.end(), {&p,&tail} );
@@ -214,7 +214,7 @@ auto kistream<System, SchemeT, AllocatorT>::_reverse_and_reduce( elem_t e ) -> e
 }
 
 template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT>
-auto kistream<System, SchemeT, AllocatorT>::_parse() -> elem_t
+auto elpa_istream<System, SchemeT, AllocatorT>::_parse() -> elem_t
 {
 	char c;
 	if( !(_is >> c) )
@@ -234,12 +234,12 @@ auto kistream<System, SchemeT, AllocatorT>::_parse() -> elem_t
 }
 
 template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT>
-auto kistream<System, SchemeT, AllocatorT>::operator>>( elem_t& elem ) -> kistream&
+auto elpa_istream<System, SchemeT, AllocatorT>::operator>>( elem_t& elem ) -> elpa_istream&
 {
     elem = _parse();
     return *this;
 }
 
-template class kostream< Debug, SimpleScheme >;
-template class kistream< Debug, SimpleScheme, SimpleAllocator >;
-template class kistream< Debug, SimpleScheme, TestAllocator >;
+template class elpa_ostream< Debug, SimpleScheme >;
+template class elpa_istream< Debug, SimpleScheme, SimpleAllocator >;
+template class elpa_istream< Debug, SimpleScheme, TestAllocator >;

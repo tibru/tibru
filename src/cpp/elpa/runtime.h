@@ -1,10 +1,10 @@
-#ifndef KCON_RUNTIME_H
-#define KCON_RUNTIME_H
+#ifndef ELPA_RUNTIME_H
+#define ELPA_RUNTIME_H
 
-#include "container/kstack.h"
+#include "container/elpa_stack.h"
 #include "stream.h"
 
-namespace kcon {
+namespace elpa {
 
 struct Runtime;
 
@@ -45,9 +45,9 @@ struct Env
     using Scheme = SchemeT<System>;
     using Allocator = AllocatorT<System, SchemeT>;
 
-    template<class T> using kstack = container::kstack<System, SchemeT, AllocatorT, T>;
-    using kostream = kcon::kostream<System, SchemeT>;
-    using kistream = kcon::kistream<System, SchemeT, AllocatorT>;
+    template<class T> using elpa_stack = container::elpa_stack<System, SchemeT, AllocatorT, T>;
+    using elpa_ostream = elpa::elpa_ostream<System, SchemeT>;
+    using elpa_istream = elpa::elpa_istream<System, SchemeT, AllocatorT>;
 
     using byte_t = typename Scheme::byte_t;
     using pcell_t = typename Scheme::pcell_t;

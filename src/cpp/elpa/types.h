@@ -1,10 +1,10 @@
-#ifndef KCON_TYPES_H
-#define KCON_TYPES_H
+#ifndef ELPA_TYPES_H
+#define ELPA_TYPES_H
 
 #include <cstdint>
 #include "common.h"
 
-namespace kcon {
+namespace elpa {
 
 const uintptr_t TAG_MASK = 2 * sizeof(void*) - 1;
 const uintptr_t ADDR_MASK = ~TAG_MASK;

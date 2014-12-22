@@ -1,20 +1,20 @@
-#ifndef KCON_STREAM_H
-#define KCON_STREAM_H
+#ifndef ELPA_STREAM_H
+#define ELPA_STREAM_H
 
 #include "types.h"
 #include "memory.h"
-#include "container/kstack.h"
+#include "container/elpa_stack.h"
 #include <ostream>
 #include <istream>
 #include <sstream>
 
-namespace kcon {
+namespace elpa {
 
 struct Syntax;
 struct EOS;
 
 template<class System, MetaScheme class SchemeT>
-class kostream
+class elpa_ostream
 {
     typedef SchemeT<System> Scheme;
     typedef typename Scheme::byte_t byte_t;
@@ -29,32 +29,32 @@ class kostream
 
     struct Tail { elem_t elem; size_t len; };
 public:
-	kostream( std::ostream& os, bool flatten=true )
+	elpa_ostream( std::ostream& os, bool flatten=true )
 		: _os( os ), _flatten( flatten ) {}
 
-    auto setflatten( bool b ) -> kostream& { _flatten = b; return *this; }
+    auto setflatten( bool b ) -> elpa_ostream& { _flatten = b; return *this; }
 
-	auto operator<<( pcell_t pcell ) -> kostream&;
-	auto operator<<( byte_t value ) -> kostream&;
-	auto operator<<( elem_t elem ) -> kostream&;
+	auto operator<<( pcell_t pcell ) -> elpa_ostream&;
+	auto operator<<( byte_t value ) -> elpa_ostream&;
+	auto operator<<( elem_t elem ) -> elpa_ostream&;
 
     template<class T>
-    auto operator<<( const T& t ) -> kostream&
+    auto operator<<( const T& t ) -> elpa_ostream&
     {
         _os << t;
         return *this;
     }
 
-    typedef kostream& (*KManip)( kostream& );
+    typedef elpa_ostream& (*ElpaManip)( elpa_ostream& );
 
-    auto operator<<( KManip m ) -> kostream&
+    auto operator<<( ElpaManip m ) -> elpa_ostream&
     {
         return m(*this);
     }
 
     typedef std::ostream& (*Manip)( std::ostream& );
 
-    auto operator<<( Manip m ) -> kostream&
+    auto operator<<( Manip m ) -> elpa_ostream&
     {
         m(_os);
         return *this;
@@ -62,19 +62,19 @@ public:
 };
 
 template<class System, MetaScheme class SchemeT>
-inline auto flat( kostream<System, SchemeT>& kos ) -> kostream<System, SchemeT>&
+inline auto flat( elpa_ostream<System, SchemeT>& kos ) -> elpa_ostream<System, SchemeT>&
 {
     return kos.setflatten( true );
 }
 
 template<class System, MetaScheme class SchemeT>
-inline auto deep( kostream<System, SchemeT>& kos ) -> kostream<System, SchemeT>&
+inline auto deep( elpa_ostream<System, SchemeT>& kos ) -> elpa_ostream<System, SchemeT>&
 {
     return kos.setflatten( false );
 }
 
 template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT>
-class kistream
+class elpa_istream
 {
     typedef SchemeT<System> Scheme;
     typedef typename Scheme::value_t value_t;
@@ -87,7 +87,7 @@ class kistream
     using auto_root = typename Allocator::template auto_root<T>;
 
     template<class T>
-    using kstack = kcon::container::kstack<System, SchemeT, AllocatorT, T>;
+    using elpa_stack = elpa::container::elpa_stack<System, SchemeT, AllocatorT, T>;
 
     std::istream& _is;
     Allocator& _alloc;
@@ -97,10 +97,10 @@ class kistream
 	auto _reverse_and_reduce( elem_t p ) -> elem_t;
 	auto _parse() -> elem_t;
 public:
-    kistream( std::istream& is, Allocator& alloc )
+    elpa_istream( std::istream& is, Allocator& alloc )
         : _is( is ), _alloc( alloc ) {}
 
-	auto operator>>( elem_t& elem ) -> kistream&;
+	auto operator>>( elem_t& elem ) -> elpa_istream&;
 };
 
 }	//namespace

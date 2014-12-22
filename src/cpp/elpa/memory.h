@@ -1,5 +1,5 @@
-#ifndef HEADER_KCON_ALLOCATOR
-#define HEADER_KCON_ALLOCATOR
+#ifndef HEADER_ELPA_ALLOCATOR
+#define HEADER_ELPA_ALLOCATOR
 
 #include "types.h"
 #include <cstdint>
@@ -7,7 +7,7 @@
 #include <set>
 #include <vector>
 
-namespace kcon {
+namespace elpa {
 
 struct OutOfMemory {};
 

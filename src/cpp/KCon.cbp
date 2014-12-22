@@ -5,7 +5,7 @@
 		<Option title="KCon" />
 		<Option pch_mode="2" />
 		<Option compiler="gcc" />
-		<Option virtualFolders="container/;" />
+		<Option virtualFolders="elpa/;elpa/container/;kcon/;" />
 		<Build>
 			<Target title="Release">
 				<Option output="bin/Release/KCon" prefix_auto="1" extension_auto="1" />
@@ -25,25 +25,46 @@
 			<Add option="-Wall" />
 			<Add option="-fexceptions" />
 		</Compiler>
-		<Unit filename="kcon/common.cpp" />
-		<Unit filename="kcon/common.h" />
-		<Unit filename="kcon/container/kstack.h">
-			<Option virtualFolder="container/" />
+		<Unit filename="elpa/common.h">
+			<Option virtualFolder="elpa/" />
 		</Unit>
-		<Unit filename="kcon/container/range.h">
-			<Option virtualFolder="container/" />
+		<Unit filename="elpa/container/elpa_stack.h">
+			<Option virtualFolder="elpa/container/" />
+		</Unit>
+		<Unit filename="elpa/container/range.h">
+			<Option virtualFolder="elpa/container/" />
+		</Unit>
+		<Unit filename="elpa/memory.cpp">
+			<Option virtualFolder="elpa/" />
+		</Unit>
+		<Unit filename="elpa/memory.h">
+			<Option virtualFolder="elpa/" />
+		</Unit>
+		<Unit filename="elpa/runtime.h">
+			<Option virtualFolder="elpa/" />
+		</Unit>
+		<Unit filename="elpa/shell.cpp">
+			<Option virtualFolder="elpa/" />
+		</Unit>
+		<Unit filename="elpa/shell.h">
+			<Option virtualFolder="elpa/" />
+		</Unit>
+		<Unit filename="elpa/stream.cpp">
+			<Option virtualFolder="elpa/" />
+		</Unit>
+		<Unit filename="elpa/stream.h">
+			<Option virtualFolder="elpa/" />
+		</Unit>
+		<Unit filename="elpa/tests.cpp">
+			<Option virtualFolder="elpa/" />
+		</Unit>
+		<Unit filename="elpa/tests.h">
+			<Option virtualFolder="elpa/" />
+		</Unit>
+		<Unit filename="elpa/types.h">
+			<Option virtualFolder="elpa/" />
 		</Unit>
 		<Unit filename="kcon/kcon.cpp" />
-		<Unit filename="kcon/memory.cpp" />
-		<Unit filename="kcon/memory.h" />
-		<Unit filename="kcon/runtime.h" />
-		<Unit filename="kcon/shell.cpp" />
-		<Unit filename="kcon/shell.h" />
-		<Unit filename="kcon/stream.cpp" />
-		<Unit filename="kcon/stream.h" />
-		<Unit filename="kcon/tests.cpp" />
-		<Unit filename="kcon/tests.h" />
-		<Unit filename="kcon/types.h" />
 		<Extensions>
 			<code_completion />
 			<debugger />

@@ -5,7 +5,7 @@
 #include "container/range.h"
 #include <sstream>
 
-namespace kcon {
+namespace elpa {
 
 using container::range;
 
@@ -13,9 +13,9 @@ template<class Env>
 struct Tester
 {
     typedef typename Env::Allocator Allocator;
-    typedef typename Env::kostream kostream;
-    typedef typename Env::kistream kistream;
-    typedef typename Env::kostream::KManip KManip;
+    typedef typename Env::elpa_ostream elpa_ostream;
+    typedef typename Env::elpa_istream elpa_istream;
+    typedef typename Env::elpa_ostream::ElpaManip ElpaManip;
 
     typedef typename Env::Scheme::pcell_t pcell_t;
     typedef typename Env::Scheme::elem_t elem_t;
@@ -30,14 +30,14 @@ struct Tester
     {
         std::istringstream iss( in );
         elem_t elem;
-        kistream( iss, allocator ) >> elem;
+        elpa_istream( iss, allocator ) >> elem;
         return auto_root_ref<elem_t>( allocator, elem );
     }
 
-    static auto print( elem_t e, KManip m=flat ) -> std::string
+    static auto print( elem_t e, ElpaManip m=flat ) -> std::string
     {
         std::ostringstream oss;
-        kostream( oss ) << m << e;
+        elpa_ostream( oss ) << m << e;
         return oss.str();
     }
 
@@ -60,7 +60,7 @@ struct Tester
         test( found_deep == expected_deep, "Incorrect deep printing found '" + found_deep + "'\nExpected '" + expected_deep + "'" );
     }
 
-    static void test_io( const std::string& in, KManip m=flat, std::string out="" )
+    static void test_io( const std::string& in, ElpaManip m=flat, std::string out="" )
     {
         if( out.empty() )
             out = in;

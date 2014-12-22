@@ -1,13 +1,13 @@
-#include "tests.h"
-#include "runtime.h"
-#include "shell.h"
+#include "../elpa/tests.h"
+#include "../elpa/runtime.h"
+#include "../elpa/shell.h"
 #include <iostream>
 
-using namespace kcon;
+using namespace elpa;
 
 auto main( int argc, const char* argv[] ) -> int
 {
-	run_tests();
+	elpa::run_tests();
 	std::cout << "\n** All tests passed **\n";
 
 	Shell< Env<Debug, SimpleScheme, SimpleAllocator> > shell( std::cin, std::cout );

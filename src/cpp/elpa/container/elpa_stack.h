@@ -1,13 +1,13 @@
-#ifndef HEADER_KCON_CONTAINER_KSTACK
-#define HEADER_KCON_CONTAINER_KSTACK
+#ifndef HEADER_ELPA_CONTAINER_KSTACK
+#define HEADER_ELPA_CONTAINER_KSTACK
 
 #include "../types.h"
 #include "../memory.h"
 
-namespace kcon { namespace container {
+namespace elpa { namespace container {
 
 template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT>
-class basic_kstack
+class basic_elpa_stack
 {
 protected:
     typedef SchemeT<System> Scheme;
@@ -18,7 +18,7 @@ protected:
     Allocator& _alloc;
     typename Allocator::template auto_root<elem_t> _items;
 
-    basic_kstack( Allocator& alloc )
+    basic_elpa_stack( Allocator& alloc )
         : _alloc( alloc ), _items( _alloc ) {}
 
     void _push( elem_t item )
@@ -35,16 +35,16 @@ public:
 };
 
 template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT, class T>
-struct kstack;
+struct elpa_stack;
 
 template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT>
-struct kstack<System, SchemeT, AllocatorT, typename SchemeT<System>::elem_t> : basic_kstack<System, SchemeT, AllocatorT>
+struct elpa_stack<System, SchemeT, AllocatorT, typename SchemeT<System>::elem_t> : basic_elpa_stack<System, SchemeT, AllocatorT>
 {
     typedef typename SchemeT<System>::elem_t elem_t;
     typedef AllocatorT<System, SchemeT> Allocator;
 
-    kstack( Allocator& alloc )
-        : basic_kstack<System, SchemeT, AllocatorT>( alloc ) {}
+    elpa_stack( Allocator& alloc )
+        : basic_elpa_stack<System, SchemeT, AllocatorT>( alloc ) {}
 
     void push( elem_t item )
     {
@@ -58,13 +58,13 @@ struct kstack<System, SchemeT, AllocatorT, typename SchemeT<System>::elem_t> : b
 };
 
 template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT>
-struct kstack<System, SchemeT, AllocatorT, typename SchemeT<System>::pcell_t> : basic_kstack<System, SchemeT, AllocatorT>
+struct elpa_stack<System, SchemeT, AllocatorT, typename SchemeT<System>::pcell_t> : basic_elpa_stack<System, SchemeT, AllocatorT>
 {
     typedef typename SchemeT<System>::pcell_t pcell_t;
     typedef AllocatorT<System, SchemeT> Allocator;
 
-    kstack( Allocator& alloc )
-        : basic_kstack<System, SchemeT, AllocatorT>( alloc ) {}
+    elpa_stack( Allocator& alloc )
+        : basic_elpa_stack<System, SchemeT, AllocatorT>( alloc ) {}
 
     void push( pcell_t item, const typename Allocator::Roots& roots={} )
     {
@@ -79,4 +79,4 @@ struct kstack<System, SchemeT, AllocatorT, typename SchemeT<System>::pcell_t> : 
 
 } } //namespace
 
-#endif // HEADER_KCON_KSTACK
+#endif // HEADER_ELPA_KSTACK
