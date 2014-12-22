@@ -5,12 +5,23 @@
 using namespace elpa;
 
 template<class Env>
-void Shell<Env>::read_command( elpa_istream& eis )
+auto Shell<Env>::end( elpa_istream& eis ) -> elpa_istream&
+{
+    char c;
+    while( eis >> c )
+        if( !isspace( c ) )
+            throw Error<Syntax>( "unexpected character after expression '"s + c + "'" );
+
+    return eis;
+}
+
+template<class Env>
+auto Shell<Env>::process_command( elpa_istream& eis ) -> bool
 {
     try
     {
         elem_t elem;
-        eis >> elem;
+        eis >> elem >> end;
 
         elpa_ostream( _out ) << elem << std::endl;
     }
@@ -18,12 +29,15 @@ void Shell<Env>::read_command( elpa_istream& eis )
     {
         throw MoreToRead();
     }
+
+    return true;
 }
 
 template<class Env>
 void Shell<Env>::go()
 {
-    while( true )
+    bool keep_processing = true;
+    while( keep_processing )
     {
         std::string input;
 
@@ -41,13 +55,7 @@ void Shell<Env>::go()
                 std::istringstream iss( input );
 
                 elpa_istream eis( iss, _alloc );
-                read_command( eis );
-
-                char c;
-                while( iss >> c )
-                    if( !isspace( c ) )
-                        throw Error<Syntax>( "unexpected character after expression '"s + c + "'" );
-
+                keep_processing = process_command( eis );
                 break;
             }
             catch( const MoreToRead& )

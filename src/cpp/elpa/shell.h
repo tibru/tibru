@@ -2,6 +2,7 @@
 #define ELPA_SHELL_H
 
 #include "memory.h"
+#include "stream.h"
 #include <iostream>
 
 namespace elpa {
@@ -19,7 +20,8 @@ class Shell
 
     Allocator _alloc;
 
-    void read_command( elpa_istream& eis );
+    auto process_command( elpa_istream& eis ) -> bool;
+    static auto end( elpa_istream& ) -> elpa_istream&;
 public:
     struct MoreToRead {};
 

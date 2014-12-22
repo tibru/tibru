@@ -101,6 +101,17 @@ public:
         : _is( is ), _alloc( alloc ) {}
 
 	auto operator>>( elem_t& elem ) -> elpa_istream&;
+
+	auto operator>>( char& c ) -> elpa_istream& { _is >> c; return *this; }
+
+    typedef elpa_istream& (*ElpaManip)( elpa_istream& );
+
+    auto operator>>( ElpaManip m ) -> elpa_istream&
+    {
+        return m(*this);
+    }
+
+    operator bool() const { return _is; }
 };
 
 }	//namespace
