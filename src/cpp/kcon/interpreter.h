@@ -15,9 +15,12 @@ public:
     KConInterpreter( size_t ncells )
         : InterpreterBase<System, SchemeT, AllocatorT>( ncells ) {}
 
-    bool is_valid_operator( char op ) const { return false; }
+    struct ShellManager
+    {
+        bool is_valid_operator( char op ) const { return false; }
 
-    auto process_operator( char op, elpa_istream& eis, std::ostream& out ) -> bool;
+        auto process_operator( char op, elpa_istream& eis, KConInterpreter& interpreter, std::ostream& out ) -> bool;
+    };
 };
 
 }   //namespace

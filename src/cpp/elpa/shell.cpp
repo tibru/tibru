@@ -45,9 +45,9 @@ auto Shell<Env>::process_input( const std::string& input ) -> bool
 
             return process_command( cmd, eis );
         }
-        else if( _interpreter.is_valid_operator( c ) )
+        else if( _manager.is_valid_operator( c ) )
         {
-            return _interpreter.process_operator( c, eis, _out );
+            return _manager.process_operator( c, eis, _interpreter, _out );
         }
         else
         {

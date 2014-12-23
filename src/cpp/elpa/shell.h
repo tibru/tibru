@@ -13,6 +13,7 @@ template<class Env>
 class Shell
 {
     typedef typename Env::Interpreter Interpreter;
+    typedef typename Interpreter::ShellManager ShellManager;
     typedef typename Env::elpa_istream elpa_istream;
     typedef typename Env::elpa_ostream elpa_ostream;
     typedef typename Env::elem_t elem_t;
@@ -21,6 +22,7 @@ class Shell
     std::ostream& _out;
 
     Interpreter _interpreter;
+    ShellManager _manager;
 
     auto process_command( const std::string& cmd, elpa_istream& eis ) -> bool;
     auto process_input( const std::string& input ) -> bool;
@@ -29,7 +31,7 @@ public:
     struct MoreToRead {};
 
     Shell( std::istream& in, std::ostream& out )
-        : _in( in ), _out( out ), _interpreter( 1024 ) {}
+        : _in( in ), _out( out ), _interpreter( 1024 ), _manager() {}
 
     void go();
 };
