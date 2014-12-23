@@ -34,6 +34,9 @@
 		<Unit filename="elpa/container/range.h">
 			<Option virtualFolder="elpa/container/" />
 		</Unit>
+		<Unit filename="elpa/interpreter.h">
+			<Option virtualFolder="elpa/" />
+		</Unit>
 		<Unit filename="elpa/memory.cpp">
 			<Option virtualFolder="elpa/" />
 		</Unit>
@@ -65,6 +68,9 @@
 			<Option virtualFolder="elpa/" />
 		</Unit>
 		<Unit filename="kcon.cpp" />
+		<Unit filename="kcon/interpreter.h">
+			<Option virtualFolder="kcon/" />
+		</Unit>
 		<Extensions>
 			<code_completion />
 			<debugger />

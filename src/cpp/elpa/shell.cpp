@@ -40,7 +40,7 @@ template<class Env>
 auto Shell<Env>::process_input( const std::string& input ) -> bool
 {
     std::istringstream iss( input );
-    elpa_istream eis( iss, _alloc );
+    elpa_istream eis( iss, _interpreter.allocator() );
 
     const std::set<char> OPS = {'*','/'};
 
@@ -120,4 +120,5 @@ void Shell<Env>::go()
     }
 }
 
-template class Shell< Env<Debug, SimpleScheme, SimpleAllocator> >;
+#include "../kcon/interpreter.h"
+template class Shell< Env<Debug, SimpleScheme, SimpleAllocator, kcon::KConInterpreter> >;

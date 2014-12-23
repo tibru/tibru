@@ -231,8 +231,8 @@ struct Tester
 
 void run_tests()
 {
-    Tester< Env< Debug, SimpleScheme, TestAllocator > >::run_tests();
-    Tester< Env< Debug, SimpleScheme, SimpleAllocator > >::run_tests();
+    Tester< Env< Debug, SimpleScheme, TestAllocator, NullInterpreter > >::run_tests();
+    Tester< Env< Debug, SimpleScheme, SimpleAllocator, NullInterpreter > >::run_tests();
 }
 
 }	//namespace

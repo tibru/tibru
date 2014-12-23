@@ -3,6 +3,7 @@
 
 #include "container/elpa_stack.h"
 #include "stream.h"
+#include "interpreter.h"
 
 namespace elpa {
 
@@ -38,12 +39,14 @@ typedef System< Params<>::Assert<false> > Debug;
 template<
     class System,
     MetaScheme class SchemeT,
-    MetaAllocator class AllocatorT
+    MetaAllocator class AllocatorT,
+    MetaInterpreter class InterpreterT
 >
 struct Env
 {
     using Scheme = SchemeT<System>;
     using Allocator = AllocatorT<System, SchemeT>;
+    using Interpreter = InterpreterT<System, SchemeT, AllocatorT>;
 
     template<class T> using elpa_stack = container::elpa_stack<System, SchemeT, AllocatorT, T>;
     using elpa_ostream = elpa::elpa_ostream<System, SchemeT>;
