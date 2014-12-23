@@ -22,6 +22,7 @@ auto Shell<Env>::process_input( const std::string& input ) -> bool
 {
     std::istringstream iss( input );
     elpa_istream eis( iss, _manager.interpreter().allocator() );
+    elpa_ostream eos( _out );
 
     char c;
     if( eis >> c )
@@ -34,20 +35,24 @@ auto Shell<Env>::process_input( const std::string& input ) -> bool
 
             return process_command( cmd, eis );
         }
-        else if( _manager.is_valid_operator( c ) )
-        {
-            return _manager.process_operator( c, eis, _out );
-        }
         else
         {
-            eis.putback( c );
+            if( !_manager.is_valid_operator( c ) )
+            {
+                eis.putback( c );
+                c = '\0';
+            }
 
             try
             {
                 elem_t elem;
-                eis >> elem >> nomoreinput;
+                eis >> elem;
 
-                elpa_ostream( _out ) << elem << std::endl;
+                if( c != '\0' )
+                    return _manager.process_operator( c, elem, eis, eos );
+
+                eos << elem << std::endl;
+                return true;
             }
             catch( const Error<Syntax,EOS>& )
             {
