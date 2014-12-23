@@ -68,6 +68,9 @@
 			<Option virtualFolder="elpa/" />
 		</Unit>
 		<Unit filename="kcon.cpp" />
+		<Unit filename="kcon/interpreter.cpp">
+			<Option virtualFolder="kcon/" />
+		</Unit>
 		<Unit filename="kcon/interpreter.h">
 			<Option virtualFolder="kcon/" />
 		</Unit>

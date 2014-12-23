@@ -18,14 +18,6 @@ auto Shell<Env>::end( elpa_istream& eis ) -> elpa_istream&
 }
 
 template<class Env>
-auto Shell<Env>::process_operator( char op, elpa_istream& eis ) -> bool
-{
-    eis >> end;
-    _out << "OP " << op << std::endl;
-    return true;
-}
-
-template<class Env>
 auto Shell<Env>::process_command( const std::string& cmd, elpa_istream& eis ) -> bool
 {
     eis >> end;
@@ -42,8 +34,6 @@ auto Shell<Env>::process_input( const std::string& input ) -> bool
     std::istringstream iss( input );
     elpa_istream eis( iss, _interpreter.allocator() );
 
-    const std::set<char> OPS = {'*','/'};
-
     char c;
     if( eis >> c )
     {
@@ -55,9 +45,9 @@ auto Shell<Env>::process_input( const std::string& input ) -> bool
 
             return process_command( cmd, eis );
         }
-        else if( OPS.find( c ) != OPS.end() )
+        else if( _interpreter.is_valid_operator( c ) )
         {
-            return process_operator( c, eis );
+            return _interpreter.process_operator( c, eis, _out );
         }
         else
         {

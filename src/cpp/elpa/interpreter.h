@@ -3,6 +3,7 @@
 
 #include "types.h"
 #include "memory.h"
+#include "stream.h"
 
 namespace elpa
 {
