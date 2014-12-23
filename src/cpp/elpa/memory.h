@@ -5,7 +5,6 @@
 #include <cstdint>
 #include <initializer_list>
 #include <set>
-#include <vector>
 
 namespace elpa {
 
@@ -25,7 +24,7 @@ protected:
 
 	const size_t _ncells;
 	size_t _gc_count;
-	std::vector<elem_t*> _elem_roots;
+	std::set<elem_t*> _elem_roots;
 
 	AllocatorBase( size_t ncells )
 		: _ncells( ncells ), _gc_count( 0 )
@@ -35,8 +34,8 @@ protected:
 public:
     auto gc_count() const -> size_t { return _gc_count; }
 
-    void push_root( elem_t* root ) { _elem_roots.push_back( root ); }
-	void pop_root( elem_t* root ) { System::assert( _elem_roots.back() == root, "Out of order root pop" ); _elem_roots.pop_back(); }
+    void add_root( elem_t* root ) { _elem_roots.insert( root ); }
+	void del_root( elem_t* root ) { _elem_roots.erase( root ); }
 
     template<class T>
     struct auto_root_ref : T
@@ -54,9 +53,9 @@ public:
     public:
         typedef auto_root_ref<T> ref;
 
-        auto_root( Allocator& alloc, const T& root=T() ) : ref( alloc, root ) { this->alloc.push_root( this ); }
-        auto_root( const auto_root_ref<T>& r ) : ref( r ) { this->alloc.push_root( this ); }
-        ~auto_root() { this->alloc.pop_root( this ); }
+        auto_root( Allocator& alloc, const T& root=T() ) : ref( alloc, root ) { this->alloc.add_root( this ); }
+        auto_root( const auto_root_ref<T>& r ) : ref( r ) { this->alloc.add_root( this ); }
+        ~auto_root() { this->alloc.del_root( this ); }
         auto_root& operator=( const T& t ) { (T&) *this = t; return *this; }
     };
 };
@@ -96,11 +95,11 @@ public:
     {
 		elem_t e = System::check_address( new Cell( head, tail ) );	//switch pcell_t
 		_allocated.insert( e.pcell() );
-        this->push_root( &e );
+        this->add_root( &e );
         _shift();
         if( _allocated.size() == this->_ncells )
             gc();
-        this->pop_root( &e );
+        this->del_root( &e );
         return e.pcell();
     }
 
@@ -180,9 +179,9 @@ public:
         if( _free_list == 0 )
         {
             elem_t e = p;
-            this->push_root( &e);
+            this->add_root( &e);
             gc();
-            this->pop_root( &e );
+            this->del_root( &e );
             p = e.pcell();
         }
 
