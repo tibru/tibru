@@ -32,7 +32,7 @@ template<class Env>
 auto Shell<Env>::process_input( const std::string& input ) -> bool
 {
     std::istringstream iss( input );
-    elpa_istream eis( iss, _interpreter.allocator() );
+    elpa_istream eis( iss, _manager.interpreter().allocator() );
 
     char c;
     if( eis >> c )
@@ -47,7 +47,7 @@ auto Shell<Env>::process_input( const std::string& input ) -> bool
         }
         else if( _manager.is_valid_operator( c ) )
         {
-            return _manager.process_operator( c, eis, _interpreter, _out );
+            return _manager.process_operator( c, eis, _out );
         }
         else
         {
@@ -111,4 +111,5 @@ void Shell<Env>::go()
 }
 
 #include "../kcon/interpreter.h"
+#include "../kcon/shell.h"
 template class Shell< Env<Debug, SimpleScheme, SimpleAllocator, kcon::KConInterpreter> >;

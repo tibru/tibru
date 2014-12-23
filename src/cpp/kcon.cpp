@@ -2,6 +2,7 @@
 #include "elpa/runtime.h"
 #include "elpa/shell.h"
 #include "kcon/interpreter.h"
+#include "kcon/shell.h"
 #include <iostream>
 
 using namespace elpa;

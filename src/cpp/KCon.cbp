@@ -74,6 +74,12 @@
 		<Unit filename="kcon/interpreter.h">
 			<Option virtualFolder="kcon/" />
 		</Unit>
+		<Unit filename="kcon/shell.cpp">
+			<Option virtualFolder="kcon/" />
+		</Unit>
+		<Unit filename="kcon/shell.h">
+			<Option virtualFolder="kcon/" />
+		</Unit>
 		<Extensions>
 			<code_completion />
 			<debugger />
