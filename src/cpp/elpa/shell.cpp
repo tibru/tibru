@@ -1,6 +1,7 @@
 #include "shell.h"
 #include "runtime.h"
 #include <sstream>
+#include <iomanip>
 
 using namespace elpa;
 
@@ -16,8 +17,21 @@ auto Shell<Env>::end( elpa_istream& eis ) -> elpa_istream&
 }
 
 template<class Env>
-auto Shell<Env>::process_command( elpa_istream& eis ) -> bool
+auto Shell<Env>::process_command( const std::string& input ) -> bool
 {
+    std::istringstream iss( input );
+    elpa_istream eis( iss, _alloc );
+
+    char c;
+    eis >> c;
+
+    std::string command = "";
+    if( c != ':' )
+        eis.putback( c );
+    else
+        if( !(eis >> std::noskipws >> command >> std::skipws) )
+            throw Error<Syntax>( "Expected command after ':'" );
+
     try
     {
         elem_t elem;
@@ -52,10 +66,7 @@ void Shell<Env>::go()
                 input += (line + "\n"s);
                 prompt = "... ";
 
-                std::istringstream iss( input );
-
-                elpa_istream eis( iss, _alloc );
-                keep_processing = process_command( eis );
+                keep_processing = process_command( input );
                 break;
             }
             catch( const MoreToRead& )

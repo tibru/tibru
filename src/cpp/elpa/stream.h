@@ -103,6 +103,7 @@ public:
 	auto operator>>( elem_t& elem ) -> elpa_istream&;
 
 	auto operator>>( char& c ) -> elpa_istream& { _is >> c; return *this; }
+	auto operator>>( std::string& s ) -> elpa_istream& { _is >> s; return *this; }
 
     typedef elpa_istream& (*ElpaManip)( elpa_istream& );
 
@@ -111,7 +112,16 @@ public:
         return m(*this);
     }
 
+    typedef std::ios_base& (*Manip)( std::ios_base& );
+
+    auto operator>>( Manip m ) -> elpa_istream&
+    {
+        _is >> m;
+        return *this;
+    }
+
     operator bool() const { return _is; }
+    void putback( char c ) { _is.putback( c ); }
 };
 
 }	//namespace

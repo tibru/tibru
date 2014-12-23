@@ -20,7 +20,7 @@ class Shell
 
     Allocator _alloc;
 
-    auto process_command( elpa_istream& eis ) -> bool;
+    auto process_command( const std::string& command ) -> bool;
     static auto end( elpa_istream& ) -> elpa_istream&;
 public:
     struct MoreToRead {};
