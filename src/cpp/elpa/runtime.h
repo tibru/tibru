@@ -2,6 +2,7 @@
 #define ELPA_RUNTIME_H
 
 #include "container/elpa_stack.h"
+#include "container/elpa_map.h"
 #include "stream.h"
 #include "interpreter.h"
 
@@ -49,6 +50,7 @@ struct Env
     using Interpreter = InterpreterT<System, SchemeT, AllocatorT>;
 
     template<class T> using elpa_stack = container::elpa_stack<System, SchemeT, AllocatorT, T>;
+    template<class K, class V> using elpa_map = elpa::container::elpa_map<System, SchemeT, AllocatorT, K, V>;
     using elpa_ostream = elpa::elpa_ostream<System, SchemeT>;
     using elpa_istream = elpa::elpa_istream<System, SchemeT, AllocatorT>;
 

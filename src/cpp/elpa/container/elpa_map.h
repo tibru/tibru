@@ -18,16 +18,16 @@ protected:
     Allocator& _alloc;
     typename Allocator::template auto_root<elem_t> _items;
 
-    basic_elpa_stack( Allocator& alloc )
+    basic_elpa_map( Allocator& alloc )
         : _alloc( alloc ), _items( _alloc ) {}
 public:
 };
 
-template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT, class T>
+template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT, class K, class V>
 struct elpa_map;
 
-template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT>
-struct elpa_mapk<System, SchemeT, AllocatorT, typename SchemeT<System>::elem_t> : basic_elpa_map<System, SchemeT, AllocatorT>
+template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT, class K>
+struct elpa_map<System, SchemeT, AllocatorT, K, typename SchemeT<System>::elem_t> : basic_elpa_map<System, SchemeT, AllocatorT>
 {
     typedef typename SchemeT<System>::elem_t elem_t;
     typedef AllocatorT<System, SchemeT> Allocator;
