@@ -124,6 +124,17 @@ public:
     void putback( char c ) { _is.putback( c ); }
 };
 
+template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT>
+auto nomoreinput( elpa_istream<System, SchemeT, AllocatorT>& eis ) -> auto&
+{
+    char c;
+    while( eis >> c )
+        if( !isspace( c ) )
+            throw Error<Syntax>( "Unexpected character after expression '"s + c + "'" );
+
+    return eis;
+}
+
 }	//namespace
 
 #endif

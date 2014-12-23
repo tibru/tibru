@@ -28,7 +28,6 @@ class Shell
 
     auto process_command( const std::string& cmd, elpa_istream& eis ) -> bool;
     auto process_input( const std::string& input ) -> bool;
-    static auto end( elpa_istream& ) -> elpa_istream&;
 public:
     struct MoreToRead {};
 

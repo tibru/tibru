@@ -16,7 +16,7 @@ public:
     KConShellManager( size_t ncells )
         : elpa::ShellManagerBase<System, SchemeT, AllocatorT, KConInterpreter>( ncells ) {}
 
-    bool is_valid_operator( char op ) const { return false; }
+    bool is_valid_operator( char op ) const;
 
     auto process_operator( char op, elpa_istream& eis, std::ostream& out ) -> bool;
 };

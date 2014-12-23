@@ -7,20 +7,9 @@
 using namespace elpa;
 
 template<class Env>
-auto Shell<Env>::end( elpa_istream& eis ) -> elpa_istream&
-{
-    char c;
-    while( eis >> c )
-        if( !isspace( c ) )
-            throw Error<Syntax>( "unexpected character after expression '"s + c + "'" );
-
-    return eis;
-}
-
-template<class Env>
 auto Shell<Env>::process_command( const std::string& cmd, elpa_istream& eis ) -> bool
 {
-    eis >> end;
+    eis >> nomoreinput;
 
     if( cmd == "quit" || cmd == "exit" )
         return false;
@@ -56,7 +45,7 @@ auto Shell<Env>::process_input( const std::string& input ) -> bool
             try
             {
                 elem_t elem;
-                eis >> elem >> end;
+                eis >> elem >> nomoreinput;
 
                 elpa_ostream( _out ) << elem << std::endl;
             }
