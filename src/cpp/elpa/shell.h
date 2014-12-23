@@ -20,9 +20,11 @@ class Shell
     typedef typename Env::elpa_istream elpa_istream;
     typedef typename Env::elpa_ostream elpa_ostream;
     typedef typename Env::elem_t elem_t;
+    typedef typename elpa_ostream::ElpaManip ElpaManip;
 
     std::istream& _in;
     std::ostream& _out;
+    ElpaManip _format;
 
     ShellManager _manager;
 
@@ -32,7 +34,7 @@ public:
     struct MoreToRead {};
 
     Shell( std::istream& in, std::ostream& out )
-        : _in( in ), _out( out ), _manager( 1024 ) {}
+        : _in( in ), _out( out ), _format( flat ), _manager( 1024 ) {}
 
     void go();
 };

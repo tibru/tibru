@@ -13,8 +13,14 @@ auto Shell<Env>::process_command( const std::string& cmd, elpa_istream& eis ) ->
 
     if( cmd == "quit" || cmd == "exit" )
         return false;
+    else if( cmd == "flat" )
+        _format = flat;
+    else if( cmd == "deep" )
+        _format = deep;
+    else
+        throw Error<Command>( "Unknown command '"s + cmd + "'" );
 
-    throw Error<Command>( "Unknown command '"s + cmd + "'" );
+    return true;
 }
 
 template<class Env>
@@ -47,6 +53,8 @@ auto Shell<Env>::process_input( const std::string& input ) -> bool
             {
                 elem_t elem;
                 eis >> elem;
+
+                eos << _format;
 
                 if( c != '\0' )
                     return _manager.process_operator( c, elem, eis, eos );
