@@ -7,6 +7,8 @@
 
 namespace elpa {
 
+struct Command;
+
 template<class Env>
 class Shell
 {
@@ -20,7 +22,9 @@ class Shell
 
     Allocator _alloc;
 
-    auto process_command( const std::string& command ) -> bool;
+    auto process_operator( char op, elpa_istream& eis ) -> bool;
+    auto process_command( const std::string& cmd, elpa_istream& eis ) -> bool;
+    auto process_input( const std::string& input ) -> bool;
     static auto end( elpa_istream& ) -> elpa_istream&;
 public:
     struct MoreToRead {};
