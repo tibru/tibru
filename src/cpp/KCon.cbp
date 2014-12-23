@@ -28,6 +28,9 @@
 		<Unit filename="elpa/common.h">
 			<Option virtualFolder="elpa/" />
 		</Unit>
+		<Unit filename="elpa/container/elpa_map.h">
+			<Option virtualFolder="elpa/container/" />
+		</Unit>
 		<Unit filename="elpa/container/elpa_stack.h">
 			<Option virtualFolder="elpa/container/" />
 		</Unit>
