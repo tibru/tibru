@@ -114,4 +114,4 @@ void Shell<Env>::go()
 
 #include "../kcon/interpreter.h"
 #include "../kcon/shell.h"
-template class Shell< Env<Debug, SimpleScheme, SimpleAllocator, kcon::KConInterpreter> >;
+template class Shell< Env<Debug, SimpleScheme, TestAllocator, kcon::KConInterpreter> >;
