@@ -1,5 +1,5 @@
-#ifndef HEADER_ELPA_CONTAINER_KSTACK
-#define HEADER_ELPA_CONTAINER_KSTACK
+#ifndef HEADER_ELPA_CONTAINER_ELPA_STACK
+#define HEADER_ELPA_CONTAINER_ELPA_STACK
 
 #include "../types.h"
 #include "../memory.h"
