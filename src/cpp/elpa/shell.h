@@ -24,7 +24,9 @@ class Shell
 
     std::istream& _in;
     std::ostream& _out;
+
     ElpaManip _format;
+    bool _line_format;
 
     ShellManager _manager;
 
@@ -34,7 +36,7 @@ public:
     struct MoreToRead {};
 
     Shell( std::istream& in, std::ostream& out )
-        : _in( in ), _out( out ), _format( flat ), _manager( 1024 ) {}
+        : _in( in ), _out( out ), _format( flat ), _line_format( true ), _manager( 1024 ) {}
 
     void go();
 };

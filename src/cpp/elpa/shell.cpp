@@ -17,6 +17,10 @@ auto Shell<Env>::process_command( const std::string& cmd, elpa_istream& eis ) ->
         _format = flat;
     else if( cmd == "deep" )
         _format = deep;
+    else if( cmd == "line" )
+        _line_format = true;
+    else if( cmd == "list" )
+        _line_format = false;
     else
         throw Error<Command>( "Unknown command '"s + cmd + "'" );
 
@@ -59,7 +63,12 @@ auto Shell<Env>::process_input( const std::string& input ) -> bool
                 if( c != '\0' )
                     return _manager.process_operator( c, elem, eis, eos );
 
+                if( ! _line_format )
+                    for( ; elem.is_pcell(); elem = elem.pcell()->tail() )
+                        eos << elem.pcell()->head() << std::endl;
+
                 eos << elem << std::endl;
+
                 return true;
             }
             catch( const Error<Syntax,EOS>& )
