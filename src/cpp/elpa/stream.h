@@ -92,9 +92,9 @@ class elpa_istream
 
 	template<class K, class V>
     using elpa_map = elpa::container::elpa_map<System, SchemeT, AllocatorT, K, V>;
-
+public:
 	typedef elpa_map<std::string,elem_t> Names;
-	
+private:
     std::istream& _is;
     Allocator& _alloc;
     const Names& _names;

@@ -15,6 +15,7 @@ struct Tester
     typedef typename Env::Allocator Allocator;
     typedef typename Env::elpa_ostream elpa_ostream;
     typedef typename Env::elpa_istream elpa_istream;
+    typedef typename elpa_istream::Names Names;
     typedef typename Env::elpa_ostream::ElpaManip ElpaManip;
 
     typedef typename Env::Scheme::pcell_t pcell_t;
@@ -26,12 +27,18 @@ struct Tester
     template<class T>
     using auto_root = typename Allocator::template auto_root<T>;
 
-    static auto parse( Allocator& allocator, const std::string& in ) -> auto_root_ref<elem_t>
+    static auto parse( Allocator& allocator, const std::string& in, const Names& names ) -> auto_root_ref<elem_t>
     {
         std::istringstream iss( in );
         elem_t elem;
         elpa_istream( iss, allocator ) >> elem;
         return auto_root_ref<elem_t>( allocator, elem );
+    }
+    
+    static auto parse( Allocator& allocator, const std::string& in ) -> auto_root_ref<elem_t>
+    {
+    	Names names( allocator );
+    	return parse( allocator, in, names );
     }
 
     static auto print( elem_t e, ElpaManip m=flat ) -> std::string
