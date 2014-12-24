@@ -56,14 +56,13 @@ auto Shell<Env>::process_input( const std::string& input ) -> bool
             try
             {
                 elem_t elem;
-                eis >> elem;
-
-                eos << _format;
+                eis >> elem >> nomoreinput;
 
                 if( c != '\0' )
-                    return _manager.process_operator( c, elem, eis, eos );
+                    elem = _manager.process_operator( c, elem );
 
-                if( ! _line_format )
+				eos << _format;
+                if( !_line_format )
                     for( ; elem.is_pcell(); elem = elem.pcell()->tail() )
                         eos << elem.pcell()->head() << std::endl;
 

@@ -10,16 +10,14 @@ auto KConShellManager<System, SchemeT, AllocatorT>::is_valid_operator( char op )
 }
 
 template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT>
-auto KConShellManager<System, SchemeT, AllocatorT>::process_operator( char op, elem_t elem, elpa_istream& in, elpa_ostream& out ) -> bool
+auto KConShellManager<System, SchemeT, AllocatorT>::process_operator( char op, elem_t elem ) -> elem_t
 {
     if( op == '!' )
     {
-        in >> nomoreinput;
-        out << elem << std::endl;
-        return true;
+        return elem;
     }
 
-    return true;
+    return elem_t();
 }
 
 #include "../elpa/runtime.h"
