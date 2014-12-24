@@ -66,6 +66,20 @@ struct Tester
         auto expected_deep = "[1 [[3 3] 2]]";
         test( found_deep == expected_deep, "Incorrect deep printing found '" + found_deep + "'\nExpected '" + expected_deep + "'" );
     }
+    
+    static void test_istream()
+    {TEST
+    	Allocator a( 1024 );
+    	
+        Names names( a );
+        names["a"] = parse( a, "0" );
+        
+        auto test_i = [&a, &names]( std::string s ){
+        	test( print( parse( a, s, names ) ) == s, "Named parse incorrect" );
+        };
+        
+    	test_i( "0" );   
+    }
 
     static void test_io( const std::string& in, ElpaManip m=flat, std::string out="" )
     {
@@ -229,6 +243,7 @@ struct Tester
         std::cout << "TEST: " << TYPENAME( Env );
 
         test_ostream();
+        test_istream();
         test_iostream();
         test_gc();
 
