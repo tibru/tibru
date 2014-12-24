@@ -52,7 +52,7 @@ struct elpa_map<System, SchemeT, AllocatorT, K, typename SchemeT<System>::elem_t
 {
     typedef typename SchemeT<System>::elem_t elem_t;
     typedef AllocatorT<System, SchemeT> Allocator;
-
+	
     elpa_map( Allocator& alloc )
         : basic_elpa_map<System, SchemeT, AllocatorT, K>( alloc ) {}
 

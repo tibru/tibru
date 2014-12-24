@@ -4,6 +4,7 @@
 #include "types.h"
 #include "memory.h"
 #include "container/elpa_stack.h"
+#include "container/elpa_map.h"
 #include <ostream>
 #include <istream>
 #include <sstream>
@@ -89,16 +90,25 @@ class elpa_istream
     template<class T>
     using elpa_stack = elpa::container::elpa_stack<System, SchemeT, AllocatorT, T>;
 
+	template<class K, class V>
+    using elpa_map = elpa::container::elpa_map<System, SchemeT, AllocatorT, K, V>;
+
+	typedef elpa_map<std::string,elem_t> Names;
+	
     std::istream& _is;
     Allocator& _alloc;
+    const Names& _names;
 
     auto _parse_byte() -> byte_t;
 	auto _parse_elems() -> elem_t;
 	auto _reverse_and_reduce( elem_t p ) -> elem_t;
 	auto _parse() -> elem_t;
 public:
+	elpa_istream( std::istream& is, Allocator& alloc, const Names& names )
+        : _is( is ), _alloc( alloc ), _names( names ) {}
+
     elpa_istream( std::istream& is, Allocator& alloc )
-        : _is( is ), _alloc( alloc ) {}
+        : _is( is ), _alloc( alloc ), _names( Names( alloc ) ) {}
 
 	auto operator>>( elem_t& elem ) -> elpa_istream&;
 
