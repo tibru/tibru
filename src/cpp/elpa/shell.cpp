@@ -60,6 +60,8 @@ auto Shell<Env>::process_input( const std::string& input ) -> bool
 
                 if( c != '\0' )
                     elem = _manager.process_operator( c, elem );
+                    
+                _names["it"] = elem;
 
 				eos << _format;
                 if( !_line_format )
