@@ -99,6 +99,27 @@ auto elpa_ostream<System, SchemeT>::_format( byte_t value )
 }
 
 template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT>
+auto elpa_istream<System, SchemeT, AllocatorT>::_parse_name() -> elem_t
+{
+	std::string name;
+	char c;
+	while( _is.get( c ) && isalnum( c ) )
+		name += c;
+	
+	if( _is )
+		_is.putback( c );
+
+	try
+	{
+    	return _names.at( name);
+	}
+	catch( const std::out_of_range& )
+	{
+		throw Error<Syntax>( "Undefined name '"s + name + "'" );
+	}
+}
+
+template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT>
 auto elpa_istream<System, SchemeT, AllocatorT>::_parse_byte() -> byte_t
 {
     value_t value;
@@ -138,6 +159,11 @@ auto elpa_istream<System, SchemeT, AllocatorT>::_parse_elems() -> elem_t
 		{
 			tails.push( tail );
 			tail = elem_t();
+		}
+		else if( isalpha( c ) )
+		{
+			_is.putback( c );
+			tail = _alloc.new_Cell( _parse_name(), tail );
 		}
 		else if( isdigit( c ) )
 		{
@@ -223,6 +249,11 @@ auto elpa_istream<System, SchemeT, AllocatorT>::_parse() -> elem_t
     if( c == '[' )
     {
         return _reverse_and_reduce( _parse_elems() );
+    }
+    else if( isalpha( c ) )
+    {
+    	_is.putback( c );
+        return _parse_name();
     }
     else if( isdigit( c ) )
     {

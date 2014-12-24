@@ -99,6 +99,7 @@ class elpa_istream
     Allocator& _alloc;
     const Names& _names;
 
+	auto _parse_name() -> elem_t;
     auto _parse_byte() -> byte_t;
 	auto _parse_elems() -> elem_t;
 	auto _reverse_and_reduce( elem_t p ) -> elem_t;

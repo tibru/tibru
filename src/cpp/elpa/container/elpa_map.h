@@ -31,6 +31,11 @@ protected:
 		return *i->second;
 	}
 	
+	elem_t _at( K key ) const
+	{
+		return *_items.at(key);
+	}
+	
     basic_elpa_map( Allocator& alloc )
         : _alloc( alloc ) {}
 public:	
@@ -59,6 +64,11 @@ struct elpa_map<System, SchemeT, AllocatorT, K, typename SchemeT<System>::elem_t
 	elem_t& operator[]( const K& key )
 	{
 		return this->_get( key );
+	}
+	
+	elem_t at( const K& key ) const
+	{
+		return this->_at( key );
 	}
 };
 

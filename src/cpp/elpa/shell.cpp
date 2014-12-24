@@ -31,8 +31,8 @@ template<class Env>
 auto Shell<Env>::process_input( const std::string& input ) -> bool
 {
     std::istringstream iss( input );
-    elpa_istream eis( iss, _manager.interpreter().allocator() );
-    elpa_ostream eos( _out );
+    elpa_istream eis( iss, _manager.interpreter().allocator(), _names );
+	elpa_ostream eos( _out );
 
     char c;
     if( eis >> c )
