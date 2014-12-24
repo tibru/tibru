@@ -99,7 +99,7 @@ auto elpa_ostream<System, SchemeT>::_format( byte_t value )
 }
 
 template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT>
-auto elpa_istream<System, SchemeT, AllocatorT>::_parse_name() -> elem_t
+auto elpa_istream<System, SchemeT, AllocatorT>::_parse_name() -> std::string
 {
 	std::string name;
 	char c;
@@ -108,15 +108,8 @@ auto elpa_istream<System, SchemeT, AllocatorT>::_parse_name() -> elem_t
 	
 	if( _is )
 		_is.putback( c );
-
-	try
-	{
-    	return _names.at( name);
-	}
-	catch( const std::out_of_range& )
-	{
-		throw Error<Syntax>( "Undefined name '"s + name + "'" );
-	}
+		
+	return name;
 }
 
 template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT>
@@ -130,7 +123,7 @@ auto elpa_istream<System, SchemeT, AllocatorT>::_parse_byte() -> byte_t
 }
 
 template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT>
-auto elpa_istream<System, SchemeT, AllocatorT>::_parse_elems() -> elem_t
+auto elpa_istream<System, SchemeT, AllocatorT>::_parse_elems( std::vector< std::string >& named ) -> elem_t
 {
     auto_root<elem_t> tail( _alloc );
     elpa_stack<elem_t> tails( _alloc );
@@ -163,7 +156,8 @@ auto elpa_istream<System, SchemeT, AllocatorT>::_parse_elems() -> elem_t
 		else if( isalpha( c ) )
 		{
 			_is.putback( c );
-			tail = _alloc.new_Cell( _parse_name(), tail );
+			named.push_back( _parse_name() );
+			tail = _alloc.new_Cell( elem_t(), tail );
 		}
 		else if( isdigit( c ) )
 		{
@@ -178,8 +172,10 @@ auto elpa_istream<System, SchemeT, AllocatorT>::_parse_elems() -> elem_t
 }
 
 template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT>
-auto elpa_istream<System, SchemeT, AllocatorT>::_reverse_and_reduce( elem_t e ) -> elem_t
+auto elpa_istream<System, SchemeT, AllocatorT>::_reverse_and_reduce( elem_t e, const std::vector< std::string >& named  ) -> elem_t
 {
+	auto pname = named.rbegin();
+	
     auto_root<elem_t> p( _alloc, e );
     auto_root<elem_t> tail( _alloc );
 	elpa_stack<elem_t> tails( _alloc );
@@ -218,9 +214,21 @@ auto elpa_istream<System, SchemeT, AllocatorT>::_reverse_and_reduce( elem_t e ) 
                 p = p->head();
                 tail = elem_t();
             }
-            else
+            else if( p->head().is_undef() )
             {
-                System::assert( p->head().is_byte(), "" );
+            	const elem_t head = _names.at( *pname++ );
+
+                if( tail.is_undef() )
+                    tail = head;
+                else if( tail.is_byte() )
+                    tail = _alloc.new_Cell( head, tail.byte() );
+                else
+                    tail = _alloc.new_Cell( head, tail.pcell() );
+
+                p = p->tail();
+            }
+            else if( p->head().is_byte() )
+            {
                 const byte_t head = p->head().byte();
 
                 if( tail.is_undef() )
@@ -232,6 +240,8 @@ auto elpa_istream<System, SchemeT, AllocatorT>::_reverse_and_reduce( elem_t e ) 
 
                 p = p->tail();
             }
+            else
+            	System::assert( false, "Unhandled cell type in reverse and reduce" );
         }
     }
 
@@ -245,15 +255,17 @@ auto elpa_istream<System, SchemeT, AllocatorT>::_parse() -> elem_t
 	char c;
 	if( !(_is >> c) )
         throw Error<Syntax>( "Unexpected end of input" );
-
+	
     if( c == '[' )
     {
-        return _reverse_and_reduce( _parse_elems() );
+    	std::vector< std::string > named;
+    	auto elems = _parse_elems( named );
+        return _reverse_and_reduce( elems, named );
     }
     else if( isalpha( c ) )
     {
     	_is.putback( c );
-        return _parse_name();
+        return _names.at( _parse_name() );
     }
     else if( isdigit( c ) )
     {
