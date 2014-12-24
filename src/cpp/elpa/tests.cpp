@@ -74,11 +74,14 @@ struct Tester
         Names names( a );
         names["a"] = parse( a, "0" );
         
-        auto test_i = [&a, &names]( std::string s ){
-        	test( print( parse( a, s, names ) ) == s, "Named parse incorrect" );
+        auto test_i = [&a, &names]( std::string in, std::string out )
+        {
+        	auto r = print( parse( a, in, names ) );
+        	test( r == out, "Named parse of '"s + in + "' incorrect.\nExpected " + out + "\nFound: " + r );
         };
         
-    	test_i( "0" );   
+    	test_i( "0", "0" );   
+    	//test_i( "a", "0" );
     }
 
     static void test_io( const std::string& in, ElpaManip m=flat, std::string out="" )
