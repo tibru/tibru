@@ -31,7 +31,7 @@ struct Tester
     {
         std::istringstream iss( in );
         elem_t elem;
-        elpa_istream( iss, allocator ) >> elem;
+        elpa_istream( iss, allocator, names ) >> elem;
         return auto_root_ref<elem_t>( allocator, elem );
     }
     
