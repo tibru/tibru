@@ -72,7 +72,9 @@ struct Tester
     	Allocator a( 1024 );
     	
         Names names( a );
-        names["a"] = parse( a, "0" );
+        names["x"] = parse( a, "0", names );
+        names["y"] = parse( a, "[x 1 x]", names );
+        names["z"] = parse( a, "[y 2 x]", names );
         
         auto test_i = [&a, &names]( std::string in, std::string out )
         {
@@ -80,8 +82,17 @@ struct Tester
         	test( r == out, "Named parse of '"s + in + "' incorrect.\nExpected " + out + "\nFound: " + r );
         };
         
+        try { test_i( "notfound", "" ); fail( "Parsed undefined element" ); }
+        catch( Error<Syntax,Undef> ) { pass(); }
+
+        try { test_i( "[notfound 0]", "" ); fail( "Parsed undefined element" ); }
+        catch( Error<Syntax,Undef> ) { pass(); }
+                   
     	test_i( "0", "0" );   
-    	test_i( "a", "0" );
+    	test_i( "x", "0" );
+    	test_i( "y", "[0 1 0]" );
+    	test_i( "z", "[[0 1 0] 2 0]" );
+    	test_i( "[x y z]", "[0 [0 1 0] [0 1 0] 2 0]" );
     }
 
     static void test_io( const std::string& in, ElpaManip m=flat, std::string out="" )

@@ -232,7 +232,7 @@ auto elpa_istream<System, SchemeT, AllocatorT>::_reverse_and_reduce( elem_t e, c
             	}
             	catch( const std::out_of_range& )
     			{
-    				throw Error<Syntax>( "Undefined reference to '"s + name + "'" );
+    				throw Error<Syntax,Undef>( "Undefined reference to '"s + name + "'" );
     			}
             }
             else if( p->head().is_byte() )
@@ -280,7 +280,7 @@ auto elpa_istream<System, SchemeT, AllocatorT>::_parse() -> elem_t
     	}
     	catch( const std::out_of_range& )
     	{
-    		throw Error<Syntax>( "Undefined reference to '"s + name + "'" );
+    		throw Error<Syntax,Undef>( "Undefined reference to '"s + name + "'" );
     	}
     }
     else if( isdigit( c ) )

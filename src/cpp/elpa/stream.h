@@ -13,6 +13,7 @@ namespace elpa {
 
 struct Syntax;
 struct EOS;
+struct Undef;
 
 template<class System, MetaScheme class SchemeT>
 class elpa_ostream
