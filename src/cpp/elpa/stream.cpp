@@ -216,16 +216,24 @@ auto elpa_istream<System, SchemeT, AllocatorT>::_reverse_and_reduce( elem_t e, c
             }
             else if( p->head().is_undef() )
             {
-            	const elem_t head = _names.at( *pname++ );
+            	const std::string name = *pname++;
+            	try
+            	{
+            		const elem_t head = _names.at( name );
 
-                if( tail.is_undef() )
-                    tail = head;
-                else if( tail.is_byte() )
-                    tail = _alloc.new_Cell( head, tail.byte() );
-                else
-                    tail = _alloc.new_Cell( head, tail.pcell() );
+                	if( tail.is_undef() )
+                 	   tail = head;
+                	else if( tail.is_byte() )
+                 	   tail = _alloc.new_Cell( head, tail.byte() );
+                	else
+                    	tail = _alloc.new_Cell( head, tail.pcell() );
 
-                p = p->tail();
+                	p = p->tail();
+            	}
+            	catch( const std::out_of_range& )
+    			{
+    				throw Error<Syntax>( "Undefined reference to '"s + name + "'" );
+    			}
             }
             else if( p->head().is_byte() )
             {
@@ -265,7 +273,15 @@ auto elpa_istream<System, SchemeT, AllocatorT>::_parse() -> elem_t
     else if( isalpha( c ) )
     {
     	_is.putback( c );
-        return _names.at( _parse_name() );
+    	std::string name = _parse_name();
+    	try
+    	{
+        	return _names.at( name );
+    	}
+    	catch( const std::out_of_range& )
+    	{
+    		throw Error<Syntax>( "Undefined reference to '"s + name + "'" );
+    	}
     }
     else if( isdigit( c ) )
     {

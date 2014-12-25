@@ -81,7 +81,7 @@ struct Tester
         };
         
     	test_i( "0", "0" );   
-    	//test_i( "a", "0" );
+    	test_i( "a", "0" );
     }
 
     static void test_io( const std::string& in, ElpaManip m=flat, std::string out="" )
