@@ -14,7 +14,7 @@ auto Shell<Env>::process_command( const std::string& cmd, elpa_istream& eis ) ->
     	std::string name;
     	elem_t elem;
     	eis >> name >> elem >> nomoreinput;
-    	_names[name] = elem;
+    	_defns[name] = elem;
     	return true;
     }
     
@@ -40,7 +40,7 @@ template<class Env>
 auto Shell<Env>::process_input( const std::string& input ) -> bool
 {
     std::istringstream iss( input );
-    elpa_istream eis( iss, _manager.interpreter().allocator(), _names );
+    elpa_istream eis( iss, _manager.interpreter().allocator(), _defns );
 	elpa_ostream eos( _out );
 
     char c;
@@ -70,7 +70,7 @@ auto Shell<Env>::process_input( const std::string& input ) -> bool
                 if( c != '\0' )
                     elem = _manager.process_operator( c, elem );
                     
-                _names["it"] = elem;
+                _defns["it"] = elem;
 
 				eos << _format;
                 if( !_line_format )

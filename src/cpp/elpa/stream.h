@@ -94,23 +94,23 @@ class elpa_istream
 	template<class K, class V>
     using elpa_map = elpa::container::elpa_map<System, SchemeT, AllocatorT, K, V>;
 public:
-	typedef elpa_map<std::string,elem_t> Names;
+	typedef elpa_map<std::string,elem_t> Defns;
 private:
     std::istream& _is;
     Allocator& _alloc;
-    const Names& _names;
+    const Defns& _defns;
 
 	auto _parse_name() -> std::string;
     auto _parse_byte() -> byte_t;
-	auto _parse_elems( std::vector< std::string >& named ) -> elem_t;
-	auto _reverse_and_reduce( elem_t p, const std::vector< std::string >& named ) -> elem_t;
+	auto _parse_elems( std::vector< std::string >& names ) -> elem_t;
+	auto _reverse_and_reduce( elem_t p, const std::vector< std::string >& names ) -> elem_t;
 	auto _parse() -> elem_t;
 public:
-	elpa_istream( std::istream& is, Allocator& alloc, const Names& names )
-        : _is( is ), _alloc( alloc ), _names( names ) {}
+	elpa_istream( std::istream& is, Allocator& alloc, const Defns& defns )
+        : _is( is ), _alloc( alloc ), _defns( defns ) {}
 
     elpa_istream( std::istream& is, Allocator& alloc )
-        : _is( is ), _alloc( alloc ), _names( Names( alloc ) ) {}
+        : _is( is ), _alloc( alloc ), _defns( Defns( alloc ) ) {}
 
 	auto operator>>( elem_t& elem ) -> elpa_istream&;
 

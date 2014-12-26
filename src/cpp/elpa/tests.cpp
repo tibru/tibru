@@ -15,7 +15,7 @@ struct Tester
     typedef typename Env::Allocator Allocator;
     typedef typename Env::elpa_ostream elpa_ostream;
     typedef typename Env::elpa_istream elpa_istream;
-    typedef typename elpa_istream::Names Names;
+    typedef typename elpa_istream::Defns Defns;
     typedef typename Env::elpa_ostream::ElpaManip ElpaManip;
 
     typedef typename Env::Scheme::pcell_t pcell_t;
@@ -27,18 +27,18 @@ struct Tester
     template<class T>
     using auto_root = typename Allocator::template auto_root<T>;
 
-    static auto parse( Allocator& allocator, const std::string& in, const Names& names ) -> auto_root_ref<elem_t>
+    static auto parse( Allocator& allocator, const std::string& in, const Defns& defns ) -> auto_root_ref<elem_t>
     {
         std::istringstream iss( in );
         elem_t elem;
-        elpa_istream( iss, allocator, names ) >> elem;
+        elpa_istream( iss, allocator, defns ) >> elem;
         return auto_root_ref<elem_t>( allocator, elem );
     }
     
     static auto parse( Allocator& allocator, const std::string& in ) -> auto_root_ref<elem_t>
     {
-    	Names names( allocator );
-    	return parse( allocator, in, names );
+    	Defns defns( allocator );
+    	return parse( allocator, in, defns );
     }
 
     static auto print( elem_t e, ElpaManip m=flat ) -> std::string
@@ -71,14 +71,14 @@ struct Tester
     {TEST
     	Allocator a( 1024 );
     	
-        Names names( a );
-        names["x"] = parse( a, "0", names );
-        names["y"] = parse( a, "[x 1 x]", names );
-        names["z"] = parse( a, "[y 2 x]", names );
+        Defns defns( a );
+        defns["x"] = parse( a, "0", defns );
+        defns["y"] = parse( a, "[x 1 x]", defns );
+        defns["z"] = parse( a, "[y 2 x]", defns );
         
-        auto test_i = [&a, &names]( std::string in, std::string out )
+        auto test_i = [&a, &defns]( std::string in, std::string out )
         {
-        	auto r = print( parse( a, in, names ) );
+        	auto r = print( parse( a, in, defns ) );
         	test( r == out, "Named parse of '"s + in + "' incorrect.\nExpected " + out + "\nFound: " + r );
         };
         

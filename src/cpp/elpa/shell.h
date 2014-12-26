@@ -32,7 +32,7 @@ class Shell
     bool _line_format;
 
     ShellManager _manager;
-    elpa_map<std::string, elem_t> _names;   //put in manager?
+    elpa_map<std::string, elem_t> _defns;   //put in manager?
 
     auto process_command( const std::string& cmd, elpa_istream& eis ) -> bool;
     auto process_input( const std::string& input ) -> bool;
@@ -40,7 +40,7 @@ public:
     struct MoreToRead {};
 
     Shell( std::istream& in, std::ostream& out )
-        : _in( in ), _out( out ), _format( flat ), _line_format( true ), _manager( 1024 ), _names( _manager.interpreter().allocator() ) {}
+        : _in( in ), _out( out ), _format( flat ), _line_format( true ), _manager( 1024 ), _defns( _manager.interpreter().allocator() ) {}
 
     void go();
 };
