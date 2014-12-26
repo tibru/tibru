@@ -14,6 +14,8 @@ const uintptr_t ADDR_MASK = ~TAG_MASK;
 template<class System>
 struct SimpleScheme
 {
+	static auto name() -> std::string { return "simple"; }
+
     struct Cell;
 
     typedef uint8_t byte_t;

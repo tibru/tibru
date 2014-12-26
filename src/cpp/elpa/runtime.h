@@ -33,18 +33,24 @@ struct System
         assert( reinterpret_cast<uintptr_t>(p) < MAX_POINTER, "Invalid address" );
         return p;
     }
+    
+    static auto name() -> std::string
+    {
+    	return "assert="s + (Params::AssertFlag ? "on" : "off" );
+    }
 };
 
 typedef System< Params<>::Assert<false> > Debug;
 
 template<
-    class System,
+    class Sys,
     MetaScheme class SchemeT,
     MetaAllocator class AllocatorT,
     MetaInterpreter class InterpreterT
 >
 struct Env
 {
+	using System = Sys;
     using Scheme = SchemeT<System>;
     using Allocator = AllocatorT<System, SchemeT>;
     using Interpreter = InterpreterT<System, SchemeT, AllocatorT>;

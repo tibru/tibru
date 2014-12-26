@@ -35,6 +35,12 @@ auto Shell<Env>::process_command( const std::string& cmd, elpa_istream& eis, elp
     	for( auto defn : _defns )
     		eos << defn.first << std::endl;
     }
+    else if( cmd == "sys" )
+    {
+    	eos << "System: " << Env::System::name() << std::endl;
+    	eos << "Scheme: " << Env::Scheme::name() << std::endl;
+    	eos << "Allocator: " << Env::Allocator::name() << std::endl;
+    }
     else
         throw Error<Command>( "Unknown command '"s + cmd + "'" );
 

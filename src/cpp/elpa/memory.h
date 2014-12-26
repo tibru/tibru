@@ -80,6 +80,8 @@ private:
     static void _mark( std::set<pcell_t>& live, pcell_t pcell );
     void _shift();
 public:
+	static auto name() -> std::string { return "test"; }
+	
     TestAllocator( size_t ncells )
         : AllocatorBase<System, SchemeT, TestAllocator>( ncells ), _allocated() {}
 
@@ -137,6 +139,8 @@ private:
 
     static void _mark( std::set<pcell_t>& live, pcell_t pcell );
 public:
+	static auto name() -> std::string { return "simple"; }
+
     SimpleAllocator( size_t ncells )
         : AllocatorBase<System, SchemeT, SimpleAllocator>( ncells ), _page( new FreeCell[ncells] ), _free_list( 0 )
     {
