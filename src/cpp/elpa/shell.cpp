@@ -9,6 +9,15 @@ using namespace elpa;
 template<class Env>
 auto Shell<Env>::process_command( const std::string& cmd, elpa_istream& eis ) -> bool
 {
+	if( cmd == "def" )
+    {
+    	std::string name;
+    	elem_t elem;
+    	eis >> name >> elem >> nomoreinput;
+    	_names[name] = elem;
+    	return true;
+    }
+    
     eis >> nomoreinput;
 
     if( cmd == "quit" || cmd == "exit" )
