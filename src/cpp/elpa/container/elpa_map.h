@@ -70,6 +70,26 @@ struct elpa_map<System, SchemeT, AllocatorT, K, typename SchemeT<System>::elem_t
 	{
 		return this->_at( key );
 	}
+	
+	typedef std::pair<K,elem_t> value_type;
+	
+	class const_iterator
+	{
+		typedef typename std::map<K,elem_t*>::const_iterator CIter;
+		
+		CIter _i;
+	public:
+		const_iterator( CIter i )
+			: _i( i ) {}
+			
+		const_iterator operator++() { ++_i; return *this; }
+		value_type operator*() const { return value_type( _i->first, *_i->second ); }
+		
+		bool operator!=( const const_iterator& i ) const { return _i != i._i; }
+	};
+	
+	const_iterator begin() const { return this->_items.begin(); }
+	const_iterator end() const { return this->_items.end(); }
 };
 
 } } //namespace

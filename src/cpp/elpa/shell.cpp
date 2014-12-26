@@ -7,7 +7,7 @@
 using namespace elpa;
 
 template<class Env>
-auto Shell<Env>::process_command( const std::string& cmd, elpa_istream& eis ) -> bool
+auto Shell<Env>::process_command( const std::string& cmd, elpa_istream& eis, elpa_ostream& eos ) -> bool
 {
 	if( cmd == "def" )
     {
@@ -30,6 +30,11 @@ auto Shell<Env>::process_command( const std::string& cmd, elpa_istream& eis ) ->
         _line_format = true;
     else if( cmd == "list" )
         _line_format = false;
+    else if( cmd == "defs" )
+    {
+    	for( auto defn : _defns )
+    		eos << defn.first << std::endl;
+    }
     else
         throw Error<Command>( "Unknown command '"s + cmd + "'" );
 
@@ -52,7 +57,7 @@ auto Shell<Env>::process_input( const std::string& input ) -> bool
             if( !(eis >> std::noskipws >> cmd >> std::skipws) )
                 throw Error<Syntax>( "Expected command after ':'" );
 
-            return process_command( cmd, eis );
+            return process_command( cmd, eis, eos );
         }
         else
         {

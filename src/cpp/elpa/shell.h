@@ -34,7 +34,7 @@ class Shell
     ShellManager _manager;
     elpa_map<std::string, elem_t> _defns;   //put in manager?
 
-    auto process_command( const std::string& cmd, elpa_istream& eis ) -> bool;
+    auto process_command( const std::string& cmd, elpa_istream& eis, elpa_ostream& eos ) -> bool;
     auto process_input( const std::string& input ) -> bool;
 public:
     struct MoreToRead {};
