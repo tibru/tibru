@@ -6,6 +6,7 @@
 #include "interpreter.h"
 #include "container/elpa_map.h"
 #include <iostream>
+#include <iomanip>
 
 namespace elpa {
 
@@ -22,6 +23,8 @@ class Shell
     typedef typename Env::elpa_ostream elpa_ostream;
     typedef typename Env::elem_t elem_t;
     typedef typename elpa_ostream::ElpaManip ElpaManip;
+    typedef typename elpa_ostream::Manip Manip;
+    typedef typename elpa_ostream::BaseManip BaseManip;
     template<class K, class V>
     using elpa_map = typename Env::template elpa_map<K, V>;
 
@@ -29,6 +32,7 @@ class Shell
     std::ostream& _out;
 
     ElpaManip _format;
+    BaseManip _num_format;
     bool _line_format;
 
     ShellManager _manager;
@@ -40,7 +44,7 @@ public:
     struct MoreToRead {};
 
     Shell( std::istream& in, std::ostream& out )
-        : _in( in ), _out( out ), _format( flat ), _line_format( true ), _manager( 1024 ), _defns( _manager.interpreter().allocator() ) {}
+        : _in( in ), _out( out ), _format( flat ), _num_format( std::dec ), _line_format( true ), _manager( 1024 ), _defns( _manager.interpreter().allocator() ) {}
 
     void go();
 };

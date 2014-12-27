@@ -22,6 +22,10 @@ auto Shell<Env>::process_command( const std::string& cmd, elpa_istream& eis, elp
 
     if( cmd == "quit" || cmd == "exit" )
         return false;
+    else if( cmd == "dec" )
+        _num_format = std::dec;
+    else if( cmd == "hex" )
+        _num_format = std::hex;
     else if( cmd == "flat" )
         _format = flat;
     else if( cmd == "deep" )
@@ -49,6 +53,8 @@ auto Shell<Env>::process_command( const std::string& cmd, elpa_istream& eis, elp
     	eos << "Mem total: " << nalloc << " cells" << std::endl;
     	eos << "GC count: " << _manager.interpreter().allocator().gc_count() << std::endl;
     }
+    else if( cmd == "gc" )
+    	_manager.interpreter().allocator().gc();
     else
         throw Error<Command>( "Unknown command '"s + cmd + "'" );
 
@@ -91,7 +97,7 @@ auto Shell<Env>::process_input( const std::string& input ) -> bool
                     
                 _defns["it"] = elem;
 
-				eos << _format;
+				eos << _format << _num_format;
                 if( !_line_format )
                     for( ; elem.is_pcell(); elem = elem.pcell()->tail() )
                         eos << elem.pcell()->head() << std::endl;

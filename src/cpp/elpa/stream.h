@@ -40,7 +40,7 @@ public:
 	auto operator<<( byte_t value ) -> elpa_ostream&;
 	auto operator<<( elem_t elem ) -> elpa_ostream&;
 
-    template<class T>
+	template<class T>
     auto operator<<( const T& t ) -> elpa_ostream&
     {
         _os << t;
@@ -57,6 +57,14 @@ public:
     typedef std::ostream& (*Manip)( std::ostream& );
 
     auto operator<<( Manip m ) -> elpa_ostream&
+    {
+        m(_os);
+        return *this;
+    }
+    
+    typedef std::ios_base& (*BaseManip)( std::ios_base& );
+
+    auto operator<<( BaseManip m ) -> elpa_ostream&
     {
         m(_os);
         return *this;
