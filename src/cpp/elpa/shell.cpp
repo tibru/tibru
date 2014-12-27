@@ -40,6 +40,14 @@ auto Shell<Env>::process_command( const std::string& cmd, elpa_istream& eis, elp
     	eos << "System: " << Env::System::name() << std::endl;
     	eos << "Scheme: " << Env::Scheme::name() << std::endl;
     	eos << "Allocator: " << Env::Allocator::name() << std::endl;
+    	uint64_t nalloc = _manager.interpreter().allocator().num_allocated();
+    	uint64_t ntotal = _manager.interpreter().allocator().num_total();
+    	eos << "Mem alloc: " << nalloc << " cells";
+    	if( ntotal > 0 )
+    		eos << " (" << (nalloc * 100) / ntotal << "%)";
+    	eos << std::endl;
+    	eos << "Mem total: " << nalloc << " cells" << std::endl;
+    	eos << "GC count: " << _manager.interpreter().allocator().gc_count() << std::endl;
     }
     else
         throw Error<Command>( "Unknown command '"s + cmd + "'" );
