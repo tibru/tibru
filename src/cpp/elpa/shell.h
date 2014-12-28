@@ -36,7 +36,7 @@ class Shell
     elpa_map<std::string, elem_t> _defns;   //put in manager?
 
     auto process_command( const std::string& cmd, elpa_istream& eis, elpa_ostream& eos ) -> bool;
-    auto process_input( const std::string& input, elpa_ostream& eos ) -> bool;
+    auto process_input( std::istream& is, elpa_ostream& eos ) -> bool;
 public:
     struct MoreToRead {};
 

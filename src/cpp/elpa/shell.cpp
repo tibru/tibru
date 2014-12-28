@@ -62,10 +62,9 @@ auto Shell<Env>::process_command( const std::string& cmd, elpa_istream& eis, elp
 }
 
 template<class Env>
-auto Shell<Env>::process_input( const std::string& input, elpa_ostream& eos ) -> bool
+auto Shell<Env>::process_input( std::istream& is, elpa_ostream& eos ) -> bool
 {
-    std::istringstream iss( input );
-    elpa_istream eis( iss, _manager.interpreter().allocator(), _defns );
+    elpa_istream eis( is, _manager.interpreter().allocator(), _defns );
 
     char c;
     if( eis >> c )
@@ -138,7 +137,8 @@ void Shell<Env>::interactive( std::istream& in, std::ostream& out )
                     input += (line + "\n"s);
                     prompt = "... ";
 
-                    keep_processing = process_input( input, eos );
+					std::istringstream iss( input );
+                    keep_processing = process_input( iss, eos );
                     break;
                 }
                 catch( const MoreToRead& )
