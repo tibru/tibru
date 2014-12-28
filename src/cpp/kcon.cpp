@@ -12,8 +12,7 @@ auto main( int argc, const char* argv[] ) -> int
 	elpa::run_tests();
 	std::cout << "\n** All tests passed **\n";
 
-	Shell< Env<Debug, SimpleScheme, TestAllocator, kcon::KConInterpreter> > shell( std::cin, std::cout );
-
-	shell.go();
+	Shell< Env<Debug, SimpleScheme, TestAllocator, kcon::KConInterpreter> > shell;
+	
+	shell.interactive( std::cin, std::cout );
 }
-

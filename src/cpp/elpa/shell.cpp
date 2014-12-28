@@ -62,11 +62,10 @@ auto Shell<Env>::process_command( const std::string& cmd, elpa_istream& eis, elp
 }
 
 template<class Env>
-auto Shell<Env>::process_input( const std::string& input ) -> bool
+auto Shell<Env>::process_input( const std::string& input, elpa_ostream& eos ) -> bool
 {
     std::istringstream iss( input );
     elpa_istream eis( iss, _manager.interpreter().allocator(), _defns );
-	elpa_ostream eos( _out );
 
     char c;
     if( eis >> c )
@@ -117,8 +116,10 @@ auto Shell<Env>::process_input( const std::string& input ) -> bool
 }
 
 template<class Env>
-void Shell<Env>::go()
+void Shell<Env>::interactive( std::istream& in, std::ostream& out )
 {
+	elpa_ostream eos( out );
+	
     bool keep_processing = true;
     while( keep_processing )
     {
@@ -131,13 +132,13 @@ void Shell<Env>::go()
             {
                 try
                 {
-                    _out << prompt;
+                    out << prompt;
                     std::string line;
-                    std::getline( _in, line );
+                    std::getline( in, line );
                     input += (line + "\n"s);
                     prompt = "... ";
 
-                    keep_processing = process_input( input );
+                    keep_processing = process_input( input, eos );
                     break;
                 }
                 catch( const MoreToRead& )
@@ -147,13 +148,19 @@ void Shell<Env>::go()
         }
         catch( const Error<Syntax>& e )
         {
-            _out << "Syntax: " << e.message() << std::endl;
+            out << "Syntax: " << e.message() << std::endl;
         }
         catch( const Error<Command>& e )
         {
-            _out << "Command: " << e.message() << std::endl;
+            out << "Command: " << e.message() << std::endl;
         }
     }
+}
+
+
+template<class Env>
+void Shell<Env>::process( std::istream& in, std::ostream& out )
+{
 }
 
 #include "../kcon/interpreter.h"

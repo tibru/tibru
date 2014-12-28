@@ -3,6 +3,7 @@
 #include "runtime.h"
 #include "stream.h"
 #include "container/range.h"
+#include "shell.h"
 #include <sstream>
 
 namespace elpa {
@@ -250,6 +251,17 @@ struct Tester
                 test( a.num_allocated() == 6, "Failed to hold and cleanup all cells in GC" );
             }
         }
+    }
+    
+    static void test_shell()
+    {
+    	Shell< Env > shell;
+    	
+    	auto script = "";
+    	std::istringstream iss( script );
+    	std::ostringstream oss;
+    	
+    	shell.process( iss, oss );
     }
 
     static void run_tests()

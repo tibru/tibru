@@ -28,9 +28,6 @@ class Shell
     template<class K, class V>
     using elpa_map = typename Env::template elpa_map<K, V>;
 
-    std::istream& _in;
-    std::ostream& _out;
-
     ElpaManip _format;
     BaseManip _num_format;
     bool _line_format;
@@ -39,14 +36,15 @@ class Shell
     elpa_map<std::string, elem_t> _defns;   //put in manager?
 
     auto process_command( const std::string& cmd, elpa_istream& eis, elpa_ostream& eos ) -> bool;
-    auto process_input( const std::string& input ) -> bool;
+    auto process_input( const std::string& input, elpa_ostream& eos ) -> bool;
 public:
     struct MoreToRead {};
 
-    Shell( std::istream& in, std::ostream& out )
-        : _in( in ), _out( out ), _format( flat ), _num_format( std::dec ), _line_format( true ), _manager( 1024 ), _defns( _manager.interpreter().allocator() ) {}
+    Shell()
+        : _format( flat ), _num_format( std::dec ), _line_format( true ), _manager( 1024 ), _defns( _manager.interpreter().allocator() ) {}
 
-    void go();
+    void interactive( std::istream& in, std::ostream& out );
+	void process( std::istream& in, std::ostream& out );
 };
 
 template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT, MetaInterpreter class InterpreterT>
