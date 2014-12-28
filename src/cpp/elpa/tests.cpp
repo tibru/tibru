@@ -257,11 +257,8 @@ struct Tester
     {
     	Shell< Env > shell;
     	
-    	auto script = "";
-    	std::istringstream iss( script );
     	std::ostringstream oss;
-    	
-    	shell.process( iss, oss );
+    	test( shell.process( "", oss ).is_undef(), "Blank script doesn't process to undefined" );
     }
 
     static void run_tests()

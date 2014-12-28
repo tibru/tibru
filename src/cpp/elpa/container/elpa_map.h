@@ -86,10 +86,13 @@ struct elpa_map<System, SchemeT, AllocatorT, K, typename SchemeT<System>::elem_t
 		value_type operator*() const { return value_type( _i->first, *_i->second ); }
 		
 		bool operator!=( const const_iterator& i ) const { return _i != i._i; }
+		bool operator==( const const_iterator& i ) const { return _i == i._i; }
 	};
 	
 	const_iterator begin() const { return this->_items.begin(); }
 	const_iterator end() const { return this->_items.end(); }
+	
+	const_iterator find( const K& key ) const { return this->_items.find( key ); }
 };
 
 } } //namespace

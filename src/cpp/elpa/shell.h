@@ -44,7 +44,8 @@ public:
         : _format( flat ), _num_format( std::dec ), _line_format( true ), _manager( 1024 ), _defns( _manager.interpreter().allocator() ) {}
 
     void interactive( std::istream& in, std::ostream& out );
-	void process( std::istream& in, std::ostream& out );
+	auto process( std::istream& in, std::ostream& out ) -> elem_t;
+	auto process( const std::string& in, std::ostream& out ) -> elem_t;
 };
 
 template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT, MetaInterpreter class InterpreterT>

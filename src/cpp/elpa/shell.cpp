@@ -159,8 +159,16 @@ void Shell<Env>::interactive( std::istream& in, std::ostream& out )
 
 
 template<class Env>
-void Shell<Env>::process( std::istream& in, std::ostream& out )
+auto Shell<Env>::process( std::istream& in, std::ostream& out ) -> elem_t
 {
+	return _defns.find("it") != _defns.end() ? _defns["it"] : elem_t();
+}
+
+template<class Env>
+auto Shell<Env>::process( const std::string& in, std::ostream& out ) -> elem_t
+{
+	std::istringstream iss( in );
+	return process( iss, out );
 }
 
 #include "../kcon/interpreter.h"
