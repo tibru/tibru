@@ -183,9 +183,7 @@ auto Shell<Env>::process( const std::string& in ) -> elem_t
 	return process( iss );
 }
 
-template class NullShellManager<Debug, SimpleScheme, TestAllocator>;
 template class Shell< Env<Debug, SimpleScheme, TestAllocator, NullInterpreter> >;
-template class NullShellManager<Debug, SimpleScheme, SimpleAllocator>;
 template class Shell< Env<Debug, SimpleScheme, SimpleAllocator, NullInterpreter> >;
 
 #include "../kcon/interpreter.h"
