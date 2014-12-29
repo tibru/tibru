@@ -3,6 +3,7 @@
 #include <sstream>
 #include <iomanip>
 #include <set>
+#include <fstream>
 
 using namespace elpa;
 
@@ -15,6 +16,13 @@ auto Shell<Env>::_process_command( const std::string& cmd, elpa_istream& eis, el
     	elem_t elem;
     	eis >> name >> elem >> endofline;
     	_defns[name] = elem;
+    	return true;
+    }
+    else if( cmd == "include" )
+    {
+    	std::string filename;
+    	eis >> filename >> endofline;
+    	include( filename );
     	return true;
     }
     
@@ -181,6 +189,21 @@ auto Shell<Env>::process( const std::string& in ) -> elem_t
 {
 	std::istringstream iss( in );
 	return process( iss );
+}
+
+template<class Env>
+void Shell<Env>::include( const std::string& filename )
+{
+	std::ifstream ifs( filename );
+	if( !ifs )
+		throw Error<Runtime>( "File not found '"s + filename + "'" );
+		
+	if( !_processing.insert( filename ).second )
+		throw Error<Runtime>( "File included recursively '"s + filename + "'" );
+		
+	process( ifs );
+	
+	System::assert( _processing.erase( filename ) == 1, "Failed to register processed file" );
 }
 
 template class Shell< Env<Debug, SimpleScheme, TestAllocator, NullInterpreter> >;

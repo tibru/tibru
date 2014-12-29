@@ -7,6 +7,7 @@
 #include "container/elpa_map.h"
 #include <iostream>
 #include <iomanip>
+#include <set>
 
 namespace elpa {
 
@@ -35,6 +36,7 @@ class Shell
 
     ShellManager _manager;
     elpa_map<std::string, elem_t> _defns;   //put in manager?
+    std::set<std::string> _processing;
 
     auto _process_command( const std::string& cmd, elpa_istream& eis, elpa_ostream& eos, bool noisy ) -> bool;
     auto _process_input( std::istream& is, elpa_ostream& eos, bool noisy=true ) -> bool;
@@ -47,6 +49,7 @@ public:
     void interactive( std::istream& in, std::ostream& out );
 	auto process( std::istream& in ) -> elem_t;
 	auto process( const std::string& in ) -> elem_t;
+	void include( const std::string& filename );
 };
 
 template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT, MetaInterpreter class InterpreterT>
