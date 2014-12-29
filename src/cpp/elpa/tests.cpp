@@ -265,6 +265,7 @@ struct Tester
 		test( print( shell.process( ":def t [1 2] \n"
 									"\t0 \n"
 									":gc\n"
+									":sys\n"	//check noisinesd
 									":def h it\n"
 									"[h t]" ) ) == "[0 1 2]", "Complex shell script failed" );
 									
