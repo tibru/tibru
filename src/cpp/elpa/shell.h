@@ -44,8 +44,8 @@ public:
         : _format( flat ), _num_format( std::dec ), _line_format( true ), _manager( 1024 ), _defns( _manager.interpreter().allocator() ) {}
 
     void interactive( std::istream& in, std::ostream& out );
-	auto process( std::istream& in, std::ostream& out ) -> elem_t;
-	auto process( const std::string& in, std::ostream& out ) -> elem_t;
+	auto process( std::istream& in ) -> elem_t;
+	auto process( const std::string& in ) -> elem_t;
 };
 
 template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT, MetaInterpreter class InterpreterT>
@@ -60,6 +60,20 @@ protected:
         : _interpreter( ncells ) {}
 public:
     Interpreter& interpreter() { return _interpreter; }
+};
+
+template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT>
+class NullShellManager : public ShellManagerBase<System, SchemeT, AllocatorT, NullInterpreter>
+{
+public:
+    typedef SchemeT<System> Scheme;
+    typedef typename Scheme::elem_t elem_t;
+
+    NullShellManager( size_t ncells )
+        : ShellManagerBase<System, SchemeT, AllocatorT, NullInterpreter>( ncells ) {}
+
+    bool is_valid_operator( char op ) const { return op == '*'; }
+    auto process_operator( char op, elem_t elem ) -> elem_t { return elem; }
 };
 
 }   //namespace

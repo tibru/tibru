@@ -142,16 +142,17 @@ public:
 
     operator bool() const { return _is; }
     void putback( char c ) { _is.putback( c ); }
+    bool get( char& c ) { return _is.get( c ); }
 };
 
 template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT>
-auto nomoreinput( elpa_istream<System, SchemeT, AllocatorT>& eis ) -> auto&
+auto endofline( elpa_istream<System, SchemeT, AllocatorT>& eis ) -> auto&
 {
     char c;
-    while( eis >> c )
-        if( !isspace( c ) )
+    while( eis.get(c) && (c != '\n') )
+    	if( !isspace( c ) )
             throw Error<Syntax>( "Unexpected character after expression '"s + c + "'" );
-
+    
     return eis;
 }
 

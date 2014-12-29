@@ -257,8 +257,16 @@ struct Tester
     {
     	Shell< Env > shell;
     	
-    	std::ostringstream oss;
-    	test( shell.process( "", oss ).is_undef(), "Blank script doesn't process to undefined" );
+    	test( shell.process( "" ).is_undef(), "Blank script doesn't process to undefined" );
+		test( print( shell.process( "8" ) ) == "8", "Byte doesn't process to itself" );
+		test( print( shell.process( "[8 9]" ) ) == "[8 9]", "Pair doesn't process to itself" );
+		test( print( shell.process( "[8 9]\n[0 1]" ) ) == "[0 1]", "2 expressions don't process to last" );
+		test( print( shell.process( "[8 9]\n[it 8]" ) ) == "[[8 9] 8]", "Use of 'it' failed" );
+		test( print( shell.process( ":def t [1 2] \n"
+									"\t0 \n"
+									":gc\n"
+									":def h it\n"
+									"[h t]" ) ) == "[0 1 2]", "Complex shell script failed" );
     }
 
     static void run_tests()
@@ -269,6 +277,7 @@ struct Tester
         test_istream();
         test_iostream();
         test_gc();
+        test_shell();
 
         std::cout << "\n\n";
     }

@@ -13,12 +13,12 @@ auto Shell<Env>::process_command( const std::string& cmd, elpa_istream& eis, elp
     {
     	std::string name;
     	elem_t elem;
-    	eis >> name >> elem >> nomoreinput;
+    	eis >> name >> elem >> endofline;
     	_defns[name] = elem;
     	return true;
     }
     
-    eis >> nomoreinput;
+    eis >> endofline;
 
     if( cmd == "quit" || cmd == "exit" )
         return false;
@@ -88,7 +88,7 @@ auto Shell<Env>::process_input( std::istream& is, elpa_ostream& eos ) -> bool
             try
             {
                 elem_t elem;
-                eis >> elem >> nomoreinput;
+                eis >> elem >> endofline;
 
                 if( c != '\0' )
                     elem = _manager.process_operator( c, elem );
@@ -159,17 +159,26 @@ void Shell<Env>::interactive( std::istream& in, std::ostream& out )
 
 
 template<class Env>
-auto Shell<Env>::process( std::istream& in, std::ostream& out ) -> elem_t
+auto Shell<Env>::process( std::istream& in ) -> elem_t
 {
+	std::ostringstream oss;//remove
+	elpa_ostream eos( oss );
+	while( in )
+		process_input( in, eos );
 	return _defns.find("it") != _defns.end() ? _defns["it"] : elem_t();
 }
 
 template<class Env>
-auto Shell<Env>::process( const std::string& in, std::ostream& out ) -> elem_t
+auto Shell<Env>::process( const std::string& in ) -> elem_t
 {
 	std::istringstream iss( in );
-	return process( iss, out );
+	return process( iss );
 }
+
+template class NullShellManager<Debug, SimpleScheme, TestAllocator>;
+template class Shell< Env<Debug, SimpleScheme, TestAllocator, NullInterpreter> >;
+template class NullShellManager<Debug, SimpleScheme, SimpleAllocator>;
+template class Shell< Env<Debug, SimpleScheme, SimpleAllocator, NullInterpreter> >;
 
 #include "../kcon/interpreter.h"
 #include "../kcon/shell.h"

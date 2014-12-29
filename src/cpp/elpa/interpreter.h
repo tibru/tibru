@@ -24,12 +24,18 @@ public:
 };
 
 template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT>
-struct NullInterpreter : InterpreterBase<System, SchemeT, AllocatorT>
+class NullShellManager;
+
+template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT>
+class NullInterpreter : public InterpreterBase<System, SchemeT, AllocatorT>
 {
-    bool is_valid_op( char op ) const { return false; }
+public:
+    NullInterpreter( size_t ncells )
+        : InterpreterBase<System, SchemeT, AllocatorT>( ncells ) {}
+
+    typedef NullShellManager<System, SchemeT, AllocatorT> ShellManager;
 };
 
 }   //namespace
 
 #endif
-
