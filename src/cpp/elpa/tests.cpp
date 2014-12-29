@@ -267,6 +267,15 @@ struct Tester
 									":gc\n"
 									":def h it\n"
 									"[h t]" ) ) == "[0 1 2]", "Complex shell script failed" );
+									
+		test( print( shell.process( "t" ) ) == "[1 2]", "Failed to hold reference between processes (1)" );
+		test( print( shell.process( "[t t]" ) ) == "[[1 2] 1 2]", "Failed to hold reference between processes (2)" );							
+									
+		try { shell.process( "z" ); fail( "Shell returned undefined reference (1)" ); }
+		catch( Error<Syntax,Undef> ) { pass(); }
+		
+		try { shell.process( "[z z]" ); fail( "Shell returned undefined reference (2)" ); }
+		catch( Error<Syntax,Undef> ) { pass(); }
     }
 
     static void run_tests()
