@@ -18,6 +18,7 @@ struct ShellManager;
 template<class Env>
 class Shell
 {
+	typedef typename Env::System System;
     typedef typename Env::Interpreter::ShellManager ShellManager;
     typedef typename Env::elpa_istream elpa_istream;
     typedef typename Env::elpa_ostream elpa_ostream;
@@ -35,8 +36,8 @@ class Shell
     ShellManager _manager;
     elpa_map<std::string, elem_t> _defns;   //put in manager?
 
-    auto process_command( const std::string& cmd, elpa_istream& eis, elpa_ostream& eos ) -> bool;
-    auto process_input( std::istream& is, elpa_ostream& eos ) -> bool;
+    auto _process_command( const std::string& cmd, elpa_istream& eis, elpa_ostream& eos, bool noisy ) -> bool;
+    auto _process_input( std::istream& is, elpa_ostream& eos, bool noisy=true ) -> bool;
 public:
     struct MoreToRead {};
 

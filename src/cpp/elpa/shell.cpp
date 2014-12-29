@@ -7,7 +7,7 @@
 using namespace elpa;
 
 template<class Env>
-auto Shell<Env>::process_command( const std::string& cmd, elpa_istream& eis, elpa_ostream& eos ) -> bool
+auto Shell<Env>::_process_command( const std::string& cmd, elpa_istream& eis, elpa_ostream& eos, bool noisy ) -> bool
 {
 	if( cmd == "def" )
     {
@@ -36,22 +36,26 @@ auto Shell<Env>::process_command( const std::string& cmd, elpa_istream& eis, elp
         _line_format = false;
     else if( cmd == "defs" )
     {
-    	for( auto defn : _defns )
-    		eos << defn.first << std::endl;
+    	if( noisy )
+    		for( auto defn : _defns )
+    			eos << defn.first << std::endl;
     }
     else if( cmd == "sys" )
     {
-    	eos << "System: " << Env::System::name() << std::endl;
-    	eos << "Scheme: " << Env::Scheme::name() << std::endl;
-    	eos << "Allocator: " << Env::Allocator::name() << std::endl;
-    	uint64_t nalloc = _manager.interpreter().allocator().num_allocated();
-    	uint64_t ntotal = _manager.interpreter().allocator().num_total();
-    	eos << "Mem alloc: " << nalloc << " cells";
-    	if( ntotal > 0 )
-    		eos << " (" << (nalloc * 100) / ntotal << "%)";
-    	eos << std::endl;
-    	eos << "Mem total: " << nalloc << " cells" << std::endl;
-    	eos << "GC count: " << _manager.interpreter().allocator().gc_count() << std::endl;
+    	if( noisy )
+    	{
+    		eos << "System: " << Env::System::name() << std::endl;
+    		eos << "Scheme: " << Env::Scheme::name() << std::endl;
+    		eos << "Allocator: " << Env::Allocator::name() << std::endl;
+    		uint64_t nalloc = _manager.interpreter().allocator().num_allocated();
+    		uint64_t ntotal = _manager.interpreter().allocator().num_total();
+    		eos << "Mem alloc: " << nalloc << " cells";
+    		if( ntotal > 0 )
+    			eos << " (" << (nalloc * 100) / ntotal << "%)";
+    		eos << std::endl;
+    		eos << "Mem total: " << nalloc << " cells" << std::endl;
+    		eos << "GC count: " << _manager.interpreter().allocator().gc_count() << std::endl;
+    	}
     }
     else if( cmd == "gc" )
     	_manager.interpreter().allocator().gc();
@@ -62,7 +66,7 @@ auto Shell<Env>::process_command( const std::string& cmd, elpa_istream& eis, elp
 }
 
 template<class Env>
-auto Shell<Env>::process_input( std::istream& is, elpa_ostream& eos ) -> bool
+auto Shell<Env>::_process_input( std::istream& is, elpa_ostream& eos, bool noisy ) -> bool
 {
     elpa_istream eis( is, _manager.interpreter().allocator(), _defns );
 
@@ -75,7 +79,7 @@ auto Shell<Env>::process_input( std::istream& is, elpa_ostream& eos ) -> bool
             if( !(eis >> std::noskipws >> cmd >> std::skipws) )
                 throw Error<Syntax>( "Expected command after ':'" );
 
-            return process_command( cmd, eis, eos );
+            return _process_command( cmd, eis, eos, noisy );
         }
         else
         {
@@ -94,14 +98,17 @@ auto Shell<Env>::process_input( std::istream& is, elpa_ostream& eos ) -> bool
                     elem = _manager.process_operator( c, elem );
                     
                 _defns["it"] = elem;
+                
+                if( noisy )
+            	{
+					eos << _format << _num_format;
+                	if( !_line_format )
+                	    for( ; elem.is_pcell(); elem = elem.pcell()->tail() )
+                  	      eos << elem.pcell()->head() << std::endl;
 
-				eos << _format << _num_format;
-                if( !_line_format )
-                    for( ; elem.is_pcell(); elem = elem.pcell()->tail() )
-                        eos << elem.pcell()->head() << std::endl;
-
-                eos << elem << std::endl;
-
+                	eos << elem << std::endl;
+            	}
+            	
                 return true;
             }
             catch( const Error<Syntax,EOS>& )
@@ -138,7 +145,7 @@ void Shell<Env>::interactive( std::istream& in, std::ostream& out )
                     prompt = "... ";
 
 					std::istringstream iss( input );
-                    keep_processing = process_input( iss, eos );
+                    keep_processing = _process_input( iss, eos );
                     break;
                 }
                 catch( const MoreToRead& )
@@ -161,10 +168,11 @@ void Shell<Env>::interactive( std::istream& in, std::ostream& out )
 template<class Env>
 auto Shell<Env>::process( std::istream& in ) -> elem_t
 {
-	std::ostringstream oss;//remove
+	std::ostringstream oss;
 	elpa_ostream eos( oss );
 	while( in )
-		process_input( in, eos );
+		_process_input( in, eos, false );
+	System::assert( oss.str() == "", "Processing produced output" );
 	return _defns.find("it") != _defns.end() ? _defns["it"] : elem_t();
 }
 
