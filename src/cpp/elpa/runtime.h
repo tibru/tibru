@@ -48,7 +48,7 @@ struct System
     }
 };
 
-typedef System< Params<>::Assert<false> > Debug;
+typedef System< Params<>::Assert<false>::Check<true> > Debug;
 
 template<
     class Sys,

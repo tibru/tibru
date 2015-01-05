@@ -10,9 +10,16 @@ using namespace elpa;
 
 auto main( int argc, const char* argv[] ) -> int
 {
-	elpa::run_tests();
-	kcon::run_tests();
-	std::cout << "\n** All tests passed **\n";
+    try
+    {
+        elpa::run_tests();
+        kcon::run_tests();
+        std::cout << "\n** All tests passed **\n";
+    }
+    catch( const Error<Test>& e )
+    {
+        std::cerr << e.message() << std::endl;
+    }
 
 	Shell< Env<Debug, SimpleScheme, TestAllocator, kcon::KConInterpreter> > shell;
 

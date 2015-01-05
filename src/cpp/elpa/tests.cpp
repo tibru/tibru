@@ -35,7 +35,7 @@ struct Tester
         elpa_istream( iss, allocator, defns ) >> elem;
         return auto_root_ref<elem_t>( allocator, elem );
     }
-    
+
     static auto parse( Allocator& allocator, const std::string& in ) -> auto_root_ref<elem_t>
     {
     	Defns defns( allocator );
@@ -67,29 +67,29 @@ struct Tester
         auto expected_deep = "[1 [[3 3] 2]]";
         test( found_deep == expected_deep, "Incorrect deep printing found '" + found_deep + "'\nExpected '" + expected_deep + "'" );
     }
-    
+
     static void test_istream()
     {TEST
     	Allocator a( 1024 );
-    	
+
         Defns defns( a );
         defns["x"] = parse( a, "0", defns );
         defns["y"] = parse( a, "[x 1 x]", defns );
         defns["z"] = parse( a, "[y 2 x]", defns );
-        
+
         auto test_i = [&a, &defns]( std::string in, std::string out )
         {
         	auto r = print( parse( a, in, defns ) );
         	test( r == out, "Named parse of '"s + in + "' incorrect.\nExpected " + out + "\nFound: " + r );
         };
-        
+
         try { test_i( "notfound", "" ); fail( "Parsed undefined element" ); }
         catch( Error<Syntax,Undef> ) { pass(); }
 
         try { test_i( "[notfound 0]", "" ); fail( "Parsed undefined element" ); }
         catch( Error<Syntax,Undef> ) { pass(); }
-                   
-    	test_i( "0", "0" );   
+
+    	test_i( "0", "0" );
     	test_i( "x", "0" );
     	test_i( "y", "[0 1 0]" );
     	test_i( "z", "[[0 1 0] 2 0]" );
@@ -118,14 +118,13 @@ struct Tester
         try
         {
             found = print( parse( a, in ) );
+            fail( "IO failed for: '" + in + "'\nExpected error: '" + msg + "'\nFound:    '" + found + "'" );
         }
         catch( const Error<Syntax,SubType>& e )
         {
             test( e.message() == msg, "IO failed for: '" + in + "'\nExpected error: '" + msg + "'\nFound:          '" + e.message() + "'" );
-            return pass();
+            pass();
         }
-
-        test( false, "IO failed for: '" + in + "'\nExpected error: '" + msg + "'\nFound:    '" + found + "'" );
     }
 
     static void test_iostream()
@@ -252,11 +251,11 @@ struct Tester
             }
         }
     }
-    
+
     static void test_shell()
     {
     	Shell< Env > shell;
-    	
+
     	test( shell.process( "" ).is_undef(), "Blank script doesn't process to undefined" );
 		test( print( shell.process( "8" ) ) == "8", "Byte doesn't process to itself" );
 		test( print( shell.process( "[8 9]" ) ) == "[8 9]", "Pair doesn't process to itself" );
@@ -268,13 +267,13 @@ struct Tester
 									":sys\n"	//check noisinesd
 									":def h it\n"
 									"[h t]" ) ) == "[0 1 2]", "Complex shell script failed" );
-									
+
 		test( print( shell.process( "t" ) ) == "[1 2]", "Failed to hold reference between processes (1)" );
-		test( print( shell.process( "[t t]" ) ) == "[[1 2] 1 2]", "Failed to hold reference between processes (2)" );							
-									
+		test( print( shell.process( "[t t]" ) ) == "[[1 2] 1 2]", "Failed to hold reference between processes (2)" );
+
 		try { shell.process( "z" ); fail( "Shell returned undefined reference (1)" ); }
 		catch( Error<Syntax,Undef> ) { pass(); }
-		
+
 		try { shell.process( "[z z]" ); fail( "Shell returned undefined reference (2)" ); }
 		catch( Error<Syntax,Undef> ) { pass(); }
     }

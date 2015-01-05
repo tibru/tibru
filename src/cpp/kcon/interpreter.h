@@ -23,9 +23,24 @@ public:
     typedef KConShellManager<System, SchemeT, AllocatorT> ShellManager;
 
     bool is_valid_operator( char op ) const { return op == '!'; }
-    auto process_operator( char op, elem_t elem ) -> elem_t
+    auto process_operator( char op, elem_t arg ) -> elem_t
     {
-        return elem;
+        switch( op )
+        {
+        case '!':
+            return exec( arg );
+        }
+
+        throw Error<Assertion>( "Unknown operator '"s + op + "'" );
+    }
+
+    auto exec( elem_t arg ) -> elem_t
+    {
+        System::assert( arg.is_def(), "Undefined argument passed to exec" );
+
+        System::check( arg.is_pcell(), "Illegal byte argument for !" );
+
+        return arg;
     }
 };
 
