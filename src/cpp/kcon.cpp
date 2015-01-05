@@ -1,4 +1,5 @@
 #include "elpa/tests.h"
+#include "kcon/tests.h"
 #include "elpa/runtime.h"
 #include "elpa/shell.h"
 #include "kcon/interpreter.h"
@@ -10,9 +11,10 @@ using namespace elpa;
 auto main( int argc, const char* argv[] ) -> int
 {
 	elpa::run_tests();
+	kcon::run_tests();
 	std::cout << "\n** All tests passed **\n";
 
 	Shell< Env<Debug, SimpleScheme, TestAllocator, kcon::KConInterpreter> > shell;
-	
+
 	shell.interactive( std::cin, std::cout );
 }

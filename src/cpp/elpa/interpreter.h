@@ -8,6 +8,8 @@
 namespace elpa
 {
 
+struct IllegalOp;
+
 #define MetaInterpreter template<class System, template<class> class SchemeT, template<class System, template<class> class SchemeT> class AllocatorT>
 
 template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT>

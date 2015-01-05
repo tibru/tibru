@@ -10,12 +10,14 @@ namespace elpa {
 
 struct Runtime;
 
-template<bool AssertF=false>
+template<bool AssertF=false, bool CheckF=false>
 struct Params
 {
     static const bool AssertFlag = AssertF;
+    static const bool CheckFlag = CheckF;
 
-    template<bool flag> struct Assert : Params<flag> {};
+    template<bool flag> struct Assert : Params<flag, CheckF> {};
+    template<bool flag> struct Check : Params<AssertF, flag> {};
 };
 
 template<class Params>
@@ -27,13 +29,19 @@ struct System
             throw Error<Assertion>( msg );
     }
 
+    static void check( bool cond, const std::string& msg )
+    {
+        if( Params::CheckFlag && !cond )
+            throw Error<IllegalOp>( msg );
+    }
+
     template<class T>
     static T* check_address( T* p )
     {
         assert( reinterpret_cast<uintptr_t>(p) < MAX_POINTER, "Invalid address" );
         return p;
     }
-    
+
     static auto name() -> std::string
     {
     	return "assert="s + (Params::AssertFlag ? "on" : "off" );
