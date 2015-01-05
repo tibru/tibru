@@ -64,11 +64,9 @@ void TestAllocator<System, SchemeT>::_mark( std::set<pcell_t>& live, pcell_t p )
     {
         live.insert( p );
 
-        System::assert( p->head().is_def(), "Found undef head during GC" );
         if( p->head().is_pcell() )
             _mark( live, p->head().pcell() );
 
-        System::assert( p->tail().is_def(), "Found undef tail during GC" );
         if( p->tail().is_pcell() )
             _mark( live, p->tail().pcell() );
     }
