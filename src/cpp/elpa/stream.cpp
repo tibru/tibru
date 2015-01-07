@@ -105,10 +105,10 @@ auto elpa_istream<System, SchemeT, AllocatorT>::_parse_name() -> std::string
 	char c;
 	while( _is.get( c ) && isalnum( c ) )
 		name += c;
-	
+
 	if( _is )
 		_is.putback( c );
-		
+
 	return name;
 }
 
@@ -175,7 +175,7 @@ template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT>
 auto elpa_istream<System, SchemeT, AllocatorT>::_reverse_and_reduce( elem_t e, const std::vector< std::string >& names  ) -> elem_t
 {
 	auto pname = names.rbegin();
-	
+
     auto_root<elem_t> p( _alloc, e );
     auto_root<elem_t> tail( _alloc );
 	elpa_stack<elem_t> tails( _alloc );
@@ -217,10 +217,10 @@ auto elpa_istream<System, SchemeT, AllocatorT>::_reverse_and_reduce( elem_t e, c
             else if( p->head().is_undef() )
             {
             	const std::string name = *pname++;
-            	
+
             	if( _defns.find( name ) == _defns.end() )
        	     	throw Error<Syntax,Undef>( "Undefined reference to '"s + name + "'" );
-    			
+
             	const elem_t head = _defns.at( name );
 
                 if( tail.is_undef() )
@@ -260,7 +260,7 @@ auto elpa_istream<System, SchemeT, AllocatorT>::_parse() -> elem_t
 	char c;
 	if( !(_is >> c) )
         throw Error<Syntax>( "Unexpected end of input" );
-	
+
     if( c == '[' )
     {
     	std::vector< std::string > names;
@@ -271,10 +271,10 @@ auto elpa_istream<System, SchemeT, AllocatorT>::_parse() -> elem_t
     {
     	_is.putback( c );
     	std::string name = _parse_name();
-    	
+
     	if( _defns.find( name ) == _defns.end() )
     		throw Error<Syntax,Undef>( "Undefined reference to '"s + name + "'" );
-    	
+
     	return _defns.at( name );
     }
     else if( isdigit( c ) )
@@ -296,3 +296,9 @@ auto elpa_istream<System, SchemeT, AllocatorT>::operator>>( elem_t& elem ) -> el
 template class elpa_ostream< Debug, SimpleScheme >;
 template class elpa_istream< Debug, SimpleScheme, SimpleAllocator >;
 template class elpa_istream< Debug, SimpleScheme, TestAllocator >;
+
+template class elpa_ostream< Safe, OptScheme >;
+template class elpa_istream< Safe, OptScheme, OptAllocator >;
+
+template class elpa_ostream< Fast, OptScheme >;
+template class elpa_istream< Fast, OptScheme, OptAllocator >;

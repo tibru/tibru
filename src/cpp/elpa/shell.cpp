@@ -25,7 +25,7 @@ auto Shell<Env>::_process_command( const std::string& cmd, elpa_istream& eis, el
     	include( filename );
     	return true;
     }
-    
+
     eis >> endofline;
 
     if( cmd == "quit" || cmd == "exit" )
@@ -104,9 +104,9 @@ auto Shell<Env>::_process_input( std::istream& is, elpa_ostream& eos, bool noisy
 
                 if( c != '\0' )
                     elem = _manager.process_operator( c, elem );
-                    
+
                 _defns["it"] = elem;
-                
+
                 if( noisy )
             	{
 					eos << _format << _num_format;
@@ -116,7 +116,7 @@ auto Shell<Env>::_process_input( std::istream& is, elpa_ostream& eos, bool noisy
 
                 	eos << elem << std::endl;
             	}
-            	
+
                 return true;
             }
             catch( const Error<Syntax,EOS>& )
@@ -133,7 +133,7 @@ template<class Env>
 void Shell<Env>::interactive( std::istream& in, std::ostream& out )
 {
 	elpa_ostream eos( out );
-	
+
     bool keep_processing = true;
     while( keep_processing )
     {
@@ -197,12 +197,12 @@ void Shell<Env>::include( const std::string& filename )
 	std::ifstream ifs( filename );
 	if( !ifs )
 		throw Error<Runtime>( "File not found '"s + filename + "'" );
-		
+
 	if( !_processing.insert( filename ).second )
 		throw Error<Runtime>( "File included recursively '"s + filename + "'" );
-		
+
 	process( ifs );
-	
+
 	System::assert( _processing.erase( filename ) == 1, "Failed to register processed file" );
 }
 
@@ -212,3 +212,5 @@ template class Shell< Env<Debug, SimpleScheme, SimpleAllocator, NullInterpreter>
 #include "../kcon/interpreter.h"
 #include "../kcon/shell.h"
 template class Shell< Env<Debug, SimpleScheme, TestAllocator, kcon::KConInterpreter> >;
+template class Shell< Env<Safe, OptScheme, OptAllocator, kcon::KConInterpreter> >;
+template class Shell< Env<Fast, OptScheme, OptAllocator, kcon::KConInterpreter> >;

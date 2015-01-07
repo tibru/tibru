@@ -81,7 +81,7 @@ private:
     void _shift();
 public:
 	static auto name() -> std::string { return "test"; }
-	
+
     TestAllocator( size_t ncells )
         : AllocatorBase<System, SchemeT, TestAllocator>( ncells ), _allocated() {}
 
@@ -109,7 +109,7 @@ public:
     {
         return _allocated.size();
     }
-    
+
     auto num_total() const -> size_t
     {
     	return _allocated.size();
@@ -141,7 +141,7 @@ private:
 
     FreeCell* _page;
     FreeCell* _free_list;
-    
+
     auto _next() -> void*
     {
         System::assert( _free_list != 0, "SimpleAllocator failed to reserve cell" );
@@ -150,7 +150,7 @@ private:
         _free_list = _free_list->next;
         return p;
     }
-    
+
     static void _mark( std::set<pcell_t>& live, pcell_t pcell );
 public:
 	static auto name() -> std::string { return "simple"; }
@@ -180,7 +180,7 @@ public:
 
         return n;
     }
-    
+
     auto num_total() const -> size_t
     {
     	return this->_ncells;
@@ -202,6 +202,9 @@ public:
         return p;
     }
 };
+
+template<class System, MetaScheme class SchemeT>
+using OptAllocator = SimpleAllocator<System, SchemeT>;
 
 }	//namespace
 

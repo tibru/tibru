@@ -44,11 +44,14 @@ struct System
 
     static auto name() -> std::string
     {
-    	return "assert="s + (Params::AssertFlag ? "on" : "off" );
+    	return "assert="s + (Params::AssertFlag ? "on" : "off" ) + "; " +
+                "check="s + (Params::CheckFlag ? "on" : "off" );
     }
 };
 
 typedef System< Params<>::Assert<true>::Check<true> > Debug;
+typedef System< Params<>::Assert<false>::Check<true> > Safe;
+typedef System< Params<>::Assert<false>::Check<false> > Fast;
 
 template<
     class Sys,

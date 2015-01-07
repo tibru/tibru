@@ -78,6 +78,9 @@ struct SimpleScheme
     };
 };
 
+template<class System>
+using OptScheme = SimpleScheme<System>;
+
 }	//namespace
 
 /*

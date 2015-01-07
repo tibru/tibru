@@ -113,3 +113,6 @@ void SimpleAllocator<System, SchemeT>::gc()
 
 template class TestAllocator< Debug, SimpleScheme >;
 template class SimpleAllocator< Debug, SimpleScheme >;
+
+template class SimpleAllocator< Safe, OptScheme >;  //should read OptAllocator when a real class
+template class SimpleAllocator< Fast, OptScheme >;  //should read OptAllocator when a real class

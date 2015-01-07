@@ -16,10 +16,24 @@ auto info( int ret_code ) -> int
     return ret_code;
 }
 
+template<class Env>
+auto run( const std::vector< std::string >& filenames, bool repl ) -> int
+{
+	Shell< Env > shell;
+
+    for( auto filename : filenames )
+        shell.include( filename );
+
+    if( repl )
+        shell.interactive( std::cin, std::cout );
+
+    return 0;
+}
+
 auto main( int argc, const char* argv[] ) -> int
 {
     bool run_tests = false;
-    std::string mode = "debug";
+    std::string mode = "";
     bool repl = false;
     std::vector< std::string > filenames;
 
@@ -36,13 +50,19 @@ auto main( int argc, const char* argv[] ) -> int
             else if( arg == "-help" || arg == "--help" )
                 return info( 0 );
             else
+            {
+                std::cerr << "Invalid option: " << arg << std::endl;
                 return info( 1 );
+            }
         }
         else
         {
             filenames.push_back( arg );
         }
     }
+
+    if( mode == "" )
+        mode = "-debug";
 
     if( filenames.size() == 0 )
         repl = true;
@@ -62,11 +82,13 @@ auto main( int argc, const char* argv[] ) -> int
         }
     }
 
-	Shell< Env<Debug, SimpleScheme, TestAllocator, kcon::KConInterpreter> > shell;
+    if( mode == "-debug" )
+        return run< Env<Debug, SimpleScheme, TestAllocator, kcon::KConInterpreter> >( filenames, repl );
+    else if( mode == "-safe" )
+        return run< Env<Safe, OptScheme, OptAllocator, kcon::KConInterpreter> >( filenames, repl );
+    else if( mode == "-fast" )
+        return run< Env<Fast, OptScheme, OptAllocator, kcon::KConInterpreter> >( filenames, repl );
 
-    for( auto filename : filenames )
-        shell.include( filename );
-
-    if( repl )
-        shell.interactive( std::cin, std::cout );
+    std::cerr << "Unknown mode: "s + mode;
+    return 1;
 }

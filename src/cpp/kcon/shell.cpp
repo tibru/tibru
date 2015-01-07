@@ -22,4 +22,5 @@ auto KConShellManager<System, SchemeT, AllocatorT>::process_operator( char op, e
 
 #include "../elpa/runtime.h"
 template class KConShellManager<Debug, SimpleScheme, TestAllocator>;
-template class Shell< Env<Debug, SimpleScheme, TestAllocator, KConInterpreter> >;
+template class KConShellManager<Safe, OptScheme, OptAllocator>;
+template class KConShellManager<Fast, OptScheme, OptAllocator>;
