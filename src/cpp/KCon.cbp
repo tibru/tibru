@@ -12,6 +12,7 @@
 				<Option object_output="obj/Release/" />
 				<Option type="1" />
 				<Option compiler="gcc" />
+				<Option parameters="-tests -repl test.elpa" />
 				<Compiler>
 					<Add option="-O2" />
 					<Add option="-fexceptions -std=c++14" />

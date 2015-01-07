@@ -8,7 +8,7 @@
 
 namespace elpa {
 
-using container::range;
+using container::valrange;
 
 template<class Env>
 struct Tester
@@ -220,7 +220,7 @@ struct Tester
 
         {
             //Test with minimal memory to create memory churn
-            for( auto n : range(1,11) )
+            for( auto n : valrange(1,11) )
             {
                 try
                 {
@@ -237,7 +237,7 @@ struct Tester
 
         {
             //Test with minimal memory to create memory churn
-            for( auto n : range(11,20) )
+            for( auto n : valrange(11,20) )
             {
                 Allocator a( n );
                 auto_root<elem_t> p( parse( a, "[0 [1 [2 3] 4] 5 6]" ) );
