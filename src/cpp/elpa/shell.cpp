@@ -4,6 +4,7 @@
 #include <iomanip>
 #include <set>
 #include <fstream>
+#include <algorithm>
 
 using namespace elpa;
 
@@ -48,6 +49,15 @@ auto Shell<Env>::_process_command( const std::string& cmd, elpa_istream& eis, el
     		for( auto defn : _defns )
     			eos << defn.first << std::endl;
     }
+    else if( cmd == "ops" )
+    {
+    	if( noisy )
+        {
+    		for( auto op : _manager.operators() )
+    			eos << op;
+            eos << std::endl;
+        }
+    }
     else if( cmd == "sys" )
     {
     	if( noisy )
@@ -69,6 +79,32 @@ auto Shell<Env>::_process_command( const std::string& cmd, elpa_istream& eis, el
     }
     else if( cmd == "gc" )
     	_manager.interpreter().allocator().gc();
+    else if( cmd == "help" )
+    {
+        if( noisy )
+        {
+            std::cout << "Evaluate an expression of the form <name>|byte|[<expr> <expr>+] and define 'it' as its value\n";
+            std::cout << "Or process an operator on an expression of the form <op><expr> and define 'it' as its value\n";
+            std::cout << "Or run one of the following commands\n";
+
+            std::cout << ":def <name> <expr> - Define a named expression\n";
+            std::cout << ":include <filename> - Silently include all statements in the specified file\n";
+
+            std::cout << ":dec  - Show bytes in decimal notation (default)\n";
+            std::cout << ":hex  - Show bytes in hex notation\n";
+            std::cout << ":flat - Show cells as flattened right associative lists (default)\n";
+            std::cout << ":deep - Show cells as pairs\n";
+            std::cout << ":line - Show expressions on a single line (default)\n";
+            std::cout << ":list - Show expressions over multiple lines in list format\n";
+            std::cout << ":defs - Show all defined names\n";
+            std::cout << ":ops  - Show all available operations\n";
+            std::cout << ":sys  - Show information about the system\n";
+            std::cout << ":gc   - Run the garbage collector\n";
+            std::cout << ":help - Show this help\n";
+            std::cout << ":exit - End the shell session\n";
+            std::cout << ":quit - End the shell session\n";
+        }
+    }
     else
         throw Error<Command>( "Unknown command '"s + cmd + "'" );
 
@@ -93,7 +129,8 @@ auto Shell<Env>::_process_input( std::istream& is, elpa_ostream& eos, bool noisy
         }
         else
         {
-            if( !_manager.is_valid_operator( c ) )
+            const std::vector<char> ops = _manager.operators();
+            if( std::find( ops.begin(), ops.end(), c ) == ops.end() )
             {
                 eis.putback( c );
                 c = '\0';
@@ -166,10 +203,12 @@ void Shell<Env>::interactive( std::istream& in, std::ostream& out )
         catch( const Error<Syntax>& e )
         {
             out << "Syntax: " << e.message() << std::endl;
+            out << "Run :help for more details" << std::endl;
         }
         catch( const Error<Command>& e )
         {
             out << "Command: " << e.message() << std::endl;
+            out << "Run :help for more details" << std::endl;
         }
     }
 }

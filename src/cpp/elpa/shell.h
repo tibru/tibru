@@ -76,7 +76,7 @@ public:
     NullShellManager( size_t ncells )
         : ShellManagerBase<System, SchemeT, AllocatorT, NullInterpreter>( ncells ) {}
 
-    bool is_valid_operator( char op ) const { return op == '*'; }
+    auto operators() const -> std::vector<char> { return {}; }
     auto process_operator( char op, elem_t elem ) -> elem_t { return elem; }
 };
 

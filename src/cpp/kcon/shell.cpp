@@ -4,9 +4,9 @@ using namespace kcon;
 using namespace elpa;
 
 template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT>
-auto KConShellManager<System, SchemeT, AllocatorT>::is_valid_operator( char op ) const -> bool
+auto KConShellManager<System, SchemeT, AllocatorT>::operators() const -> std::vector<char>
 {
-    return op == '!';
+    return {'!'};
 }
 
 template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT>
