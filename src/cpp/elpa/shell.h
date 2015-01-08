@@ -43,8 +43,8 @@ class Shell
 public:
     struct MoreToRead {};
 
-    Shell()
-        : _format( flat ), _num_format( std::dec ), _line_format( true ), _manager( 1024 ), _defns( _manager.interpreter().allocator() ) {}
+    Shell( size_t ncells )
+        : _format( flat ), _num_format( std::dec ), _line_format( true ), _manager( ncells ), _defns( _manager.interpreter().allocator() ) {}
 
     void interactive( std::istream& in, std::ostream& out );
 	auto process( std::istream& in ) -> elem_t;

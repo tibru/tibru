@@ -34,6 +34,8 @@ protected:
 public:
     auto gc_count() const -> size_t { return _gc_count; }
 
+    auto num_max() const -> size_t { return _ncells; }
+
     void add_root( elem_t* root ) { _elem_roots.insert( root ); }
 	void del_root( elem_t* root ) { _elem_roots.erase( root ); }
 

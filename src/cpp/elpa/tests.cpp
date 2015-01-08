@@ -254,7 +254,7 @@ struct Tester
 
     static void test_shell()
     {
-    	Shell< Env > shell;
+    	Shell< Env > shell( 1024 );
 
     	test( shell.process( "" ).is_undef(), "Blank script doesn't process to undefined" );
 		test( print( shell.process( "8" ) ) == "8", "Byte doesn't process to itself" );

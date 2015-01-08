@@ -57,11 +57,13 @@ auto Shell<Env>::_process_command( const std::string& cmd, elpa_istream& eis, el
     		eos << "Allocator: " << Env::Allocator::name() << std::endl;
     		uint64_t nalloc = _manager.interpreter().allocator().num_allocated();
     		uint64_t ntotal = _manager.interpreter().allocator().num_total();
+    		uint64_t nmax = _manager.interpreter().allocator().num_max();
     		eos << "Mem alloc: " << nalloc << " cells";
     		if( ntotal > 0 )
     			eos << " (" << (nalloc * 100) / ntotal << "%)";
     		eos << std::endl;
     		eos << "Mem total: " << nalloc << " cells" << std::endl;
+    		eos << "Mem max: " << nmax << " cells" << std::endl;
     		eos << "GC count: " << _manager.interpreter().allocator().gc_count() << std::endl;
     	}
     }
