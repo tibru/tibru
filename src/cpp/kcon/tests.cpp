@@ -59,6 +59,11 @@ struct Tester
         }
         catch( Error<Syntax> ) { pass(); }
 
+        std::cout << print( parse( a, "[1 2 < 3]" ) ) << std::endl;
+        std::cout << print( parse( a, "[1 2 3 <]" ) ) << std::endl;
+        std::cout << print( parse( a, "[1 2 3 < 4 5]" ) ) << std::endl;
+        std::cout << print( parse( a, "[[1 1] [2 2] [3 3] <]" ) ) << std::endl;
+        std::cout << print( parse( a, "1 <" ) ) << std::endl;
     }
 
     static void test_interpreter()

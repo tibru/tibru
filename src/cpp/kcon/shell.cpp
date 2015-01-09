@@ -40,6 +40,18 @@ auto KConShellManager<System, SchemeT, AllocatorT>::macros() -> const Macros&
         { '\'', []( Allocator& alloc, elem_t elem ) -> elem_t {
             return alloc.new_Cell( byte_t(0), elem );
         } },
+        { '<', []( Allocator& alloc, elem_t elem ) -> elem_t {
+            elpa_ostream<System, SchemeT> os( std::cout );
+            os << "Tail: " << elem << std::endl;
+
+            auto_root<elem_t> r( alloc );
+            while( elem.is_pcell() )
+            {
+                r = alloc.new_Cell( elem.pcell()->head(), r );
+                elem = elem.pcell()->tail();
+            }
+            return r;
+        } },
     };
 
     return macros;
