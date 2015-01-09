@@ -18,6 +18,9 @@ public:
     typedef typename Scheme::elem_t elem_t;
     typedef typename Scheme::byte_t byte_t;
 
+    template<class T>
+    using auto_root = typename Allocator::template auto_root<T>;
+
     KConShellManager( size_t ncells )
         : elpa::ShellManagerBase<System, SchemeT, AllocatorT, KConInterpreter>( ncells ) {}
 

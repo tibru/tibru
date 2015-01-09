@@ -8,7 +8,24 @@ auto KConShellManager<System, SchemeT, AllocatorT>::readers() -> const Readers&
 {
     static Readers readers = {
         { '#', []( Allocator& alloc, std::istream& is ) -> elem_t {
-            return 21;
+            uint32_t n = 0;
+            char c = '\0';
+            while( is.get(c) && isdigit(c) )
+            {
+                uint32_t d = n * 10 + (c - '0');
+                if( d < n )
+                    throw Error<Syntax>( "Integer overflow for #" );
+                n = d;
+            }
+            if( !isdigit(c) && c != '\0' )
+                is.putback( c );
+
+            auto_root<elem_t> n4( alloc );
+            n4 = alloc.new_Cell( byte_t((n >> 24) & 0xff), n4 );
+            n4 = alloc.new_Cell( byte_t((n >> 16) & 0xff), n4 );
+            n4 = alloc.new_Cell( byte_t((n >>  8) & 0xff), n4 );
+            n4 = alloc.new_Cell( byte_t((n >>  0) & 0xff), n4 );
+            return n4;
         } },
     };
 

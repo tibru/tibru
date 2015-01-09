@@ -194,6 +194,9 @@ auto elpa_istream<System, SchemeT, AllocatorT>::_parse_elems( std::vector< std::
 template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT>
 auto elpa_istream<System, SchemeT, AllocatorT>::_reverse_and_reduce( elem_t e, const std::vector< std::string >& names  ) -> elem_t
 {
+    if( e.is_byte() )
+        return e;
+
 	auto pname = names.rbegin();
 
     auto_root<elem_t> p( _alloc, e );
@@ -304,7 +307,8 @@ auto elpa_istream<System, SchemeT, AllocatorT>::_parse() -> elem_t
     }
     else if( _readers.find( c ) != _readers.end() )
     {
-        return _parse_reader( c );
+        std::vector< std::string > names;
+        return _reverse_and_reduce( _parse_reader( c ), names );
     }
     else if( _macros.find( c ) != _macros.end() )
     {
