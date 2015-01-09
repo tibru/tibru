@@ -17,6 +17,8 @@ struct Tester
     typedef typename Env::elpa_ostream elpa_ostream;
     typedef typename Env::elpa_istream elpa_istream;
     typedef typename elpa_istream::Defns Defns;
+    typedef typename elpa_istream::Readers Readers;
+    typedef typename elpa_istream::Macros Macros;
     typedef typename Env::elpa_ostream::ElpaManip ElpaManip;
 
     typedef typename Env::Scheme::pcell_t pcell_t;
@@ -28,18 +30,20 @@ struct Tester
     template<class T>
     using auto_root = typename Allocator::template auto_root<T>;
 
-    static auto parse( Allocator& allocator, const std::string& in, const Defns& defns ) -> auto_root_ref<elem_t>
+    static auto parse( Allocator& allocator, const std::string& in, const Defns& defns, const Readers& readers, const Macros& macros ) -> auto_root_ref<elem_t>
     {
         std::istringstream iss( in );
         elem_t elem;
-        elpa_istream( iss, allocator, defns ) >> elem;
+        elpa_istream( iss, allocator, defns, readers, macros ) >> elem;
         return auto_root_ref<elem_t>( allocator, elem );
     }
 
     static auto parse( Allocator& allocator, const std::string& in ) -> auto_root_ref<elem_t>
     {
     	Defns defns( allocator );
-    	return parse( allocator, in, defns );
+    	Readers readers;
+    	Macros macros;
+    	return parse( allocator, in, defns, readers, macros );
     }
 
     static auto print( elem_t e, ElpaManip m=flat ) -> std::string
@@ -73,13 +77,17 @@ struct Tester
     	Allocator a( 1024 );
 
         Defns defns( a );
-        defns["x"] = parse( a, "0", defns );
-        defns["y"] = parse( a, "[x 1 x]", defns );
-        defns["z"] = parse( a, "[y 2 x]", defns );
+        Readers readers;
+        Macros macros;
 
-        auto test_i = [&a, &defns]( std::string in, std::string out )
+        auto parse = [&]( std::string s ) { return Tester::parse( a, s, defns, readers, macros ); };
+        defns["x"] = parse( "0" );
+        defns["y"] = parse( "[x 1 x]" );
+        defns["z"] = parse( "[y 2 x]" );
+
+        auto test_i = [&]( std::string in, std::string out )
         {
-        	auto r = print( parse( a, in, defns ) );
+        	auto r = print( parse( in ) );
         	test( r == out, "Named parse of '"s + in + "' incorrect.\nExpected " + out + "\nFound: " + r );
         };
 

@@ -71,12 +71,17 @@ class NullShellManager : public ShellManagerBase<System, SchemeT, AllocatorT, Nu
 {
 public:
     typedef SchemeT<System> Scheme;
+    typedef typename elpa_istream<System, SchemeT, AllocatorT>::Readers Readers;
+    typedef typename elpa_istream<System, SchemeT, AllocatorT>::Macros Macros;
     typedef typename Scheme::elem_t elem_t;
 
     NullShellManager( size_t ncells )
         : ShellManagerBase<System, SchemeT, AllocatorT, NullInterpreter>( ncells ) {}
 
-    auto operators() const -> std::vector<char> { return {}; }
+    static auto readers() -> const Readers& { static Readers readers; return readers; }
+    static auto macros() -> const Macros& { static Macros macros; return macros; }
+    static auto operators() -> const std::vector<char>& { static std::vector<char> ops; return ops; }
+
     auto process_operator( char op, elem_t elem ) -> elem_t { return elem; }
 };
 

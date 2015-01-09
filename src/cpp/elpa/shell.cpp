@@ -114,7 +114,7 @@ auto Shell<Env>::_process_command( const std::string& cmd, elpa_istream& eis, el
 template<class Env>
 auto Shell<Env>::_process_input( std::istream& is, elpa_ostream& eos, bool noisy ) -> bool
 {
-    elpa_istream eis( is, _manager.interpreter().allocator(), _defns );
+    elpa_istream eis( is, _manager.interpreter().allocator(), _defns, _manager.readers(), _manager.macros() );
 
     char c;
     if( eis >> c )

@@ -61,7 +61,7 @@ public:
         m(_os);
         return *this;
     }
-    
+
     typedef std::ios_base& (*BaseManip)( std::ios_base& );
 
     auto operator<<( BaseManip m ) -> elpa_ostream&
@@ -103,10 +103,14 @@ class elpa_istream
     using elpa_map = elpa::container::elpa_map<System, SchemeT, AllocatorT, K, V>;
 public:
 	typedef elpa_map<std::string,elem_t> Defns;
+	typedef std::map<char, auto (*)(Allocator&, std::istream&) -> elem_t> Readers;
+	typedef std::map<char, auto (*)(Allocator&, elem_t) -> elem_t> Macros;
 private:
     std::istream& _is;
     Allocator& _alloc;
     const Defns& _defns;
+    const Readers& _readers;
+    const Macros& _macros;
 
 	auto _parse_name() -> std::string;
     auto _parse_byte() -> byte_t;
@@ -114,11 +118,8 @@ private:
 	auto _reverse_and_reduce( elem_t p, const std::vector< std::string >& names ) -> elem_t;
 	auto _parse() -> elem_t;
 public:
-	elpa_istream( std::istream& is, Allocator& alloc, const Defns& defns )
-        : _is( is ), _alloc( alloc ), _defns( defns ) {}
-
-    elpa_istream( std::istream& is, Allocator& alloc )
-        : _is( is ), _alloc( alloc ), _defns( Defns( alloc ) ) {}
+	elpa_istream( std::istream& is, Allocator& alloc, const Defns& defns, const Readers& readers, const Macros& macros )
+        : _is( is ), _alloc( alloc ), _defns( defns ), _readers( readers ), _macros( macros ) {}
 
 	auto operator>>( elem_t& elem ) -> elpa_istream&;
 
@@ -152,7 +153,7 @@ auto endofline( elpa_istream<System, SchemeT, AllocatorT>& eis ) -> auto&
     while( eis.get(c) && (c != '\n') )
     	if( !isspace( c ) )
             throw Error<Syntax>( "Unexpected character after expression '"s + c + "'" );
-    
+
     return eis;
 }
 

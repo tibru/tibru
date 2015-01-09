@@ -12,12 +12,17 @@ class KConShellManager : public elpa::ShellManagerBase<System, SchemeT, Allocato
 {
 public:
     typedef SchemeT<System> Scheme;
+    typedef typename elpa_istream<System, SchemeT, AllocatorT>::Readers Readers;
+    typedef typename elpa_istream<System, SchemeT, AllocatorT>::Macros Macros;
     typedef typename Scheme::elem_t elem_t;
 
     KConShellManager( size_t ncells )
         : elpa::ShellManagerBase<System, SchemeT, AllocatorT, KConInterpreter>( ncells ) {}
 
-    auto operators() const -> std::vector<char>;
+    static auto readers() -> const Readers&;
+    static auto macros() -> const Macros&;
+    static auto operators() -> const std::vector<char>&;
+
     auto process_operator( char op, elem_t elem ) -> elem_t;
 };
 

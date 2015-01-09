@@ -4,9 +4,24 @@ using namespace kcon;
 using namespace elpa;
 
 template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT>
-auto KConShellManager<System, SchemeT, AllocatorT>::operators() const -> std::vector<char>
+auto KConShellManager<System, SchemeT, AllocatorT>::readers() -> const Readers&
 {
-    return {'!'};
+    static Readers readers;
+    return readers;
+}
+
+template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT>
+auto KConShellManager<System, SchemeT, AllocatorT>::macros() -> const Macros&
+{
+    static Macros macros;
+    return macros;
+}
+
+template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT>
+auto KConShellManager<System, SchemeT, AllocatorT>::operators() -> const std::vector<char>&
+{
+    static std::vector<char> ops = {'!'};
+    return ops;
 }
 
 template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT>
