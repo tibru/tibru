@@ -12,9 +12,11 @@ class KConShellManager : public elpa::ShellManagerBase<System, SchemeT, Allocato
 {
 public:
     typedef SchemeT<System> Scheme;
+    typedef AllocatorT<System, SchemeT> Allocator;
     typedef typename elpa_istream<System, SchemeT, AllocatorT>::Readers Readers;
     typedef typename elpa_istream<System, SchemeT, AllocatorT>::Macros Macros;
     typedef typename Scheme::elem_t elem_t;
+    typedef typename Scheme::byte_t byte_t;
 
     KConShellManager( size_t ncells )
         : elpa::ShellManagerBase<System, SchemeT, AllocatorT, KConInterpreter>( ncells ) {}

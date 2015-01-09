@@ -113,6 +113,18 @@ auto elpa_istream<System, SchemeT, AllocatorT>::_parse_name() -> std::string
 }
 
 template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT>
+auto elpa_istream<System, SchemeT, AllocatorT>::_parse_reader( char c ) -> elem_t
+{
+    return _readers.at(c)( _alloc, _is );
+}
+
+template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT>
+auto elpa_istream<System, SchemeT, AllocatorT>::_parse_macro( char c ) -> elem_t
+{
+    throw Error<NotImplemented>( "Not doing macros" );
+}
+
+template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT>
 auto elpa_istream<System, SchemeT, AllocatorT>::_parse_byte() -> byte_t
 {
     value_t value;
@@ -163,6 +175,14 @@ auto elpa_istream<System, SchemeT, AllocatorT>::_parse_elems( std::vector< std::
 		{
 			_is.putback( c );
 			tail = _alloc.new_Cell( _parse_byte(), tail );
+		}
+		else if( _readers.find( c ) != _readers.end() )
+		{
+		    tail =  _alloc.new_Cell( _parse_reader( c ), tail );
+		}
+		else if( _macros.find( c ) != _macros.end() )
+		{
+		    tail = _parse_macro( c );
 		}
 		else
 			throw Error<Syntax>( "Unexpected '"s + c + "'" );
@@ -281,6 +301,14 @@ auto elpa_istream<System, SchemeT, AllocatorT>::_parse() -> elem_t
     {
         _is.putback( c );
         return _parse_byte();
+    }
+    else if( _readers.find( c ) != _readers.end() )
+    {
+        return _parse_reader( c );
+    }
+    else if( _macros.find( c ) != _macros.end() )
+    {
+        return _parse_macro( c );
     }
     else
         throw Error<Syntax>( "Unexpected '"s + c + "'" );

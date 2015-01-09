@@ -8,6 +8,7 @@
 #include <ostream>
 #include <istream>
 #include <sstream>
+#include <functional>
 
 namespace elpa {
 
@@ -103,8 +104,8 @@ class elpa_istream
     using elpa_map = elpa::container::elpa_map<System, SchemeT, AllocatorT, K, V>;
 public:
 	typedef elpa_map<std::string,elem_t> Defns;
-	typedef std::map<char, auto (*)(Allocator&, std::istream&) -> elem_t> Readers;
-	typedef std::map<char, auto (*)(Allocator&, elem_t) -> elem_t> Macros;
+	typedef std::map<char, std::function< auto (Allocator&, std::istream&) -> elem_t> > Readers;
+	typedef std::map<char, std::function< auto (Allocator&, elem_t) -> elem_t> > Macros;
 private:
     std::istream& _is;
     Allocator& _alloc;
@@ -113,6 +114,8 @@ private:
     const Macros& _macros;
 
 	auto _parse_name() -> std::string;
+	auto _parse_reader( char c ) -> elem_t;
+	auto _parse_macro( char c ) -> elem_t;
     auto _parse_byte() -> byte_t;
 	auto _parse_elems( std::vector< std::string >& names ) -> elem_t;
 	auto _reverse_and_reduce( elem_t p, const std::vector< std::string >& names ) -> elem_t;

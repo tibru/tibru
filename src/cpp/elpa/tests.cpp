@@ -23,6 +23,7 @@ struct Tester
 
     typedef typename Env::Scheme::pcell_t pcell_t;
     typedef typename Env::Scheme::elem_t elem_t;
+    typedef typename Env::Scheme::byte_t byte_t;
 
     template<class T>
     using auto_root_ref = typename Allocator::template auto_root_ref<T>;
@@ -77,13 +78,22 @@ struct Tester
     	Allocator a( 1024 );
 
         Defns defns( a );
-        Readers readers;
+        Readers readers = { {'$', []( Allocator& a, std::istream& is ) -> elem_t {
+            byte_t l = 0;
+            char c;
+            while( is.get( c ) && isdigit(c) )
+                l++;
+            if( !isdigit(c) )
+                is.putback( c );
+            return l;
+        } } };
         Macros macros;
 
         auto parse = [&]( std::string s ) { return Tester::parse( a, s, defns, readers, macros ); };
         defns["x"] = parse( "0" );
         defns["y"] = parse( "[x 1 x]" );
         defns["z"] = parse( "[y 2 x]" );
+        defns["l"] = parse( "$123" );
 
         auto test_i = [&]( std::string in, std::string out )
         {
@@ -102,6 +112,7 @@ struct Tester
     	test_i( "y", "[0 1 0]" );
     	test_i( "z", "[[0 1 0] 2 0]" );
     	test_i( "[x y z]", "[0 [0 1 0] [0 1 0] 2 0]" );
+    	test_i( "[l $3456]", "[3 4]" );
     }
 
     static void test_io( const std::string& in, ElpaManip m=flat, std::string out="" )
