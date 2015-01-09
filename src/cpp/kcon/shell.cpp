@@ -38,7 +38,14 @@ auto KConShellManager<System, SchemeT, AllocatorT>::macros() -> const Macros&
 {
     static Macros macros = {
         { '\'', []( Allocator& alloc, elem_t tail ) -> elem_t {
-            return alloc.new_Cell( byte_t(0), tail );
+        	if( !tail.is_pcell() )
+        		throw Error<Syntax>( "Invalid application of '" );
+        		
+        	auto_root<elem_t> t( alloc, tail );
+            auto_root<elem_t> r( alloc );
+            r = alloc.new_Cell( byte_t(0), r );
+            r = alloc.new_Cell( t.pcell()->head(), r );
+            return alloc.new_Cell( r, t.pcell()->tail() );
         } },
         { '<', []( Allocator& alloc, elem_t tail ) -> elem_t {
 			auto_root<elem_t> t( alloc, tail );
