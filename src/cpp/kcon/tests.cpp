@@ -58,12 +58,22 @@ struct Tester
             fail( "Parsed integer larger that 32bits with #" );
         }
         catch( Error<Syntax> ) { pass(); }
+        
+        auto test_parse = [&]( const std::string& in, const std::string& out )
+        {
+            elem_t elem = parse( a, in );
 
-        std::cout << print( parse( a, "[1 2 < 3]" ) ) << std::endl;
-        std::cout << print( parse( a, "[1 2 3 <]" ) ) << std::endl;
-        std::cout << print( parse( a, "[1 2 3 < 4 5]" ) ) << std::endl;
-        std::cout << print( parse( a, "[[1 1] [2 2] [3 3] <]" ) ) << std::endl;
-        std::cout << print( parse( a, "1 <" ) ) << std::endl;
+            std::string found = print( elem );
+
+            test( found == out, "Parse failed for: '" + in + "'\nExpected: '" + out + "'\nFound:    '" + found + "'" );
+        };
+
+        test_parse( "[1 2 < 3]", "[2 1 3]" );
+        test_parse( "[1 2 3 <]", "[3 2 1]" );
+        test_parse( "[1 2 3 < 4 5]", "[3 2 1 4 5]" );
+        test_parse( "[[1 1] [2 2] [3 3] <]", "[[3 3] [2 2] 1 1]" );
+        test_parse( "1 <", "1" );
+        test_parse( "[[1 2 < 3] 2 [0 < 1] [10 20 <] <]", "[[20 10] [0 1] 2 2 1 3]" );
     }
 
     static void test_interpreter()

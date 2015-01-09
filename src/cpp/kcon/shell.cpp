@@ -37,20 +37,18 @@ template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT>
 auto KConShellManager<System, SchemeT, AllocatorT>::macros() -> const Macros&
 {
     static Macros macros = {
-        { '\'', []( Allocator& alloc, elem_t elem ) -> elem_t {
-            return alloc.new_Cell( byte_t(0), elem );
+        { '\'', []( Allocator& alloc, elem_t tail ) -> elem_t {
+            return alloc.new_Cell( byte_t(0), tail );
         } },
-        { '<', []( Allocator& alloc, elem_t elem ) -> elem_t {
-            elpa_ostream<System, SchemeT> os( std::cout );
-            os << "Tail: " << elem << std::endl;
-
+        { '<', []( Allocator& alloc, elem_t tail ) -> elem_t {
+			auto_root<elem_t> t( alloc, tail );
             auto_root<elem_t> r( alloc );
-            while( elem.is_pcell() )
+            while( t.is_pcell() )
             {
-                r = alloc.new_Cell( elem.pcell()->head(), r );
-                elem = elem.pcell()->tail();
+            	r = alloc.new_Cell( t.pcell()->head(), r );
+                t = t.pcell()->tail();
             }
-            return r;
+			return r;
         } },
     };
 
