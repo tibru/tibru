@@ -21,10 +21,11 @@ auto KConShellManager<System, SchemeT, AllocatorT>::readers() -> const Readers&
                 is.putback( c );
 
             auto_root<elem_t> n4( alloc );
-            n4 = alloc.new_Cell( byte_t((n >> 24) & 0xff), n4 );
-            n4 = alloc.new_Cell( byte_t((n >> 16) & 0xff), n4 );
-            n4 = alloc.new_Cell( byte_t((n >>  8) & 0xff), n4 );
             n4 = alloc.new_Cell( byte_t((n >>  0) & 0xff), n4 );
+            n4 = alloc.new_Cell( byte_t((n >>  8) & 0xff), n4 );
+            n4 = alloc.new_Cell( byte_t((n >> 16) & 0xff), n4 );
+            n4 = alloc.new_Cell( byte_t((n >> 24) & 0xff), n4 );
+
             return n4;
         } },
     };
@@ -64,5 +65,6 @@ auto KConShellManager<System, SchemeT, AllocatorT>::process_operator( char op, e
 
 #include "../elpa/runtime.h"
 template class KConShellManager<Debug, SimpleScheme, TestAllocator>;
+template class KConShellManager<Debug, SimpleScheme, SimpleAllocator>;
 template class KConShellManager<Safe, OptScheme, OptAllocator>;
 template class KConShellManager<Fast, OptScheme, OptAllocator>;

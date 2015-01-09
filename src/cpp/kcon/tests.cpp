@@ -1,5 +1,6 @@
 #include "tests.h"
 #include "interpreter.h"
+#include "shell.h"
 #include "../elpa/runtime.h"
 
 using namespace elpa;
@@ -16,6 +17,7 @@ struct Tester
     typedef typename elpa_istream::Readers Readers;
     typedef typename elpa_istream::Macros Macros;
     typedef typename Env::Interpreter Interpreter;
+    typedef typename Shell<Env>::ShellManager ShellManager;
 
     typedef typename Env::Scheme::elem_t elem_t;
 
@@ -33,8 +35,8 @@ struct Tester
     static auto parse( Allocator& allocator, const std::string& in ) -> auto_root_ref<elem_t>
     {
     	Defns defns( allocator );
-    	Readers readers;
-    	Macros macros;
+    	Readers readers = ShellManager::readers();
+    	Macros macros = ShellManager::macros();
     	return parse( allocator, in, defns, readers, macros );
     }
 
@@ -43,6 +45,20 @@ struct Tester
         std::ostringstream oss;
         elpa_ostream( oss ) << e;
         return oss.str();
+    }
+
+    static void test_parse()
+    {TEST
+        Allocator a( 1024 );
+        test( print( parse( a, "#1000" ) ) == "[232 3 0 0]", "Incorrect parse of #" );
+
+        try
+        {
+            parse( a, "#40000000000" );
+            fail( "Parsed integer larger that 32bits with #" );
+        }
+        catch( Error<Syntax> ) { pass(); }
+
     }
 
     static void test_interpreter()
@@ -82,6 +98,7 @@ struct Tester
     {
         std::cout << "TEST: " << TYPENAME( Env );
 
+        test_parse();
         test_interpreter();
 
         std::cout << "\n\n";

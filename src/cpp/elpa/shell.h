@@ -17,7 +17,7 @@ template<class Interpreter>
 struct ShellManager;
 
 template<class Env>
-class Shell
+struct Shell
 {
 	typedef typename Env::System System;
     typedef typename Env::Interpreter::ShellManager ShellManager;
@@ -29,7 +29,7 @@ class Shell
     typedef typename elpa_ostream::BaseManip BaseManip;
     template<class K, class V>
     using elpa_map = typename Env::template elpa_map<K, V>;
-
+private:
     ElpaManip _format;
     BaseManip _num_format;
     bool _line_format;
