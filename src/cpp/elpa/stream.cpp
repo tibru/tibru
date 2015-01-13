@@ -332,14 +332,15 @@ auto elpa_istream<System, SchemeT, AllocatorT>::_parse() -> elem_t
     	std::vector< std::string > names;
     	auto elems = _parse_elems( names, 0 );
 
-    	//elpa_ostream<System,SchemeT>( std::cout ) << _reverse_and_reduce( elems, names ) << std::endl;
-
     	return _reverse_and_reduce( elems, names );
     }
     else if( isdigit( c ) )
     {
         _is.putback( c );
-        return _parse_byte();
+    	std::vector< std::string > names;
+    	auto elems = _parse_elems( names, 0 );
+
+    	return _reverse_and_reduce( elems, names );
     }
     else if( _readers.find( c ) != _readers.end() )
     {

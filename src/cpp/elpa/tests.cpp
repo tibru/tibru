@@ -87,7 +87,10 @@ struct Tester
                 is.putback( c );
             return l;
         } } };
-        Macros macros;
+
+        Macros macros = { {'%', []( Allocator& a, elem_t tail ) -> elem_t {
+            return a.new_Cell( tail.pcell()->head(), tail );
+        } } };
 
         auto parse = [&]( std::string s ) { return Tester::parse( a, s, defns, readers, macros ); };
         defns["x"] = parse( "0" );
@@ -113,7 +116,11 @@ struct Tester
     	test_i( "z", "[[0 1 0] 2 0]" );
     	test_i( "[x y z]", "[0 [0 1 0] [0 1 0] 2 0]" );
     	test_i( "[l $3456]", "[3 4]" );
+    	test_i( "[4 [5 6] %]", "[4 [5 6] 5 6]" );
     	test_i( "y <dontparsethis>", "[0 1 0]" );
+
+    	try { test_i( "%", "" ); fail( "Used macro with no expression" ); }
+    	catch( Error<Syntax> e ) { test( e.message() == "Unexpected macro '%'", "Found: "s + e.message() ); }
     }
 
     static void test_io( const std::string& in, ElpaManip m=flat, std::string out="" )
