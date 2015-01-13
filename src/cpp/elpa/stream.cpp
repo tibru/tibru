@@ -203,6 +203,9 @@ auto elpa_istream<System, SchemeT, AllocatorT>::_parse_elems( std::vector< std::
 		}
 		else if( _macros.find( c ) != _macros.end() )
 		{
+		    if( tail.is_undef() )
+                throw Error<Syntax>( "Unexpected macro '"s + c + "'" );
+
 		    tail = _parse_macro( c, tail );
 		}
 		else
@@ -349,7 +352,11 @@ auto elpa_istream<System, SchemeT, AllocatorT>::_parse() -> elem_t
     }
     else if( _macros.find( c ) != _macros.end() )
     {
-        throw Error<Syntax>( "Unexpected macro '"s + c + "'" );
+        _is.putback( c );
+    	std::vector< std::string > names;
+    	auto elems = _parse_elems( names, 0 );
+
+    	return _reverse_and_reduce( elems, names );
     }
     else
         throw Error<Syntax>( "Unexpected '"s + c + "'" );
