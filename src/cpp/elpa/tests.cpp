@@ -161,7 +161,11 @@ struct Tester
         test_io( "[[[0 1] [2 3]] [[4 5] [6 7]]]", flat, "[[[0 1] 2 3] [4 5] 6 7]" );
         test_io( "[[[0 1] 2 3] [4 5] 6 7]", flat );
 
+        test_io_error<EOS>( "", "Unexpected end of input" );
         test_io_error<EOS>( "[", "Unexpected end of input" );
+        test_io_error<EOS>( "[45 ", "Unexpected end of input" );
+        test_io_error<EOS>( "[45 34", "Unexpected end of input" );
+        test_io_error<EOS>( "[45 [34", "Unexpected end of input" );
         test_io_error( "]", "Unexpected ']'" );
         test_io_error( "[0]", "Unexpected singleton" );
         test_io_error( "[[0] 2]", "Unexpected singleton" );

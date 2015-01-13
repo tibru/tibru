@@ -26,8 +26,11 @@ auto elpa_ostream<System, SchemeT>::operator<<( elem_t elem ) -> elpa_ostream&
 {
     if( elem.is_pcell() )
         return elpa_ostream::operator<<( elem.pcell() );
-    else
+    else if( elem.is_byte() )
         return elpa_ostream::operator<<( elem.byte() );
+
+    _os << "<undef>";
+    return *this;
 }
 
 //complicated but avoids recursion on c-stack
@@ -83,11 +86,25 @@ auto elpa_ostream<System, SchemeT>::_format( pcell_t pcell )
                 tail = Tail{ p->tail(), tail.len + 1 };
                 if( !_flatten ) _os << '[';
             }
-            else
+            else if( p->head().is_byte() && p->tail().is_byte() )
             {
                 _os << (short) p->head().byte() << ' ';
                 tail = Tail{ p->tail(), tail.len };
             }
+            else if( p->head().is_pcell() && p->tail().is_undef() )
+            {
+                tails.push( Tail{ p->tail(), tail.len } );
+
+                _os << '[';
+                tail = Tail{ p->head(), 0 };
+            }
+            else if( p->head().is_byte() && p->tail().is_undef() )
+            {
+                _os << (short) p->head().byte() << ' ';
+                tail = Tail{ p->tail(), tail.len };
+            }
+            else
+                System::assert( false, "Unhandled format type" );
         }
     }
 }
@@ -188,7 +205,20 @@ auto elpa_istream<System, SchemeT, AllocatorT>::_parse_elems( std::vector< std::
 			throw Error<Syntax>( "Unexpected '"s + c + "'" );
 	}
 
-	throw Error<Syntax,EOS>( "Unexpected end of input" );
+    //no input
+    if( tail.is_undef() )
+        throw Error<Syntax,EOS>( "Unexpected end of input" );
+
+    //singleton
+    if( tail->tail().is_undef() )
+        throw Error<Syntax,EOS>( "Unexpected end of input" );
+
+    //incomplete
+    if( tails.empty() )
+        throw Error<Syntax,EOS>( "Unexpected end of input" );
+
+    System::assert( false, "Failed to catch end of input" );
+    return elem_t();
 }
 
 template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT>
@@ -282,7 +312,7 @@ auto elpa_istream<System, SchemeT, AllocatorT>::_parse() -> elem_t
 {
 	char c;
 	if( !(_is >> c) )
-        throw Error<Syntax>( "Unexpected end of input" );
+        throw Error<Syntax,EOS>( "Unexpected end of input" );
 
     if( c == '[' )
     {

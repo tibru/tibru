@@ -32,6 +32,8 @@ public:
     }
 
     bool empty() const { return _items.is_undef(); }
+
+    elem_t items() const { return _items; }
 };
 
 template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT, class T>
