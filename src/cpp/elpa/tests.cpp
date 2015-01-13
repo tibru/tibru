@@ -254,7 +254,7 @@ struct Tester
 
         {
             //Test with minimal memory to create memory churn
-            for( auto n : valrange(1,11) )
+            for( auto n : valrange(1,13) )
             {
                 try
                 {
@@ -271,17 +271,24 @@ struct Tester
 
         {
             //Test with minimal memory to create memory churn
-            for( auto n : valrange(11,20) )
+            for( auto n : valrange(13,20) )
             {
-                Allocator a( n );
-                auto_root<elem_t> p( parse( a, "[0 [1 [2 3] 4] 5 6]" ) );
+                try
+                {
+                    Allocator a( n );
+                    auto_root<elem_t> p( parse( a, "[0 [1 [2 3] 4] 5 6]" ) );
 
-                test( a.gc_count() > 0, "GC failed to run during low memory parse" );
+                    test( a.gc_count() > 0, "GC failed to run during low memory parse" );
 
-                a.gc();
+                    a.gc();
 
-                test( print( p ) == "[0 [1 [2 3] 4] 5 6]", "Low memory parse tree tail altered by GC" );
-                test( a.num_allocated() == 6, "Failed to hold and cleanup all cells in GC" );
+                    test( print( p ) == "[0 [1 [2 3] 4] 5 6]", "Low memory parse tree tail altered by GC" );
+                    test( a.num_allocated() == 6, "Failed to hold and cleanup all cells in GC" );
+                }
+                catch( const Error<Runtime,OutOfMemory>& )
+                {
+                    fail( "Ran out of memory in minimal memory test, increase test threshold to fix the test" );
+                }
             }
         }
     }

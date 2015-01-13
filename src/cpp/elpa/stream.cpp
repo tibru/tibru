@@ -162,6 +162,9 @@ auto elpa_istream<System, SchemeT, AllocatorT>::_parse_elems( std::vector< std::
 	{
 		if( c == ']' )
 		{
+		    if( depth == 0 )
+                throw Error<Syntax>( "Unexpected ']'" );
+
 		    --depth;
 
 		    if( tail.is_undef() )
@@ -215,15 +218,9 @@ auto elpa_istream<System, SchemeT, AllocatorT>::_parse_elems( std::vector< std::
             break;
 	}
 
-    //no input
     if( tail.is_undef() )
         throw Error<Syntax,EOS>( "Unexpected end of input" );
 
-    //singleton
-    //if( tail->tail().is_undef() )
-    //    throw Error<Syntax,EOS>( "Unexpected end of input (singleton found)" );
-
-    //incomplete
     if( depth != 0 )
         throw Error<Syntax,EOS>( "Unexpected end of input (unclosed pair)" );
 
@@ -319,47 +316,10 @@ auto elpa_istream<System, SchemeT, AllocatorT>::_reverse_and_reduce( elem_t e, c
 template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT>
 auto elpa_istream<System, SchemeT, AllocatorT>::_parse() -> elem_t
 {
-	char c;
-	if( !(_is >> c) )
-        throw Error<Syntax,EOS>( "Unexpected end of input" );
+    std::vector< std::string > names;
+    auto elems = _parse_elems( names, 0 );
 
-    if( c == '[' )
-    {
-    	std::vector< std::string > names;
-    	auto elems = _parse_elems( names, 1 );
-        return _reverse_and_reduce( elems, names );
-    }
-    else if( isalpha( c ) )
-    {
-    	_is.putback( c );
-    	std::vector< std::string > names;
-    	auto elems = _parse_elems( names, 0 );
-
-    	return _reverse_and_reduce( elems, names );
-    }
-    else if( isdigit( c ) )
-    {
-        _is.putback( c );
-    	std::vector< std::string > names;
-    	auto elems = _parse_elems( names, 0 );
-
-    	return _reverse_and_reduce( elems, names );
-    }
-    else if( _readers.find( c ) != _readers.end() )
-    {
-        std::vector< std::string > names;
-        return _reverse_and_reduce( _parse_reader( c ), names );
-    }
-    else if( _macros.find( c ) != _macros.end() )
-    {
-        _is.putback( c );
-    	std::vector< std::string > names;
-    	auto elems = _parse_elems( names, 0 );
-
-    	return _reverse_and_reduce( elems, names );
-    }
-    else
-        throw Error<Syntax>( "Unexpected '"s + c + "'" );
+    return _reverse_and_reduce( elems, names );
 }
 
 template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT>
