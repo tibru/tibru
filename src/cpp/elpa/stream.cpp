@@ -152,7 +152,7 @@ auto elpa_istream<System, SchemeT, AllocatorT>::_parse_byte() -> byte_t
 }
 
 template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT>
-auto elpa_istream<System, SchemeT, AllocatorT>::_parse_elems( std::vector< std::string >& names ) -> elem_t
+auto elpa_istream<System, SchemeT, AllocatorT>::_parse_elems( std::vector< std::string >& names, size_t depth ) -> elem_t
 {
     auto_root<elem_t> tail( _alloc );
     elpa_stack<elem_t> tails( _alloc );
@@ -162,6 +162,8 @@ auto elpa_istream<System, SchemeT, AllocatorT>::_parse_elems( std::vector< std::
 	{
 		if( c == ']' )
 		{
+		    --depth;
+
 		    if( tail.is_undef() )
                 throw Error<Syntax>( "Unexpected empty cell" );
 
@@ -179,6 +181,8 @@ auto elpa_istream<System, SchemeT, AllocatorT>::_parse_elems( std::vector< std::
 		}
 		else if( c == '[' )
 		{
+		    ++depth;
+
 			tails.push( tail );
 			tail = elem_t();
 		}
@@ -203,6 +207,9 @@ auto elpa_istream<System, SchemeT, AllocatorT>::_parse_elems( std::vector< std::
 		}
 		else
 			throw Error<Syntax>( "Unexpected '"s + c + "'" );
+
+        if( depth == 0 )
+            break;
 	}
 
     //no input
@@ -210,15 +217,14 @@ auto elpa_istream<System, SchemeT, AllocatorT>::_parse_elems( std::vector< std::
         throw Error<Syntax,EOS>( "Unexpected end of input" );
 
     //singleton
-    if( tail->tail().is_undef() )
-        throw Error<Syntax,EOS>( "Unexpected end of input" );
+    //if( tail->tail().is_undef() )
+    //    throw Error<Syntax,EOS>( "Unexpected end of input (singleton found)" );
 
     //incomplete
-    if( tails.empty() )
-        throw Error<Syntax,EOS>( "Unexpected end of input" );
+    if( depth != 0 )
+        throw Error<Syntax,EOS>( "Unexpected end of input (unclosed pair)" );
 
-    System::assert( false, "Failed to catch end of input" );
-    return elem_t();
+    return tail;
 }
 
 template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT>
@@ -272,7 +278,7 @@ auto elpa_istream<System, SchemeT, AllocatorT>::_reverse_and_reduce( elem_t e, c
             	const std::string name = *pname++;
 
             	if( _defns.find( name ) == _defns.end() )
-       	     	throw Error<Syntax,Undef>( "Undefined reference to '"s + name + "'" );
+                    throw Error<Syntax,Undef>( "Undefined reference to '"s + name + "'" );
 
             	const elem_t head = _defns.at( name );
 
@@ -317,18 +323,18 @@ auto elpa_istream<System, SchemeT, AllocatorT>::_parse() -> elem_t
     if( c == '[' )
     {
     	std::vector< std::string > names;
-    	auto elems = _parse_elems( names );
+    	auto elems = _parse_elems( names, 1 );
         return _reverse_and_reduce( elems, names );
     }
     else if( isalpha( c ) )
     {
     	_is.putback( c );
-    	std::string name = _parse_name();
+    	std::vector< std::string > names;
+    	auto elems = _parse_elems( names, 0 );
 
-    	if( _defns.find( name ) == _defns.end() )
-    		throw Error<Syntax,Undef>( "Undefined reference to '"s + name + "'" );
+    	//elpa_ostream<System,SchemeT>( std::cout ) << _reverse_and_reduce( elems, names ) << std::endl;
 
-    	return _defns.at( name );
+    	return _reverse_and_reduce( elems, names );
     }
     else if( isdigit( c ) )
     {

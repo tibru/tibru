@@ -113,6 +113,7 @@ struct Tester
     	test_i( "z", "[[0 1 0] 2 0]" );
     	test_i( "[x y z]", "[0 [0 1 0] [0 1 0] 2 0]" );
     	test_i( "[l $3456]", "[3 4]" );
+    	test_i( "y <dontparsethis>", "[0 1 0]" );
     }
 
     static void test_io( const std::string& in, ElpaManip m=flat, std::string out="" )
@@ -160,12 +161,15 @@ struct Tester
         test_io( "[[[0 1] [2 3]] [[4 5] [6 7]]]", deep );
         test_io( "[[[0 1] [2 3]] [[4 5] [6 7]]]", flat, "[[[0 1] 2 3] [4 5] 6 7]" );
         test_io( "[[[0 1] 2 3] [4 5] 6 7]", flat );
+        test_io( "[0 1] <dontparsethis>", flat, "[0 1]" );
+        test_io( "0 <dontparsethis>", flat, "0" );
 
         test_io_error<EOS>( "", "Unexpected end of input" );
         test_io_error<EOS>( "[", "Unexpected end of input" );
-        test_io_error<EOS>( "[45 ", "Unexpected end of input" );
-        test_io_error<EOS>( "[45 34", "Unexpected end of input" );
-        test_io_error<EOS>( "[45 [34", "Unexpected end of input" );
+        test_io_error<EOS>( "[45 ", "Unexpected end of input (unclosed pair)" );
+        test_io_error<EOS>( "[45 34", "Unexpected end of input (unclosed pair)" );
+        test_io_error<EOS>( "[45 [34", "Unexpected end of input (unclosed pair)" );
+        test_io_error<Undef>( "ref", "Undefined reference to 'ref'" );
         test_io_error( "]", "Unexpected ']'" );
         test_io_error( "[0]", "Unexpected singleton" );
         test_io_error( "[[0] 2]", "Unexpected singleton" );
@@ -276,7 +280,7 @@ struct Tester
     }
 
     static void test_shell()
-    {
+    {TEST
     	Shell< Env > shell( 1024 );
 
     	test( shell.process( "" ).is_undef(), "Blank script doesn't process to undefined" );
@@ -287,7 +291,7 @@ struct Tester
 		test( print( shell.process( ":def t [1 2] \n"
 									"\t0 \n"
 									":gc\n"
-									":sys\n"	//check noisinesd
+									":sys\n"	//check noisiness
 									":def h it\n"
 									"[h t]" ) ) == "[0 1 2]", "Complex shell script failed" );
 
