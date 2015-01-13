@@ -81,6 +81,7 @@ public:
     static auto readers() -> const Readers& { static Readers readers; return readers; }
     static auto macros() -> const Macros& { static Macros macros; return macros; }
     static auto operators() -> const std::vector<char>& { static std::vector<char> ops; return ops; }
+    static void print_help( elpa_ostream<System,SchemeT>& eos ) {}
 
     auto process_operator( char op, elem_t elem ) -> elem_t { return elem; }
 };

@@ -83,26 +83,28 @@ auto Shell<Env>::_process_command( const std::string& cmd, elpa_istream& eis, el
     {
         if( noisy )
         {
-            std::cout << "Evaluate an expression of the form <name>|byte|[<expr> <expr>+] and define 'it' as its value\n";
-            std::cout << "Or process an operator on an expression of the form <op><expr> and define 'it' as its value\n";
-            std::cout << "Or run one of the following commands\n";
+            eos << "Evaluate an expression of the form <name>|byte|[<expr> <expr>+]|<reader><expr>|<expr><macro> and define 'it' as its value\n";
+            eos << "Or process an operator on an expression of the form <op><expr> and define 'it' as its value\n";
+            eos << "Or run one of the following commands\n";
 
-            std::cout << ":def <name> <expr> - Define a named expression\n";
-            std::cout << ":include <filename> - Silently include all statements in the specified file\n";
+            eos << ":def <name> <expr> - Define a named expression\n";
+            eos << ":include <filename> - Silently include all statements in the specified file\n";
 
-            std::cout << ":dec  - Show bytes in decimal notation (default)\n";
-            std::cout << ":hex  - Show bytes in hex notation\n";
-            std::cout << ":flat - Show cells as flattened right associative lists (default)\n";
-            std::cout << ":deep - Show cells as pairs\n";
-            std::cout << ":line - Show expressions on a single line (default)\n";
-            std::cout << ":list - Show expressions over multiple lines in list format\n";
-            std::cout << ":defs - Show all defined names\n";
-            std::cout << ":ops  - Show all available operations\n";
-            std::cout << ":sys  - Show information about the system\n";
-            std::cout << ":gc   - Run the garbage collector\n";
-            std::cout << ":help - Show this help\n";
-            std::cout << ":exit - End the shell session\n";
-            std::cout << ":quit - End the shell session\n";
+            eos << ":dec  - Show bytes in decimal notation (default)\n";
+            eos << ":hex  - Show bytes in hex notation\n";
+            eos << ":flat - Show cells as flattened right associative lists (default)\n";
+            eos << ":deep - Show cells as pairs\n";
+            eos << ":line - Show expressions on a single line (default)\n";
+            eos << ":list - Show expressions over multiple lines in list format\n";
+            eos << ":defs - Show all defined names\n";
+            eos << ":ops  - Show all available operations\n";
+            eos << ":sys  - Show information about the system\n";
+            eos << ":gc   - Run the garbage collector\n";
+            eos << ":help - Show this help\n";
+            eos << ":exit - End the shell session\n";
+            eos << ":quit - End the shell session\n";
+
+            _manager.print_help( eos );
         }
     }
     else

@@ -27,6 +27,7 @@ public:
     static auto readers() -> const Readers&;
     static auto macros() -> const Macros&;
     static auto operators() -> const std::vector<char>&;
+    static void print_help( elpa_ostream<System,SchemeT>& eos );
 
     auto process_operator( char op, elem_t elem ) -> elem_t;
 };
