@@ -155,7 +155,7 @@ auto endofline( elpa_istream<System, SchemeT, AllocatorT>& eis ) -> auto&
     char c;
     while( eis.get(c) && (c != '\n') )
     	if( !isspace( c ) )
-            throw Error<Syntax>( "Unexpected character after expression '"s + c + "'" );
+            throw Error<Syntax>( "Unexpected character '"s + c + "' after expression" );
 
     return eis;
 }

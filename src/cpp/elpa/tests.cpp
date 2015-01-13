@@ -78,19 +78,26 @@ struct Tester
     	Allocator a( 1024 );
 
         Defns defns( a );
-        Readers readers = { {'$', []( Allocator& a, std::istream& is ) -> elem_t {
-            byte_t l = 0;
-            char c;
-            while( is.get( c ) && isdigit(c) )
-                l++;
-            if( !isdigit(c) )
-                is.putback( c );
-            return l;
-        } } };
+        Readers readers = {
+            {'$', []( Allocator& a, std::istream& is ) -> elem_t {
+                byte_t l = 0;
+                char c;
+                while( is.get( c ) && isdigit(c) )
+                    l++;
+                if( !isdigit(c) )
+                    is.putback( c );
+                return l;
+            } }
+        };
 
-        Macros macros = { {'%', []( Allocator& a, elem_t tail ) -> elem_t {
-            return a.new_Cell( tail.pcell()->head(), tail );
-        } } };
+        Macros macros = {
+            {'%', []( Allocator& a, elem_t tail ) -> elem_t {
+                return a.new_Cell( tail.pcell()->head(), tail );
+            } },
+            {'+', []( Allocator& a, elem_t tail ) -> elem_t {
+                return a.new_Cell( tail.pcell()->head().byte() + 1, tail.pcell()->tail() );
+            } }
+        };
 
         auto parse = [&]( std::string s ) { return Tester::parse( a, s, defns, readers, macros ); };
         defns["x"] = parse( "0" );
@@ -117,6 +124,10 @@ struct Tester
     	test_i( "[x y z]", "[0 [0 1 0] [0 1 0] 2 0]" );
     	test_i( "[l $3456]", "[3 4]" );
     	test_i( "[4 [5 6] %]", "[4 [5 6] 5 6]" );
+    	test_i( "[4 4 +]", "[4 5]" );
+    	test_i( "[4 4+]", "[4 5]" );
+    	test_i( "4 +", "5" );
+    	test_i( "4++", "6" );
     	test_i( "y <dontparsethis>", "[0 1 0]" );
 
     	try { test_i( "%", "" ); fail( "Used macro with no expression" ); }

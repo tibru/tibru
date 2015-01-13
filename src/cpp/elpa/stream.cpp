@@ -165,22 +165,26 @@ auto elpa_istream<System, SchemeT, AllocatorT>::_parse_elems( std::vector< std::
 		    if( depth == 0 )
                 throw Error<Syntax>( "Unexpected ']'" );
 
-		    --depth;
-
 		    if( tail.is_undef() )
                 throw Error<Syntax>( "Unexpected empty cell" );
 
 		    if( tail->tail().is_undef() )
                 throw Error<Syntax>( "Unexpected singleton" );
 
-			if( tails.empty() )
-				return tail;
+			if( !tails.empty() )
+			{
+                elem_t elems = tail;
 
-			elem_t elems = tail;
+                tail = tails.top();
+                tails.pop();
+                tail = _alloc.new_Cell( elems, tail );
+			}
+			else
+			{
+			    System::assert( depth == 1, "No tails but depth about to end" );
+			}
 
-			tail = tails.top();
-			tails.pop();
-			tail = _alloc.new_Cell( elems, tail );
+		    --depth;
 		}
 		else if( c == '[' )
 		{
@@ -215,7 +219,25 @@ auto elpa_istream<System, SchemeT, AllocatorT>::_parse_elems( std::vector< std::
 			throw Error<Syntax>( "Unexpected '"s + c + "'" );
 
         if( depth == 0 )
-            break;
+        {
+            //trailing macro
+            while( true )
+            {
+                char c = '\0';
+                while( _is.get( c ) && isspace( c ) && (c != '\n') )
+                    ;
+
+                if( _macros.find( c ) == _macros.end() )
+                {
+                    if( _is )
+                        _is.putback( c );
+
+                    return tail;
+                }
+
+                tail = _parse_macro( c, tail );
+            }
+        }
 	}
 
     if( tail.is_undef() )
