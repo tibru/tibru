@@ -4,28 +4,28 @@ using namespace kcon;
 using namespace elpa;
 
 template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT>
-auto KConInterpreter<System, SchemeT, AllocatorT>::constant( elem_t elem ) -> elem_t
+auto KConInterpreter<System, SchemeT, AllocatorT>::constant( elem_t elem, elem_t state ) -> elem_t
 {
     return elem;
 }
 
 template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT>
-auto KConInterpreter<System, SchemeT, AllocatorT>::select( elem_t elem ) -> elem_t
+auto KConInterpreter<System, SchemeT, AllocatorT>::select( elem_t elem, elem_t state ) -> elem_t
 {
     System::check( elem.is_pcell(), "/ operates only on pairs" );
-    return elem;
+    return state;
 }
 
 template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT>
-auto KConInterpreter<System, SchemeT, AllocatorT>::reduce( elem_t elem ) -> elem_t
+auto KConInterpreter<System, SchemeT, AllocatorT>::reduce( elem_t elem, elem_t state ) -> elem_t
 {
     System::check( elem.is_pcell(), "@ operates only on pairs" );
     System::check( elem.pcell()->head().is_byte(), "@ requires head element to be 0 or 1" );
     byte_t code = elem.pcell()->head().byte();
     if( code == 0 )
-        return constant( elem.pcell()->tail() );
+        return constant( elem.pcell()->tail(), state );
     else if( code == 1 )
-        return select( elem.pcell()->tail() );
+        return select( elem.pcell()->tail(), state );
     else
         System::check( false, "@ requires head element to be 0 or 1" );
 
@@ -33,13 +33,13 @@ auto KConInterpreter<System, SchemeT, AllocatorT>::reduce( elem_t elem ) -> elem
 }
 
 template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT>
-auto KConInterpreter<System, SchemeT, AllocatorT>::execute( elem_t arg ) -> elem_t
+auto KConInterpreter<System, SchemeT, AllocatorT>::execute( elem_t state ) -> elem_t
 {
-    System::assert( arg.is_def(), "Undefined argument passed to exec" );
+    System::assert( state.is_def(), "Undefined state passed to execute" );
 
-    System::check( arg.is_pcell(), "Illegal byte argument for !" );
+    System::check( state.is_pcell(), "Illegal byte state for !" );
 
-    return arg;
+    return state;
 }
 
 #include "../elpa/runtime.h"

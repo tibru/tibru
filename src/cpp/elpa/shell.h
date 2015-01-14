@@ -28,15 +28,12 @@ struct Shell
     typedef typename elpa_ostream::Manip Manip;
     typedef typename elpa_ostream::BaseManip BaseManip;
     typedef std::vector< std::pair<char,std::string> > Operators;
-    template<class K, class V>
-    using elpa_map = typename Env::template elpa_map<K, V>;
 private:
     ElpaManip _format;
     BaseManip _num_format;
     bool _line_format;
 
     ShellManager _manager;
-    elpa_map<std::string, elem_t> _defns;   //put in manager?
     std::set<std::string> _processing;
 
     auto _process_command( const std::string& cmd, elpa_istream& eis, elpa_ostream& eos, bool noisy ) -> bool;
@@ -45,7 +42,7 @@ public:
     struct MoreToRead {};
 
     Shell( size_t ncells )
-        : _format( flat ), _num_format( std::dec ), _line_format( true ), _manager( ncells ), _defns( _manager.interpreter().allocator() ) {}
+        : _format( flat ), _num_format( std::dec ), _line_format( true ), _manager( ncells ) {}
 
     void interactive( std::istream& in, std::ostream& out );
 	auto process( std::istream& in ) -> elem_t;
@@ -57,14 +54,27 @@ template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT,
 class ShellManagerBase
 {
 protected:
+    typedef SchemeT<System> Scheme;
     typedef InterpreterT<System,SchemeT,AllocatorT> Interpreter;
+    typedef typename Scheme::elem_t elem_t;
+
+    template<class K, class V>
+    using elpa_map = container::elpa_map<System, SchemeT, AllocatorT, K, V>;
 
     Interpreter _interpreter;
+    elpa_map<std::string, elem_t> _defns;
 
     ShellManagerBase( size_t ncells )
-        : _interpreter( ncells ) {}
+        : _interpreter( ncells ), _defns( _interpreter.allocator() )
+    {
+        _defns["it"] = elem_t();
+    }
 public:
     Interpreter& interpreter() { return _interpreter; }
+
+    auto def( const std::string& name ) const -> elem_t { return _defns.at(name); }
+    void def( const std::string& name, elem_t elem ) { _defns[name] = elem; }
+    auto defs() const -> const auto& { return _defns; }
 };
 
 template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT>
