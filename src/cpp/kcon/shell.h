@@ -10,17 +10,15 @@ namespace kcon
 template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT>
 class KConShellManager : public elpa::ShellManagerBase<System, SchemeT, AllocatorT, KConInterpreter>
 {
+public:
     typedef SchemeT<System> Scheme;
     typedef AllocatorT<System, SchemeT> Allocator;
     typedef typename elpa_istream<System, SchemeT, AllocatorT>::Readers Readers;
     typedef typename elpa_istream<System, SchemeT, AllocatorT>::Macros Macros;
     typedef std::vector< std::pair<char,std::string> > Operators;
-    typedef typename Scheme::byte_t byte_t;
     typedef typename Scheme::elem_t elem_t;
+    typedef typename Scheme::byte_t byte_t;
 
-    auto _constant( elem_t elem ) -> elem_t;
-    auto _select( elem_t elem ) -> elem_t;
-public:
     template<class T>
     using auto_root = typename Allocator::template auto_root<T>;
 

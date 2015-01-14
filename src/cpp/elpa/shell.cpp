@@ -255,5 +255,6 @@ template class Shell< Env<Debug, SimpleScheme, SimpleAllocator, NullInterpreter>
 #include "../kcon/interpreter.h"
 #include "../kcon/shell.h"
 template class Shell< Env<Debug, SimpleScheme, TestAllocator, kcon::KConInterpreter> >;
+template class Shell< Env<Debug, SimpleScheme, SimpleAllocator, kcon::KConInterpreter> >;
 template class Shell< Env<Safe, OptScheme, OptAllocator, kcon::KConInterpreter> >;
 template class Shell< Env<Fast, OptScheme, OptAllocator, kcon::KConInterpreter> >;

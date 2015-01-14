@@ -58,7 +58,7 @@ struct Tester
             fail( "Parsed integer larger that 32bits with #" );
         }
         catch( Error<Syntax> ) { pass(); }
-        
+
         auto test_parse = [&]( const std::string& in, const std::string& out )
         {
             elem_t elem = parse( a, in );
@@ -74,41 +74,37 @@ struct Tester
         test_parse( "[[1 1] [2 2] [3 3] <]", "[[3 3] [2 2] 1 1]" );
         test_parse( "1 <", "1" );
         test_parse( "[[1 2 < 3] 2 [0 < 1] [10 20 <] <]", "[[20 10] [0 1] 2 2 1 3]" );
-        
+
         test_parse( "[1'' 9]", "[[0 0 1] 9]" );
     }
 
-    static void test_interpreter()
+    static void test_operators()
     {TEST
-        Interpreter interpreter( 1024 );
+        Shell< Env > shell( 1024 );
 
-        auto test_op = [&]( char op, const std::string& in, const std::string& out )
+        auto test_op = [&]( const std::string& in, const std::string& out )
         {
-            elem_t elem = parse( interpreter.allocator(), in );
+            std::string found = print( shell.process( in ) );
 
-            std::string found = print( interpreter.process_operator( op, elem ) );
-
-            test( found == out, "Op "s + op + " failed for: '" + in + "'\nExpected: '" + out + "'\nFound:    '" + found + "'" );
+            test( found == out, "Op failed for: '" + in + "'\nExpected: '" + out + "'\nFound:    '" + found + "'" );
         };
 
-        auto test_op_illegal = [&]( char op, const std::string& in, const std::string& msg )
+        auto test_op_illegal = [&]( const std::string& in, const std::string& msg )
         {
-            elem_t elem = parse( interpreter.allocator(), in );
-
             try
             {
-                std::string found = print( interpreter.process_operator( op, elem ) );
-                fail( "Op "s + op + " failed for: '" + in + "'\nExpected error: '" + msg + "'\nFound:    '" + found + "'" );
+                std::string found = print( shell.process( in ) );
+                fail( "Op failed for: '" + in + "'\nExpected error: '" + msg + "'\nFound:    '" + found + "'" );
             }
             catch( const Error<IllegalOp>& e )
             {
-                test( e.message() == msg, "Op "s + op + " failed for: '" + in + "'\nExpected error: '" + msg + "'\nFound:          '" + e.message() + "'" );
+                test( e.message() == msg, "Op failed for: '" + in + "'\nExpected error: '" + msg + "'\nFound:          '" + e.message() + "'" );
                 pass();
             }
         };
 
-        test_op_illegal( '!', "21", "Illegal byte argument for !" );
-        test_op( '!', "[0 21]", "[0 21]" );
+        test_op_illegal( "@21", "@ operates only on pairs" );
+        test_op( ".[0 21]", "[0 21]" );
     }
 
     static void run_tests()
@@ -116,7 +112,7 @@ struct Tester
         std::cout << "TEST: " << TYPENAME( Env );
 
         test_parse();
-        test_interpreter();
+        test_operators();
 
         std::cout << "\n\n";
     }

@@ -88,41 +88,18 @@ void KConShellManager<System, SchemeT, AllocatorT>::print_help( elpa_ostream<Sys
 }
 
 template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT>
-auto KConShellManager<System, SchemeT, AllocatorT>::_constant( elem_t elem ) -> elem_t
-{
-    return elem;
-}
-
-template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT>
-auto KConShellManager<System, SchemeT, AllocatorT>::_select( elem_t elem ) -> elem_t
-{
-    System::check( elem.is_pcell(), "/ operates only on pairs" );
-    return elem;
-}
-
-template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT>
 auto KConShellManager<System, SchemeT, AllocatorT>::process_operator( char op, elem_t elem ) -> elem_t
 {
     if( op == '.' )
     {
-        return _constant( elem );
+        return this->_interpreter.constant( elem );
     }
     else if( op == '@' )
     {
-        System::check( elem.is_pcell(), "@ operates only on pairs" );
-        System::check( elem.pcell()->head().is_byte(), "@ requires head element to be 0 or 1" );
-        byte_t code = elem.pcell()->head().byte();
-        if( code == 0 )
-            return _constant( elem.pcell()->tail() );
-        else if( code == 1 )
-            return _select( elem.pcell()->tail() );
-        else
-            System::check( false, "@ requires head element to be 0 or 1" );
+        return this->_interpreter.reduce( elem );
     }
-    else
-        throw Error<Syntax>( "Unrecognised operator '"s + op + "'" );
 
-    return elem_t();
+    throw Error<Syntax>( "Unrecognised operator '"s + op + "'" );
 }
 
 #include "../elpa/runtime.h"
