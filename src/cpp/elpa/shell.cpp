@@ -202,6 +202,11 @@ void Shell<Env>::interactive( std::istream& in, std::ostream& out )
             out << "Syntax: " << e.message() << std::endl;
             out << "Run :help for more details" << std::endl;
         }
+        catch( const Error<IllegalOp>& e )
+        {
+            out << "IllegalOp: " << e.message() << std::endl;
+            out << "Run :help for more details" << std::endl;
+        }
         catch( const Error<Command>& e )
         {
             out << "Command: " << e.message() << std::endl;
