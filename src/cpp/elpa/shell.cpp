@@ -49,15 +49,6 @@ auto Shell<Env>::_process_command( const std::string& cmd, elpa_istream& eis, el
     		for( auto defn : _defns )
     			eos << defn.first << std::endl;
     }
-    else if( cmd == "ops" )
-    {
-    	if( noisy )
-        {
-    		for( auto op : _manager.operators() )
-    			eos << op;
-            eos << std::endl;
-        }
-    }
     else if( cmd == "sys" )
     {
     	if( noisy )
@@ -85,8 +76,9 @@ auto Shell<Env>::_process_command( const std::string& cmd, elpa_istream& eis, el
         {
             eos << "Evaluate an expression of the form <name>|byte|[<expr> <expr>+]|<reader><expr>|<expr><macro> and define 'it' as its value\n";
             eos << "Or process an operator on an expression of the form <op><expr> and define 'it' as its value\n";
-            eos << "Or run one of the following commands\n";
+            eos << "Or run a command\n";
 
+            eos << "\nCommands:\n";
             eos << ":def <name> <expr> - Define a named expression\n";
             eos << ":include <filename> - Silently include all statements in the specified file\n";
 
@@ -97,12 +89,15 @@ auto Shell<Env>::_process_command( const std::string& cmd, elpa_istream& eis, el
             eos << ":line - Show expressions on a single line (default)\n";
             eos << ":list - Show expressions over multiple lines in list format\n";
             eos << ":defs - Show all defined names\n";
-            eos << ":ops  - Show all available operations\n";
             eos << ":sys  - Show information about the system\n";
             eos << ":gc   - Run the garbage collector\n";
             eos << ":help - Show this help\n";
             eos << ":exit - End the shell session\n";
             eos << ":quit - End the shell session\n";
+
+            eos << "\nOperators:\n";
+    		for( auto op : _manager.operators() )
+    			eos << op.first << " - " << op.second << std::endl;
 
             _manager.print_help( eos );
         }
@@ -131,8 +126,8 @@ auto Shell<Env>::_process_input( std::istream& is, elpa_ostream& eos, bool noisy
         }
         else
         {
-            const std::vector<char> ops = _manager.operators();
-            if( std::find( ops.begin(), ops.end(), c ) == ops.end() )
+            const Operators& ops = _manager.operators();
+            if( std::find_if( ops.begin(), ops.end(), [c]( const Operators::value_type& v ){ return v.first == c; } ) == ops.end() )
             {
                 eis.putback( c );
                 c = '\0';

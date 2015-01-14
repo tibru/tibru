@@ -27,6 +27,7 @@ struct Shell
     typedef typename elpa_ostream::ElpaManip ElpaManip;
     typedef typename elpa_ostream::Manip Manip;
     typedef typename elpa_ostream::BaseManip BaseManip;
+    typedef std::vector< std::pair<char,std::string> > Operators;
     template<class K, class V>
     using elpa_map = typename Env::template elpa_map<K, V>;
 private:
@@ -73,6 +74,7 @@ public:
     typedef SchemeT<System> Scheme;
     typedef typename elpa_istream<System, SchemeT, AllocatorT>::Readers Readers;
     typedef typename elpa_istream<System, SchemeT, AllocatorT>::Macros Macros;
+    typedef std::vector< std::pair<char,std::string> > Operators;
     typedef typename Scheme::elem_t elem_t;
 
     NullShellManager( size_t ncells )
@@ -80,7 +82,7 @@ public:
 
     static auto readers() -> const Readers& { static Readers readers; return readers; }
     static auto macros() -> const Macros& { static Macros macros; return macros; }
-    static auto operators() -> const std::vector<char>& { static std::vector<char> ops; return ops; }
+    static auto operators() -> const Operators& { static const Operators ops; return ops; }
     static void print_help( elpa_ostream<System,SchemeT>& eos ) {}
 
     auto process_operator( char op, elem_t elem ) -> elem_t { return elem; }

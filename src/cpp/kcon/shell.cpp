@@ -63,19 +63,26 @@ auto KConShellManager<System, SchemeT, AllocatorT>::macros() -> const Macros&
 }
 
 template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT>
-auto KConShellManager<System, SchemeT, AllocatorT>::operators() -> const std::vector<char>&
+auto KConShellManager<System, SchemeT, AllocatorT>::operators() -> const Operators&
 {
-    static std::vector<char> ops = {'!'};
+    static const Operators ops = {
+        {'!', "Execute"},
+        {'*', "Evaluate"},
+        {'@', "Reduce"},
+        {'/', "Select"},
+        {'?', "If"},
+        {'.', "Constant"},
+    };
     return ops;
 }
 
 template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT>
 void KConShellManager<System, SchemeT, AllocatorT>::print_help( elpa_ostream<System,SchemeT>& eos )
 {
-    eos << "\nReaders\n";
+    eos << "\nReaders:\n";
     eos << "# - Convert unsigned integer into [b1 b2 b3 b3] format e.g. #1000 -> [232 3 0 0]\n";
 
-    eos << "\nMacros\n";
+    eos << "\nMacros:\n";
     eos << "' - Convert <expr> into [0 <expr>] e.g. 3' -> [0 3]\n";
     eos << "< - Reverse preceeding list elements e.g. [1 2 3 < 4 5] -> [3 2 1 < 4 5]\n";
 }

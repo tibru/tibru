@@ -15,6 +15,7 @@ public:
     typedef AllocatorT<System, SchemeT> Allocator;
     typedef typename elpa_istream<System, SchemeT, AllocatorT>::Readers Readers;
     typedef typename elpa_istream<System, SchemeT, AllocatorT>::Macros Macros;
+    typedef std::vector< std::pair<char,std::string> > Operators;
     typedef typename Scheme::elem_t elem_t;
     typedef typename Scheme::byte_t byte_t;
 
@@ -26,7 +27,7 @@ public:
 
     static auto readers() -> const Readers&;
     static auto macros() -> const Macros&;
-    static auto operators() -> const std::vector<char>&;
+    static auto operators() -> const Operators&;
     static void print_help( elpa_ostream<System,SchemeT>& eos );
 
     auto process_operator( char op, elem_t elem ) -> elem_t;
