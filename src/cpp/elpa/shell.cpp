@@ -75,7 +75,7 @@ auto Shell<Env>::_process_command( const std::string& cmd, elpa_istream& eis, el
         if( noisy )
         {
             eos << "Evaluate an expression of the form <name>|byte|[<expr> <expr>+]|<reader><expr>|<expr><macro> and define 'it' as its value\n";
-            eos << "Or process an operator on an expression of the form <op><expr> and define 'it' as its value\n";
+            eos << "Or process an operator on an expression of the form <op><expr> where 'it' is the current state and define 'it' as its value\n";
             eos << "Or run a command\n";
 
             eos << "\nCommands:\n";
