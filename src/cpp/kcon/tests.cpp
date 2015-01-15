@@ -82,33 +82,23 @@ struct Tester
     {TEST
         Shell< Env > shell( 1024 );
 
-        auto test_op = [&]( std::vector<std::string> in, const std::string& out )
+        auto test_op = [&]( const std::string& in, const std::string& out )
         {
-            if( in.size() < 2 )
-                in.push_back( "0" );
+            std::string found = print( shell.process( in ) );
 
-            shell.process( in[1] );
-
-            std::string found = print( shell.process( in[0] ) );
-
-            test( found == out, "Op failed for: '" + in[0] + " on " + in[1] + "'\nExpected: '" + out + "'\nFound:    '" + found + "'" );
+            test( found == out, "Op failed for: '" + in + "'\nExpected: '" + out + "'\nFound:    '" + found + "'" );
         };
 
-        auto test_op_illegal = [&]( std::vector<std::string> in, const std::string& msg )
+        auto test_op_illegal = [&]( const std::string& in, const std::string& msg )
         {
             try
             {
-                if( in.size() < 2 )
-                    in.push_back( "0" );
-
-                shell.process( in[1] );
-
-                std::string found = print( shell.process( in[0] ) );
-                fail( "Op failed for: '" + in[0] + " on " + in[1] +"'\nExpected error: '" + msg + "'\nFound:    '" + found + "'" );
+                std::string found = print( shell.process( in ) );
+                fail( "Op failed for: '" + in + "'\nExpected error: '" + msg + "'\nFound:    '" + found + "'" );
             }
             catch( const Error<IllegalOp>& e )
             {
-                test( e.message() == msg, "Op failed for: '" + in[0] + " on " + in[1] +"'\nExpected error: '" + msg + "'\nFound:          '" + e.message() + "'" );
+                test( e.message() == msg, "Op failed for: '" + in +" '\nExpected error: '" + msg + "'\nFound:          '" + e.message() + "'" );
                 pass();
             }
         };
@@ -117,16 +107,16 @@ struct Tester
         shell.process( ":def select 1" );
 
         //Constant
-        test_op( {".[0 21]"}, "[0 21]" );
+        test_op( ".[0 21]", "[0 21]" );
 
         //Select
-        test_op( {"/[[1 0] 0]","[1 2 3]"}, "[1 2 3]");
+        test_op( "/[[1 0] 0]", "[[1 0] 0]");
 
         //Reduce
-        test_op_illegal( {"@21"}, "@ operates only on pairs" );
-        test_op_illegal( {"@[2 3]"}, "@ requires head element to be 0 or 1" );
-        test_op( {"@[const 21]"}, "21" );
-        test_op( {"@[select #1 0]","[1 2 3]"}, "[1 2 3]" );
+        test_op_illegal( "@21", "@ operates only on pairs" );
+        test_op_illegal( "@[2 3]", "@ requires head element to be 0 or 1" );
+        test_op( "@[const 21]", "21" );
+        test_op( "@[select #1 0]", "[[1 0 0 0] 0]" );
     }
 
     static void run_tests()

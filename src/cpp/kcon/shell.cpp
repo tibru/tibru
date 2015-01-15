@@ -92,15 +92,15 @@ auto KConShellManager<System, SchemeT, AllocatorT>::process_operator( char op, e
 {
     if( op == '.' )
     {
-        return this->_interpreter.constant( elem, this->def("it") );
+        return this->_interpreter.constant( elem );
     }
     else if( op == '/' )
     {
-        return this->_interpreter.select( elem, this->def("it") );
+        return this->_interpreter.select( elem );
     }
     else if( op == '@' )
     {
-        return this->_interpreter.reduce( elem, this->def("it") );
+        return this->_interpreter.reduce( elem  );
     }
 
     throw Error<Syntax>( "Unrecognised operator '"s + op + "'" );

@@ -23,9 +23,9 @@ public:
 
     typedef KConShellManager<System, SchemeT, AllocatorT> ShellManager;
 
-    auto constant( elem_t elem, elem_t state ) -> elem_t;
-    auto select( elem_t elem, elem_t state ) -> elem_t;
-    auto reduce( elem_t elem, elem_t state ) -> elem_t;
+    auto constant( elem_t elem ) -> elem_t;
+    auto select( elem_t elem ) -> elem_t;
+    auto reduce( elem_t elem ) -> elem_t;
     auto execute( elem_t state ) -> elem_t;
 };
 

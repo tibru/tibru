@@ -16,7 +16,7 @@ auto Shell<Env>::_process_command( const std::string& cmd, elpa_istream& eis, el
     	std::string name;
     	elem_t elem;
     	eis >> name >> elem >> endofline;
-    	_manager.def( name, elem );
+    	_defns[name] = elem;
     	return true;
     }
     else if( cmd == "include" )
@@ -46,7 +46,7 @@ auto Shell<Env>::_process_command( const std::string& cmd, elpa_istream& eis, el
     else if( cmd == "defs" )
     {
     	if( noisy )
-    		for( auto defn : _manager.defs() )
+    		for( auto defn : _defns )
     			eos << defn.first << std::endl;
     }
     else if( cmd == "sys" )
@@ -111,7 +111,7 @@ auto Shell<Env>::_process_command( const std::string& cmd, elpa_istream& eis, el
 template<class Env>
 auto Shell<Env>::_process_input( std::istream& is, elpa_ostream& eos, bool noisy ) -> bool
 {
-    elpa_istream eis( is, _manager.interpreter().allocator(), _manager.defs(), _manager.readers(), _manager.macros() );
+    elpa_istream eis( is, _manager.interpreter().allocator(), _defns, _manager.readers(), _manager.macros() );
 
     char c;
     if( eis >> c )
@@ -141,7 +141,7 @@ auto Shell<Env>::_process_input( std::istream& is, elpa_ostream& eos, bool noisy
                 if( c != '\0' )
                     elem = _manager.process_operator( c, elem );
 
-                _manager.def( "it", elem );
+                _defns["it"] = elem;
 
                 if( noisy )
             	{
@@ -224,7 +224,7 @@ auto Shell<Env>::process( std::istream& in ) -> elem_t
 	while( in )
 		_process_input( in, eos, false );
 	System::assert( oss.str() == "", "Processing produced output" );
-	return _manager.defs().find("it") != _manager.defs().end() ? _manager.def("it") : elem_t();
+	return _defns.find("it") != _defns.end() ? _defns["it"] : elem_t();
 }
 
 template<class Env>

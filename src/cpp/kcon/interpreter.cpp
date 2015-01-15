@@ -4,28 +4,28 @@ using namespace kcon;
 using namespace elpa;
 
 template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT>
-auto KConInterpreter<System, SchemeT, AllocatorT>::constant( elem_t elem, elem_t state ) -> elem_t
+auto KConInterpreter<System, SchemeT, AllocatorT>::constant( elem_t elem ) -> elem_t
 {
     return elem;
 }
 
 template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT>
-auto KConInterpreter<System, SchemeT, AllocatorT>::select( elem_t elem, elem_t state ) -> elem_t
+auto KConInterpreter<System, SchemeT, AllocatorT>::select( elem_t elem ) -> elem_t
 {
     System::check( elem.is_pcell(), "/ operates only on pairs" );
-    return state;
+    return elem;
 }
 
 template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT>
-auto KConInterpreter<System, SchemeT, AllocatorT>::reduce( elem_t elem, elem_t state ) -> elem_t
+auto KConInterpreter<System, SchemeT, AllocatorT>::reduce( elem_t elem ) -> elem_t
 {
     System::check( elem.is_pcell(), "@ operates only on pairs" );
     System::check( elem.pcell()->head().is_byte(), "@ requires head element to be 0 or 1" );
     byte_t code = elem.pcell()->head().byte();
     if( code == 0 )
-        return constant( elem.pcell()->tail(), state );
+        return constant( elem.pcell()->tail() );
     else if( code == 1 )
-        return select( elem.pcell()->tail(), state );
+        return select( elem.pcell()->tail() );
     else
         System::check( false, "@ requires head element to be 0 or 1" );
 
