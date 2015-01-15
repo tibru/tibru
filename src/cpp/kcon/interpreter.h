@@ -13,11 +13,13 @@ class KConShellManager;
 template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT>
 class KConInterpreter : public InterpreterBase<System, SchemeT, AllocatorT>
 {
-public:
     typedef SchemeT<System> Scheme;
-    typedef typename Scheme::elem_t elem_t;
+    typedef typename Scheme::pcell_t pcell_t;
     typedef typename Scheme::byte_t byte_t;
+    typedef typename Scheme::elem_t elem_t;
 
+    auto _select( pcell_t path, elem_t target ) -> elem_t;
+public:
     KConInterpreter( size_t ncells )
         : InterpreterBase<System, SchemeT, AllocatorT>( ncells ) {}
 

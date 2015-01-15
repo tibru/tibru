@@ -103,6 +103,7 @@ struct Tester
             }
         };
 
+        shell.process( ":def nil 0" );
         shell.process( ":def const 0" );
         shell.process( ":def select 1" );
 
@@ -110,13 +111,25 @@ struct Tester
         test_op( ".[0 21]", "[0 21]" );
 
         //Select
-        test_op( "/[[1 0] 0]", "[[1 0] 0]");
+        test_op( "/[[1 2 3] [0 0] 0]", "[1 2 3]");
+        test_op( "/[[1 2 3] [1 0] 0]", "[2 3]");
+        test_op( "/[[1 2 3] [0 0] 1]", "1");
+        test_op( "/[[1 2 3 4 5] #2 0]", "[3 4 5]");
+        test_op( "/[[1 2 3 4 5] #2 1]", "3");
+        test_op( "/[[1 2 3 4 5] #1 0 #1 0]", "[3 4 5]");
+        test_op( "/[[1 2 3 4 5] #1 0 #2 0]", "[4 5]");
+        test_op( "/[[[[1 2] [3 4]] [[5 6] [7 8]]] #1 1]", "[5 6]");
+        test_op( "/[[[[1 2] [3 4]] [[5 6] [7 8]]] #1 1 #1 0]", "6");
+        test_op( "/[[[0 1 2 3 nil] [1 2 3 4 nil] [2 3 4 5 nil] nil] #1 1 #2 1]", "3");
+        test_op( "/[[[0 1 2 3 nil] [1 2 3 4 nil] [2 3 4 5 nil] nil] #1 1 #3 1]", "4");
+        test_op( "/[[[0 1 2 3 nil] [1 2 3 4 nil] [2 3 4 5 nil] nil] #2 1 #2 1]", "4");
+        test_op( "/[[[0 1 2 3 nil] [1 2 3 4 nil] [2 3 4 5 nil] nil] #0 1 #0 1]", "0");
 
         //Reduce
         test_op_illegal( "@21", "@ operates only on pairs" );
         test_op_illegal( "@[2 3]", "@ requires head element to be 0 or 1" );
         test_op( "@[const 21]", "21" );
-        test_op( "@[select #1 0]", "[[1 0 0 0] 0]" );
+        //test_op( "@[select #1 0]", "[[1 0 0 0] 0]" );
     }
 
     static void run_tests()
