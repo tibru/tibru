@@ -40,9 +40,13 @@ struct SimpleScheme
         bool is_byte() const { return _value < UNDEF; }
         bool is_pcell() const { return _value > UNDEF; }
 
-        byte_t byte() const
+        byte_t byte( const char* errmsg=0 ) const
         {
-            System::assert( is_byte(), "elem_t is not a byte" );
+            if( errmsg )
+                System::check( is_byte(), errmsg );
+            else
+                System::assert( is_byte(), "elem_t is not a byte" );
+
             return static_cast<byte_t>( _value );
         }
 
@@ -51,9 +55,13 @@ struct SimpleScheme
             return pcell();
         }
 
-        pcell_t pcell() const
+        pcell_t pcell( const char* errmsg=0 ) const
         {
-            System::assert( is_pcell(), "elem_t is not a pcell" );
+            if( errmsg )
+                System::check( is_pcell(), errmsg );
+            else
+                System::assert( is_pcell(), "elem_t is not a pcell" );
+
             return _pcell;
         }
 

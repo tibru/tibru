@@ -14,9 +14,7 @@ auto KConInterpreter<System, SchemeT, AllocatorT>::_select( pcell_t path, elem_t
 {
     while( path != 0 )
     {
-        System::check( path->head().is_pcell(), "Path tails count must be of the form [b b ...]" );
-
-        pcell_t tails = path->head().pcell();
+        pcell_t tails = path->head().pcell( "Path tails count must be of the form [b b ...]" );
 
         byte_t hcount;
         if( path->tail().is_byte() )
@@ -27,12 +25,10 @@ auto KConInterpreter<System, SchemeT, AllocatorT>::_select( pcell_t path, elem_t
         else if( path->tail().is_pcell() )
         {
             path = path->tail().pcell();
-            System::check( path->head().is_byte(), "Path head count must be a byte" );
 
-            hcount = path->head().byte();
+            hcount = path->head().byte( "Path head count must be a byte" );
 
-            System::check( path->head().is_byte(), "Path tail count must not be a byte" );
-            path = path->tail().pcell();
+            path = path->tail().pcell( "Path tail count must not be a byte" );
         }
         else
             System::assert( false, "/ Path was neither cell nor byte" );
@@ -41,8 +37,7 @@ auto KConInterpreter<System, SchemeT, AllocatorT>::_select( pcell_t path, elem_t
         int scale = 0;
         while( true )
         {
-            System::check( tails->head().is_byte(), "Path tails count to be of the form [b b ...]" );
-            tcount += (tails->head().byte() << scale);
+            tcount += (tails->head().byte( "Path tails count to be of the form [b b ...]" ) << scale);
             scale += 8;
             System::check( scale != sizeof(void*) * 8, "Path tail count overflow" );
 
@@ -52,21 +47,14 @@ auto KConInterpreter<System, SchemeT, AllocatorT>::_select( pcell_t path, elem_t
                 break;
             }
 
-            System::assert( tails->tail().is_pcell(), "Tails tail expected to be pcell" );
-            tails = tails->tail().pcell();
+            tails = tails->tail().pcell( "Tails tail expected to be pcell" );
         }
 
         while( tcount-- > 0 )
-        {
-            System::check( target.is_pcell(), "/ tried to access tail of a byte" );
-            target = target.pcell()->tail();
-        }
+            target = target.pcell( "/ tried to access tail of a byte" )->tail();
 
         while( hcount-- > 0 )
-        {
-            System::check( target.is_pcell(), "/ tried to access head of a byte" );
-            target = target.pcell()->head();
-        }
+            target = target.pcell( "/ tried to access head of a byte" )->head();
     }
 
     return target;
@@ -75,21 +63,20 @@ auto KConInterpreter<System, SchemeT, AllocatorT>::_select( pcell_t path, elem_t
 template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT>
 auto KConInterpreter<System, SchemeT, AllocatorT>::select( elem_t elem ) -> elem_t
 {
-    System::check( elem.is_pcell(), "/ operates only on pairs" );
-    System::check( elem.pcell()->tail().is_pcell(), "/ requires paths of the form [([] b)+]" );
-    return _select( elem.pcell()->tail().pcell(), elem.pcell()->head() );
+    pcell_t p = elem.pcell( "/ operates only on pairs" );
+
+    return _select( p->tail().pcell( "/ requires paths of the form [([] b)+]" ), p->head() );
 }
 
 template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT>
 auto KConInterpreter<System, SchemeT, AllocatorT>::reduce( elem_t elem ) -> elem_t
 {
-    System::check( elem.is_pcell(), "@ operates only on pairs" );
-    System::check( elem.pcell()->head().is_byte(), "@ requires head element to be 0 or 1" );
-    byte_t code = elem.pcell()->head().byte();
+    pcell_t p = elem.pcell( "@ operates only on pairs" );
+    byte_t code = p->head().byte( "@ requires head element to be 0 or 1" );
     if( code == 0 )
-        return constant( elem.pcell()->tail() );
+        return constant( p->tail() );
     else if( code == 1 )
-        return select( elem.pcell()->tail() );
+        return select( p->tail() );
     else
         System::check( false, "@ requires head element to be 0 or 1" );
 
