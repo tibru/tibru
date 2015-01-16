@@ -4,13 +4,19 @@ using namespace kcon;
 using namespace elpa;
 
 template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT>
-auto KConInterpreter<System, SchemeT, AllocatorT>::constant( elem_t elem ) -> elem_t
+auto KConInterpreter<System, SchemeT, AllocatorT>::_constant( elem_t env, elem_t k ) -> elem_t
 {
-    return elem;
+    return k;
 }
 
 template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT>
-auto KConInterpreter<System, SchemeT, AllocatorT>::_select( elem_t target, pcell_t path ) -> elem_t
+auto KConInterpreter<System, SchemeT, AllocatorT>::constant( elem_t elem ) -> elem_t
+{
+    return _constant( elem_t(), elem );
+}
+
+template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT>
+auto KConInterpreter<System, SchemeT, AllocatorT>::_select( elem_t env, pcell_t path ) -> elem_t
 {
     while( path != 0 )
     {
@@ -51,13 +57,13 @@ auto KConInterpreter<System, SchemeT, AllocatorT>::_select( elem_t target, pcell
         }
 
         while( tcount-- > 0 )
-            target = target.pcell( "Tried to access tail of a byte" )->tail();
+            env = env.pcell( "Tried to access tail of a byte" )->tail();
 
         while( hcount-- > 0 )
-            target = target.pcell( "Tried to access head of a byte" )->head();
+            env = env.pcell( "Tried to access head of a byte" )->head();
     }
 
-    return target;
+    return env;
 }
 
 template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT>
@@ -90,13 +96,16 @@ template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT>
 auto KConInterpreter<System, SchemeT, AllocatorT>::reduce( elem_t elem ) -> elem_t
 {
     pcell_t p = elem.pcell( "@ operates only on cells" );
-    byte_t code = p->head().byte( "@ requires head element to be 0 or 1" );
+    elem_t env = p->head();
+    pcell_t op = p->tail().pcell( "@ requires parameterized operation" );
+
+    byte_t code = op->head().byte( "@ requires operation code to be a byte" );
     if( code == 0 )
-        return constant( p->tail() );
+        return _constant( env, op->tail() );
     else if( code == 1 )
-        return select( p->tail() );
+        return _select( env, op->tail().pcell( "@ 1 requires cell based path" ) );
     else
-        System::check( false, "@ requires head element to be 0 or 1" );
+        System::check( false, "@ requires operation code to be 0 or 1" );
 
     return elem_t();
 }

@@ -18,7 +18,8 @@ class KConInterpreter : public InterpreterBase<System, SchemeT, AllocatorT>
     typedef typename Scheme::byte_t byte_t;
     typedef typename Scheme::elem_t elem_t;
 
-    auto _select( elem_t target, pcell_t path ) -> elem_t;
+    auto _constant( elem_t env, elem_t k ) -> elem_t;
+    auto _select( elem_t env, pcell_t path ) -> elem_t;
     auto _ifcell( pcell_t choices, elem_t cond ) -> elem_t;
 public:
     KConInterpreter( size_t ncells )

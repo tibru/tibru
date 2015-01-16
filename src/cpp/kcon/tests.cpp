@@ -140,10 +140,12 @@ struct Tester
         test_op_illegal( "?0", "? operates only on cells" );
 
         //Reduce
+        test_op( "@[nil const 21]", "21" );
+        test_op( "@[[10 20 30] select #1 1]", "20" );
+        test_op( "@[[10 20 30] select #1 0 #1 0]", "30" );
         test_op_illegal( "@21", "@ operates only on cells" );
-        test_op_illegal( "@[2 3]", "@ requires head element to be 0 or 1" );
-        test_op( "@[const 21]", "21" );
-        //test_op( "@[select #1 0]", "[[1 0 0 0] 0]" );
+        test_op_illegal( "@[2 3]", "@ requires parameterized operation" );
+        test_op_illegal( "@[nil 3 0]", "@ requires operation code to be 0 or 1" );
     }
 
     static void run_tests()
