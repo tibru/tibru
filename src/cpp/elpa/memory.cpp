@@ -18,6 +18,9 @@ void TestAllocator<System, SchemeT>::gc()
         if( r->is_pcell() )
             _mark( _allocated, r->pcell() );
 
+    for( auto r : this->_pcell_roots )
+        _mark( _allocated, *r );
+
     for( auto p : all )
         if( _allocated.find( p ) == _allocated.end() )
             delete p;
@@ -55,6 +58,9 @@ void TestAllocator<System, SchemeT>::_shift()
     for( auto r : this->_elem_roots )
         if( r->is_pcell() )
             *r = move( *r ).pcell();
+
+    for( auto r : this->_pcell_roots )
+        *r = move( *r ).pcell();
 }
 
 template<class System, MetaScheme class SchemeT>
@@ -98,6 +104,9 @@ void SimpleAllocator<System, SchemeT>::gc()
     for( auto r : this->_elem_roots )
         if( r->is_pcell() )
             _mark( live, r->pcell() );
+
+    for( auto r : this->_pcell_roots )
+        _mark( live, *r );
 
     _free_list = 0;
     for( size_t i = 0; i != this->_ncells; ++i )

@@ -14,9 +14,13 @@ template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT>
 class KConInterpreter : public InterpreterBase<System, SchemeT, AllocatorT>
 {
     typedef SchemeT<System> Scheme;
+    typedef AllocatorT<System,SchemeT> Allocator;
     typedef typename Scheme::pcell_t pcell_t;
     typedef typename Scheme::byte_t byte_t;
     typedef typename Scheme::elem_t elem_t;
+
+    template<class T>
+    using auto_root = typename Allocator::template auto_root<T>;
 
     auto _constant( elem_t env, elem_t k ) -> elem_t;
     auto _select( elem_t env, pcell_t path ) -> elem_t;

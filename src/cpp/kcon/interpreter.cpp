@@ -99,10 +99,19 @@ auto KConInterpreter<System, SchemeT, AllocatorT>::_evaluate( elem_t env, pcell_
         return _reduce( env, expr );
 
     System::assert( expr->head().is_pcell(), "* expr head is neither cell nor byte" );
-    pcell_t x = expr->head().pcell();
-    pcell_t y = expr->tail().pcell( "* cons form requires 2 cell based expressions" );
 
-    return this->allocator().new_Cell( _evaluate( env, y ), _reduce( env, x ) );
+    auto_root<elem_t> v( this->allocator(), env );
+    auto_root<pcell_t> exprs( this->allocator(), expr );
+
+    elem_t t = _reduce( v, exprs->head().pcell() );
+
+    for(exprs = exprs->tail().pcell( "* cons form requires at least 2 cell based expressions" );
+        exprs->head().is_pcell();
+        exprs = exprs->tail().pcell( "* cons form requires only cell based expressions" )
+    )
+        t = this->allocator().new_Cell( _reduce( v, exprs->head().pcell() ), t );
+
+    return this->allocator().new_Cell( _reduce( v, exprs ), t );
 }
 
 template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT>

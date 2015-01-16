@@ -20,11 +20,13 @@ class AllocatorBase
 protected:
 	typedef SchemeT<System> Scheme;
 	typedef AllocatorT<System, SchemeT> Allocator;
+	typedef typename Scheme::pcell_t pcell_t;
 	typedef typename Scheme::elem_t elem_t;
 
 	const size_t _ncells;
 	size_t _gc_count;
 	std::set<elem_t*> _elem_roots;
+	std::set<pcell_t*> _pcell_roots;
 
 	AllocatorBase( size_t ncells )
 		: _ncells( ncells ), _gc_count( 0 )
@@ -38,6 +40,8 @@ public:
 
     void add_root( elem_t* root ) { _elem_roots.insert( root ); }
 	void del_root( elem_t* root ) { _elem_roots.erase( root ); }
+    void add_root( pcell_t* root ) { _pcell_roots.insert( root ); }
+	void del_root( pcell_t* root ) { _pcell_roots.erase( root ); }
 
     template<class T>
     struct auto_root_ref : T
@@ -45,6 +49,8 @@ public:
         Allocator& alloc;
 
         auto_root_ref( Allocator& a, const T& root ) : T( root ), alloc( a ) {}
+
+        T* addr() { return this; }
     };
 
     template<class T>
@@ -55,11 +61,28 @@ public:
     public:
         typedef auto_root_ref<T> ref;
 
-        auto_root( Allocator& alloc, const T& root=T() ) : ref( alloc, root ) { this->alloc.add_root( this ); }
-        auto_root( const auto_root_ref<T>& r ) : ref( r ) { this->alloc.add_root( this ); }
-        ~auto_root() { this->alloc.del_root( this ); }
+        auto_root( Allocator& alloc, const T& root=T() ) : ref( alloc, root ) { this->alloc.add_root( this->addr() ); }
+        auto_root( const auto_root_ref<T>& r ) : ref( r ) { this->alloc.add_root( this->addr() ); }
+        ~auto_root() { this->alloc.del_root( this->addr() ); }
         auto_root& operator=( const T& t ) { (T&) *this = t; return *this; }
     };
+};
+
+template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT>
+template<class T>
+struct AllocatorBase<System, SchemeT, AllocatorT>::auto_root_ref<T*>
+{
+    typedef AllocatorT<System,SchemeT> Allocator;
+
+    T* ptr;
+    Allocator& alloc;
+
+    auto_root_ref( Allocator& a, T* root ) : ptr( root ), alloc( a ) {}
+
+    T* operator->() const { return ptr; }
+    operator T*() const { return ptr; }
+
+    T** addr() { return &ptr; }
 };
 
 /**
