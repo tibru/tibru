@@ -16,45 +16,57 @@ auto KConInterpreter<System, SchemeT, AllocatorT>::constant( elem_t elem ) -> el
 }
 
 template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT>
+auto KConInterpreter<System, SchemeT, AllocatorT>::_parse_count( pcell_t tails ) -> size_t
+{
+    size_t count = 0;
+    int scale = 0;
+    while( true )
+    {
+        count += (tails->head().byte( "Path tails count must be of the form [b b ...]" ) << scale);
+        scale += 8;
+        System::check( scale != sizeof(void*) * 8, "Path tail count overflow" );
+
+        if( tails->tail().is_byte() )
+        {
+            count += (tails->tail().byte() << scale);
+            break;
+        }
+
+        tails = tails->tail().pcell( "Tails tail expected to be pcell" );
+    }
+
+    return count;
+}
+
+template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT>
+auto KConInterpreter<System, SchemeT, AllocatorT>::_parse_path_elem( pcell_t path, size_t& tcount, byte_t& hcount ) -> pcell_t
+{
+    tcount = _parse_count( path->head().pcell( "Path tails count must be cells" ) );
+
+    if( path->tail().is_byte() )
+    {
+        hcount = path->tail().byte();
+        return 0;
+    }
+
+    System::assert( path->tail().is_pcell(), "Path was neither cell nor byte" );
+
+    path = path->tail().pcell();
+
+    hcount = path->head().byte( "Path head count must be a byte" );
+
+    return path->tail().pcell( "Path tail count must not be a byte" );
+}
+
+template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT>
 auto KConInterpreter<System, SchemeT, AllocatorT>::_select( elem_t env, pcell_t path ) -> elem_t
 {
     while( path != 0 )
     {
-        pcell_t tails = path->head().pcell( "Path tails count must be cells" );
-
+        size_t tcount;
         byte_t hcount;
-        if( path->tail().is_byte() )
-        {
-            hcount = path->tail().byte();
-            path = 0;
-        }
-        else
-        {
-            System::assert( path->tail().is_pcell(), "Path was neither cell nor byte" );
 
-            path = path->tail().pcell();
-
-            hcount = path->head().byte( "Path head count must be a byte" );
-
-            path = path->tail().pcell( "Path tail count must not be a byte" );
-        }
-
-        size_t tcount = 0;
-        int scale = 0;
-        while( true )
-        {
-            tcount += (tails->head().byte( "Path tails count must be of the form [b b ...]" ) << scale);
-            scale += 8;
-            System::check( scale != sizeof(void*) * 8, "Path tail count overflow" );
-
-            if( tails->tail().is_byte() )
-            {
-                tcount += (tails->tail().byte() << scale);
-                break;
-            }
-
-            tails = tails->tail().pcell( "Tails tail expected to be pcell" );
-        }
+        path = _parse_path_elem( path, tcount, hcount );
 
         while( tcount-- > 0 )
             env = env.pcell( "Tried to access tail of a byte" )->tail();
