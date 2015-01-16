@@ -98,6 +98,10 @@ auto KConShellManager<System, SchemeT, AllocatorT>::process_operator( char op, e
     {
         return this->_interpreter.select( elem );
     }
+    else if( op == '?' )
+    {
+        return this->_interpreter.ifcell( elem );
+    }
     else if( op == '@' )
     {
         return this->_interpreter.reduce( elem  );

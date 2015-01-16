@@ -10,7 +10,7 @@ auto KConInterpreter<System, SchemeT, AllocatorT>::constant( elem_t elem ) -> el
 }
 
 template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT>
-auto KConInterpreter<System, SchemeT, AllocatorT>::_select( pcell_t path, elem_t target ) -> elem_t
+auto KConInterpreter<System, SchemeT, AllocatorT>::_select( elem_t target, pcell_t path ) -> elem_t
 {
     while( path != 0 )
     {
@@ -65,7 +65,25 @@ auto KConInterpreter<System, SchemeT, AllocatorT>::select( elem_t elem ) -> elem
 {
     pcell_t p = elem.pcell( "/ operates only on pairs" );
 
-    return _select( p->tail().pcell( "/ requires paths of the form [([] b)+]" ), p->head() );
+    return _select( p->head(), p->tail().pcell( "/ requires paths of the form [([] b)+]" ) );
+}
+
+template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT>
+auto KConInterpreter<System, SchemeT, AllocatorT>::_ifcell( pcell_t choices, elem_t cond ) -> elem_t
+{
+    if( cond.is_pcell() )
+        return choices->tail();
+
+    System::assert( cond.is_byte(), "If condition was neither pair nor byte" );
+    return choices->head();
+}
+
+template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT>
+auto KConInterpreter<System, SchemeT, AllocatorT>::ifcell( elem_t elem ) -> elem_t
+{
+    pcell_t p = elem.pcell( "? operates only on pairs" );
+
+    return _ifcell( p->head().pcell( "? Requires two choices not a byte"), p->tail() );
 }
 
 template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT>
