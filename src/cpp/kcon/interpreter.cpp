@@ -27,13 +27,12 @@ auto KConInterpreter<System, SchemeT, AllocatorT>::_parse_count( pcell_t tails )
         System::check( scale != sizeof(void*) * 8, "Path tail count overflow" );
 
         if( tails->tail().is_byte() )
-        {
-            count += (tails->tail().byte() << scale);
             break;
-        }
 
         tails = tails->tail().pcell( "Tails tail expected to be pcell" );
     }
+
+    count += (tails->tail().byte() << scale);
 
     return count;
 }
