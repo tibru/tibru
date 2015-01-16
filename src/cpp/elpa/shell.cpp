@@ -97,7 +97,7 @@ auto Shell<Env>::_process_command( const std::string& cmd, elpa_istream& eis, el
 
             eos << "\nOperators:\n";
     		for( auto op : _manager.operators() )
-    			eos << op.first << " - " << op.second << std::endl;
+                eos << op << std::endl;
 
             _manager.print_help( eos );
         }
@@ -127,7 +127,7 @@ auto Shell<Env>::_process_input( std::istream& is, elpa_ostream& eos, bool noisy
         else
         {
             const Operators& ops = _manager.operators();
-            if( std::find_if( ops.begin(), ops.end(), [c]( const typename Operators::value_type& v ){ return v.first == c; } ) == ops.end() )
+            if( std::find_if( ops.begin(), ops.end(), [c]( const typename Operators::value_type& v ){ return v[0] == c; } ) == ops.end() )
             {
                 eis.putback( c );
                 c = '\0';

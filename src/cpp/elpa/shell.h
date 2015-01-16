@@ -24,7 +24,7 @@ protected:
     ShellManagerBase( size_t ncells )
         : _interpreter( ncells ) {}
 public:
-    typedef std::vector< std::pair<char,std::string> > Operators;
+    typedef std::vector<std::string> Operators;
 
     Interpreter& interpreter() { return _interpreter; }
 };

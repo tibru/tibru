@@ -66,12 +66,19 @@ template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT>
 auto KConShellManager<System, SchemeT, AllocatorT>::operators() -> const Operators&
 {
     static const Operators ops = {
-        {'!', "Execute"},
-        {'*', "Evaluate"},
-        {'@', "Reduce"},
-        {'/', "Select"},
-        {'?', "If"},
-        {'.', "Constant"},
+        "![[f x] v]        -> ![*[v f] *[v x]]",
+        "![0 x]            -> x",
+        "![1 e [x y]]      -> ?[[x y] c]",
+        "*[v 0 x]          -> .x",
+        "*[v 1 r]          -> /[v r]",
+        "*[v [x y]]        -> [*[v y] @[v x]]",
+        "@[v 0 x]          -> .x",
+        "@[v 1 r]          -> /[v r]",
+        ".x                -> x",
+        "/[v [t1 ..] h1]   -> head{h1}( tail{t1 + 256*t2 ...}(v) )",
+        "/[v [t1 ..] h1 r] -> /[head{h1}( tail{t1 + 256*t2 ...}(v) ) r]",
+        "?[[x y] [a b]]    -> y",
+        "?[[x y] a]        -> x",
     };
     return ops;
 }
