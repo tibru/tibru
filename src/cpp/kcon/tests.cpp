@@ -151,9 +151,12 @@ struct Tester
         test_op( "*[nil const 21]", "21" );
         test_op( "*[[10 20 30] select #1 1]", "20" );
         test_op( "*[[10 20 30] select #1 0 #1 0]", "30" );
+        test_op( "*[0 [[const 2] [const 3]]]", "[3 2]" );
+        test_op( "*[0 [[const 1] [const 2] [const 3]]]", "[[3 2] 1]" );
         test_op_illegal( "*21", "* operates only on cells" );
         test_op_illegal( "*[2 3]", "* requires cell expression" );
         test_op_illegal( "*[nil 3 0]", "@ requires expression code to be 0 or 1" );
+        test_op_illegal( "*[0 [[const 2] 0]]", "* cons form requires 2 cell based expressions" );
     }
 
     static void run_tests()
