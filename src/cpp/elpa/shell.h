@@ -27,7 +27,7 @@ struct Shell
     typedef typename elpa_ostream::ElpaManip ElpaManip;
     typedef typename elpa_ostream::Manip Manip;
     typedef typename elpa_ostream::BaseManip BaseManip;
-    typedef std::vector< std::pair<char,std::string> > Operators;
+    typedef typename ShellManager::Operators Operators;
 
     template<class K, class V>
     using elpa_map = typename Env::template elpa_map<K, V>;
@@ -65,6 +65,8 @@ protected:
     ShellManagerBase( size_t ncells )
         : _interpreter( ncells ) {}
 public:
+    typedef std::vector< std::pair<char,std::string> > Operators;
+
     Interpreter& interpreter() { return _interpreter; }
 };
 
@@ -75,7 +77,7 @@ public:
     typedef SchemeT<System> Scheme;
     typedef typename elpa_istream<System, SchemeT, AllocatorT>::Readers Readers;
     typedef typename elpa_istream<System, SchemeT, AllocatorT>::Macros Macros;
-    typedef std::vector< std::pair<char,std::string> > Operators;
+    typedef typename ShellManagerBase<System, SchemeT, AllocatorT, NullInterpreter>::Operators Operators;
     typedef typename Scheme::elem_t elem_t;
 
     NullShellManager( size_t ncells )

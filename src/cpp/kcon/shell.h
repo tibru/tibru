@@ -15,7 +15,7 @@ public:
     typedef AllocatorT<System, SchemeT> Allocator;
     typedef typename elpa_istream<System, SchemeT, AllocatorT>::Readers Readers;
     typedef typename elpa_istream<System, SchemeT, AllocatorT>::Macros Macros;
-    typedef std::vector< std::pair<char,std::string> > Operators;
+    typedef typename ShellManagerBase<System, SchemeT, AllocatorT, KConInterpreter>::Operators Operators;
     typedef typename Scheme::elem_t elem_t;
     typedef typename Scheme::byte_t byte_t;
 
