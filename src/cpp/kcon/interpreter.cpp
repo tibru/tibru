@@ -14,7 +14,7 @@ auto KConInterpreter<System, SchemeT, AllocatorT>::_select( pcell_t path, elem_t
 {
     while( path != 0 )
     {
-        pcell_t tails = path->head().pcell( "Path tails count must be of the form [b b ...]" );
+        pcell_t tails = path->head().pcell( "Path tails count must be pairs" );
 
         byte_t hcount;
         if( path->tail().is_byte() )
@@ -31,13 +31,13 @@ auto KConInterpreter<System, SchemeT, AllocatorT>::_select( pcell_t path, elem_t
             path = path->tail().pcell( "Path tail count must not be a byte" );
         }
         else
-            System::assert( false, "/ Path was neither cell nor byte" );
+            System::assert( false, "Path was neither cell nor byte" );
 
         size_t tcount = 0;
         int scale = 0;
         while( true )
         {
-            tcount += (tails->head().byte( "Path tails count to be of the form [b b ...]" ) << scale);
+            tcount += (tails->head().byte( "Path tails count must be of the form [b b ...]" ) << scale);
             scale += 8;
             System::check( scale != sizeof(void*) * 8, "Path tail count overflow" );
 
@@ -51,10 +51,10 @@ auto KConInterpreter<System, SchemeT, AllocatorT>::_select( pcell_t path, elem_t
         }
 
         while( tcount-- > 0 )
-            target = target.pcell( "/ tried to access tail of a byte" )->tail();
+            target = target.pcell( "Tried to access tail of a byte" )->tail();
 
         while( hcount-- > 0 )
-            target = target.pcell( "/ tried to access head of a byte" )->head();
+            target = target.pcell( "Tried to access head of a byte" )->head();
     }
 
     return target;
