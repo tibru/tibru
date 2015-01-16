@@ -13,8 +13,42 @@ namespace elpa {
 
 struct Command;
 
-template<class Interpreter>
-struct ShellManager;
+template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT, MetaInterpreter class InterpreterT>
+class ShellManagerBase
+{
+protected:
+    typedef InterpreterT<System,SchemeT,AllocatorT> Interpreter;
+
+    Interpreter _interpreter;
+
+    ShellManagerBase( size_t ncells )
+        : _interpreter( ncells ) {}
+public:
+    typedef std::vector< std::pair<char,std::string> > Operators;
+
+    Interpreter& interpreter() { return _interpreter; }
+};
+
+template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT>
+class NullShellManager : public ShellManagerBase<System, SchemeT, AllocatorT, NullInterpreter>
+{
+public:
+    typedef SchemeT<System> Scheme;
+    typedef typename elpa_istream<System, SchemeT, AllocatorT>::Readers Readers;
+    typedef typename elpa_istream<System, SchemeT, AllocatorT>::Macros Macros;
+    typedef typename ShellManagerBase<System, SchemeT, AllocatorT, NullInterpreter>::Operators Operators;
+    typedef typename Scheme::elem_t elem_t;
+
+    NullShellManager( size_t ncells )
+        : ShellManagerBase<System, SchemeT, AllocatorT, NullInterpreter>( ncells ) {}
+
+    static auto readers() -> const Readers& { static Readers readers; return readers; }
+    static auto macros() -> const Macros& { static Macros macros; return macros; }
+    static auto operators() -> const Operators& { static const Operators ops; return ops; }
+    static void print_help( elpa_ostream<System,SchemeT>& eos ) {}
+
+    auto process_operator( char op, elem_t elem ) -> elem_t { return elem; }
+};
 
 template<class Env>
 struct Shell
@@ -52,43 +86,6 @@ public:
 	auto process( std::istream& in ) -> elem_t;
 	auto process( const std::string& in ) -> elem_t;
 	void include( const std::string& filename );
-};
-
-template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT, MetaInterpreter class InterpreterT>
-class ShellManagerBase
-{
-protected:
-    typedef InterpreterT<System,SchemeT,AllocatorT> Interpreter;
-
-    Interpreter _interpreter;
-
-    ShellManagerBase( size_t ncells )
-        : _interpreter( ncells ) {}
-public:
-    typedef std::vector< std::pair<char,std::string> > Operators;
-
-    Interpreter& interpreter() { return _interpreter; }
-};
-
-template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT>
-class NullShellManager : public ShellManagerBase<System, SchemeT, AllocatorT, NullInterpreter>
-{
-public:
-    typedef SchemeT<System> Scheme;
-    typedef typename elpa_istream<System, SchemeT, AllocatorT>::Readers Readers;
-    typedef typename elpa_istream<System, SchemeT, AllocatorT>::Macros Macros;
-    typedef typename ShellManagerBase<System, SchemeT, AllocatorT, NullInterpreter>::Operators Operators;
-    typedef typename Scheme::elem_t elem_t;
-
-    NullShellManager( size_t ncells )
-        : ShellManagerBase<System, SchemeT, AllocatorT, NullInterpreter>( ncells ) {}
-
-    static auto readers() -> const Readers& { static Readers readers; return readers; }
-    static auto macros() -> const Macros& { static Macros macros; return macros; }
-    static auto operators() -> const Operators& { static const Operators ops; return ops; }
-    static void print_help( elpa_ostream<System,SchemeT>& eos ) {}
-
-    auto process_operator( char op, elem_t elem ) -> elem_t { return elem; }
 };
 
 }   //namespace
