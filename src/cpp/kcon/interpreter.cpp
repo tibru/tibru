@@ -22,16 +22,16 @@ auto KConInterpreter<System, SchemeT, AllocatorT>::_select( pcell_t path, elem_t
             hcount = path->tail().byte();
             path = 0;
         }
-        else if( path->tail().is_pcell() )
+        else
         {
+            System::assert( path->tail().is_pcell(), "Path was neither cell nor byte" );
+
             path = path->tail().pcell();
 
             hcount = path->head().byte( "Path head count must be a byte" );
 
             path = path->tail().pcell( "Path tail count must not be a byte" );
         }
-        else
-            System::assert( false, "Path was neither cell nor byte" );
 
         size_t tcount = 0;
         int scale = 0;
