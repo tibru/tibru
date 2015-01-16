@@ -118,8 +118,12 @@ auto KConShellManager<System, SchemeT, AllocatorT>::process_operator( char op, e
     {
         return this->_interpreter.evaluate( elem  );
     }
+    else if( op == '!' )
+    {
+        return this->_interpreter.execute( elem  );
+    }
 
-    throw Error<Syntax>( "Unrecognised operator '"s + op + "'" );
+    throw Error<Syntax>( "Unimplemented operator '"s + op + "'" );
 }
 
 #include "../elpa/runtime.h"

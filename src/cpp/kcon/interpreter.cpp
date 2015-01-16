@@ -104,6 +104,28 @@ auto KConInterpreter<System, SchemeT, AllocatorT>::ifcell( elem_t elem ) -> elem
 }
 
 template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT>
+auto KConInterpreter<System, SchemeT, AllocatorT>::_reduce( elem_t env, pcell_t expr ) -> elem_t
+{
+    byte_t code = expr->head().byte( "@ requires expression code to be a byte" );
+    if( code == 0 )
+        return _constant( env, expr->tail() );
+    else if( code == 1 )
+        return _select( env, expr->tail().pcell( "@ 1 requires cell based path" ) );
+    else
+        System::check( false, "@ requires expression code to be 0 or 1" );
+
+    return elem_t();
+}
+
+template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT>
+auto KConInterpreter<System, SchemeT, AllocatorT>::reduce( elem_t elem ) -> elem_t
+{
+    pcell_t p = elem.pcell( "@ operates only on cells" );
+
+    return _evaluate( p->head(), p->tail().pcell( "@ requires cell expression" ) );
+}
+
+template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT>
 auto KConInterpreter<System, SchemeT, AllocatorT>::_evaluate( elem_t env, pcell_t expr ) -> elem_t
 {
     if( expr->head().is_byte() )
@@ -134,35 +156,18 @@ auto KConInterpreter<System, SchemeT, AllocatorT>::evaluate( elem_t elem ) -> el
 }
 
 template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT>
-auto KConInterpreter<System, SchemeT, AllocatorT>::_reduce( elem_t env, pcell_t expr ) -> elem_t
+auto KConInterpreter<System, SchemeT, AllocatorT>::_execute( pcell_t stmt ) -> elem_t
 {
-    byte_t code = expr->head().byte( "@ requires expression code to be a byte" );
-    if( code == 0 )
-        return _constant( env, expr->tail() );
-    else if( code == 1 )
-        return _select( env, expr->tail().pcell( "@ 1 requires cell based path" ) );
-    else
-        System::check( false, "@ requires expression code to be 0 or 1" );
+    while( stmt->head().is_pcell() )
+        stmt = evaluate( stmt ).pcell( "Statement didn't evaluate to a statement in !");
 
-    return elem_t();
-}
-
-template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT>
-auto KConInterpreter<System, SchemeT, AllocatorT>::reduce( elem_t elem ) -> elem_t
-{
-    pcell_t p = elem.pcell( "@ operates only on cells" );
-
-    return _evaluate( p->head(), p->tail().pcell( "@ requires cell expression" ) );
+    return reduce( stmt );
 }
 
 template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT>
 auto KConInterpreter<System, SchemeT, AllocatorT>::execute( elem_t state ) -> elem_t
 {
-    System::assert( state.is_def(), "Undefined state passed to execute" );
-
-    System::check( state.is_pcell(), "Illegal byte state for !" );
-
-    return state;
+    return _execute( state.pcell( "! requires cell state" ) );
 }
 
 #include "../elpa/runtime.h"
