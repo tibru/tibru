@@ -124,12 +124,12 @@ struct Tester
         test_op( "/[[[0 1 2 3 nil] [1 2 3 4 nil] [2 3 4 5 nil] nil] #1 1 #3 1]", "4");
         test_op( "/[[[0 1 2 3 nil] [1 2 3 4 nil] [2 3 4 5 nil] nil] #2 1 #2 1]", "4");
         test_op( "/[[[0 1 2 3 nil] [1 2 3 4 nil] [2 3 4 5 nil] nil] #0 1 #0 1]", "0");
-        test_op_illegal( "/0", "/ operates only on pairs" );
+        test_op_illegal( "/0", "/ operates only on cells" );
         test_op_illegal( "/[[1 2 3] 0]", "/ requires paths of the form [([] b)+]" );
-        test_op_illegal( "/[[1 2 3] [0 0]]", "Path tails count must be pairs" );
+        test_op_illegal( "/[[1 2 3] [0 0]]", "Path tails count must be cells" );
         test_op_illegal( "/[[1 2 3] [0 0] [[0 0] [0 0]]]", "Path head count must be a byte" );
         test_op_illegal( "/[[1 2 3] [0 0] 2 3]", "Path tail count must not be a byte" );
-        test_op_illegal( "/[[1 2 3] [0 0] 0 [0 0]]", "Path tails count must be pairs" );
+        test_op_illegal( "/[[1 2 3] [0 0] 0 [0 0]]", "Path tails count must be cells" );
         test_op_illegal( "/[[1 2 3] [255 255 255 255 255 255 255 255 255 255] 4]", "Path tail count overflow" );
         test_op_illegal( "/[[1 2 3] #4 0]", "Tried to access tail of a byte" );
         test_op_illegal( "/[[1 2 3] #0 4]", "Tried to access head of a byte" );
@@ -137,10 +137,10 @@ struct Tester
         //IfCell
         test_op( "?[[0 1] [0 0]]", "1" );
         test_op( "?[[0 1] 0]", "0" );
-        test_op_illegal( "?0", "? operates only on pairs" );
+        test_op_illegal( "?0", "? operates only on cells" );
 
         //Reduce
-        test_op_illegal( "@21", "@ operates only on pairs" );
+        test_op_illegal( "@21", "@ operates only on cells" );
         test_op_illegal( "@[2 3]", "@ requires head element to be 0 or 1" );
         test_op( "@[const 21]", "21" );
         //test_op( "@[select #1 0]", "[[1 0 0 0] 0]" );

@@ -14,7 +14,7 @@ auto KConInterpreter<System, SchemeT, AllocatorT>::_select( elem_t target, pcell
 {
     while( path != 0 )
     {
-        pcell_t tails = path->head().pcell( "Path tails count must be pairs" );
+        pcell_t tails = path->head().pcell( "Path tails count must be cells" );
 
         byte_t hcount;
         if( path->tail().is_byte() )
@@ -63,7 +63,7 @@ auto KConInterpreter<System, SchemeT, AllocatorT>::_select( elem_t target, pcell
 template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT>
 auto KConInterpreter<System, SchemeT, AllocatorT>::select( elem_t elem ) -> elem_t
 {
-    pcell_t p = elem.pcell( "/ operates only on pairs" );
+    pcell_t p = elem.pcell( "/ operates only on cells" );
 
     return _select( p->head(), p->tail().pcell( "/ requires paths of the form [([] b)+]" ) );
 }
@@ -74,14 +74,14 @@ auto KConInterpreter<System, SchemeT, AllocatorT>::_ifcell( pcell_t choices, ele
     if( cond.is_pcell() )
         return choices->tail();
 
-    System::assert( cond.is_byte(), "If condition was neither pair nor byte" );
+    System::assert( cond.is_byte(), "If condition was neither cell nor byte" );
     return choices->head();
 }
 
 template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT>
 auto KConInterpreter<System, SchemeT, AllocatorT>::ifcell( elem_t elem ) -> elem_t
 {
-    pcell_t p = elem.pcell( "? operates only on pairs" );
+    pcell_t p = elem.pcell( "? operates only on cells" );
 
     return _ifcell( p->head().pcell( "? Requires two choices not a byte"), p->tail() );
 }
@@ -89,7 +89,7 @@ auto KConInterpreter<System, SchemeT, AllocatorT>::ifcell( elem_t elem ) -> elem
 template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT>
 auto KConInterpreter<System, SchemeT, AllocatorT>::reduce( elem_t elem ) -> elem_t
 {
-    pcell_t p = elem.pcell( "@ operates only on pairs" );
+    pcell_t p = elem.pcell( "@ operates only on cells" );
     byte_t code = p->head().byte( "@ requires head element to be 0 or 1" );
     if( code == 0 )
         return constant( p->tail() );
