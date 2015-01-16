@@ -69,8 +69,8 @@ auto KConShellManager<System, SchemeT, AllocatorT>::operators() -> const Operato
         "![[f x] v]        -> ![*[v f] *[v x]]",
         "![0 x]            -> x",
         "![1 e [x y]]      -> ?[[x y] c]",
-        "*[v 0 x]          -> .x",
-        "*[v 1 r]          -> /[v r]",
+        "*[v 0 x]          -> @[v 0 x]",
+        "*[v 1 r]          -> @[v 1 r]",
         "*[v [x y]]        -> [*[v y] @[v x]]",
         "@[v 0 x]          -> .x",
         "@[v 1 r]          -> /[v r]",
@@ -112,6 +112,10 @@ auto KConShellManager<System, SchemeT, AllocatorT>::process_operator( char op, e
     else if( op == '@' )
     {
         return this->_interpreter.reduce( elem  );
+    }
+    else if( op == '*' )
+    {
+        return this->_interpreter.evaluate( elem  );
     }
 
     throw Error<Syntax>( "Unrecognised operator '"s + op + "'" );
