@@ -10,6 +10,7 @@ namespace kcon
 template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT>
 class KConShellManager : public elpa::ShellManagerBase<System, SchemeT, AllocatorT, KConInterpreter>
 {
+    bool _tracing;
 public:
     typedef SchemeT<System> Scheme;
     typedef AllocatorT<System, SchemeT> Allocator;
@@ -23,7 +24,7 @@ public:
     using auto_root = typename Allocator::template auto_root<T>;
 
     KConShellManager( size_t ncells )
-        : elpa::ShellManagerBase<System, SchemeT, AllocatorT, KConInterpreter>( ncells ) {}
+        : elpa::ShellManagerBase<System, SchemeT, AllocatorT, KConInterpreter>( ncells ), _tracing( false ) {}
 
     static auto readers() -> const Readers&;
     static auto macros() -> const Macros&;

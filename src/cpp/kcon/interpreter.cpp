@@ -156,8 +156,10 @@ auto KConInterpreter<System, SchemeT, AllocatorT>::evaluate( elem_t elem ) -> el
 }
 
 template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT>
-auto KConInterpreter<System, SchemeT, AllocatorT>::_execute( pcell_t stmt ) -> elem_t
+auto KConInterpreter<System, SchemeT, AllocatorT>::execute( elem_t state ) -> elem_t
 {
+    pcell_t stmt = state.pcell( "! requires cell state" );
+
     while( stmt->head().is_pcell() )
         stmt = evaluate( stmt ).pcell( "Statement didn't evaluate to a statement in !");
 
@@ -165,9 +167,18 @@ auto KConInterpreter<System, SchemeT, AllocatorT>::_execute( pcell_t stmt ) -> e
 }
 
 template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT>
-auto KConInterpreter<System, SchemeT, AllocatorT>::execute( elem_t state ) -> elem_t
+auto KConInterpreter<System, SchemeT, AllocatorT>::execute_trace( elem_t state, bool& more ) -> elem_t
 {
-    return _execute( state.pcell( "! requires cell state" ) );
+    pcell_t stmt = state.pcell( "! requires cell state" );
+
+    more = stmt->head().is_pcell();
+
+    if( more )
+        return evaluate( stmt ).pcell( "Statement didn't evaluate to a statement in !");
+
+    System::assert( stmt->head().is_byte(), "! stmt neither cell nor byte" );
+
+    return reduce( stmt );
 }
 
 #include "../elpa/runtime.h"

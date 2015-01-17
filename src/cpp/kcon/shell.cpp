@@ -120,6 +120,15 @@ auto KConShellManager<System, SchemeT, AllocatorT>::process_operator( char op, e
     }
     else if( op == '!' )
     {
+        if( _tracing )
+        {
+            bool more = true;
+            while( more )
+                elem = this->_interpreter.execute_trace( elem, more );
+
+            return elem;
+        }
+
         return this->_interpreter.execute( elem  );
     }
 

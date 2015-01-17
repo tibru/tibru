@@ -80,7 +80,7 @@ struct Tester
 
     static void test_operators()
     {TEST
-        Shell< Env > shell( 1024*1024 );
+        Shell< Env > shell( 100 );
 
         auto test_op = [&]( const std::string& in, const std::string& out )
         {
