@@ -31,7 +31,7 @@ auto run( size_t ncells, const std::vector< std::string >& filenames, bool repl 
 	Shell< Env > shell( ncells );
 
     for( auto filename : filenames )
-        shell.include( filename );
+        shell.process( filename );
 
     if( repl )
         shell.interactive( std::cin, std::cout );

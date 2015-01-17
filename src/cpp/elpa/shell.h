@@ -87,9 +87,11 @@ public:
         : _format( flat ), _num_format( std::dec ), _line_format( true ), _manager( ncells ), _defns( _manager.interpreter().allocator() ) {}
 
     void interactive( std::istream& in, std::ostream& out );
+    auto process( std::istream& in, elpa_ostream& eos ) -> elem_t;
 	auto process( std::istream& in ) -> elem_t;
-	auto process( const std::string& in ) -> elem_t;
-	void include( const std::string& filename );
+	void process( const std::string& filename, elpa_ostream& eos );
+	void process( const std::string& filename );
+	auto parse( const std::string& in ) -> elem_t;
 };
 
 }   //namespace

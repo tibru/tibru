@@ -19,11 +19,18 @@ auto Shell<Env>::_process_command( const std::string& cmd, elpa_istream& eis, el
     	_defns[name] = elem;
     	return true;
     }
+    else if( cmd == "process" )
+    {
+    	std::string filename;
+    	eis >> filename >> endofline;
+    	process( filename, eos );
+    	return true;
+    }
     else if( cmd == "include" )
     {
     	std::string filename;
     	eis >> filename >> endofline;
-    	include( filename );
+    	process( filename );
     	return true;
     }
     else if( _manager.process_command( cmd, eis, eos, noisy ) )
@@ -84,7 +91,8 @@ auto Shell<Env>::_process_command( const std::string& cmd, elpa_istream& eis, el
 
             eos << "\nCommands:\n";
             eos << ":def <name> <expr> - Define a named expression\n";
-            eos << ":include <filename> - Silently include all statements in the specified file\n";
+            eos << ":process <filename> - Process all statements in the specified file\n";
+            eos << ":include <filename> - Silently process all statements in the specified file\n";
 
             eos << ":dec  - Show bytes in decimal notation (default)\n";
             eos << ":hex  - Show bytes in hex notation\n";
@@ -243,9 +251,23 @@ void Shell<Env>::interactive( std::istream& in, std::ostream& out )
             out << "Command: " << e.message() << std::endl;
             out << "Run :help for more details" << std::endl;
         }
+        catch( const Error<Runtime>& e )
+        {
+            out << "Runtime: " << e.message() << std::endl;
+            out << "Run :help for more details" << std::endl;
+        }
     }
 }
 
+
+template<class Env>
+auto Shell<Env>::process( std::istream& in, elpa_ostream& eos ) -> elem_t
+{
+	while( in )
+		_process_input( in, eos, true );
+
+	return _defns.find("it") != _defns.end() ? _defns["it"] : elem_t();
+}
 
 template<class Env>
 auto Shell<Env>::process( std::istream& in ) -> elem_t
@@ -259,14 +281,29 @@ auto Shell<Env>::process( std::istream& in ) -> elem_t
 }
 
 template<class Env>
-auto Shell<Env>::process( const std::string& in ) -> elem_t
+auto Shell<Env>::parse( const std::string& in ) -> elem_t
 {
 	std::istringstream iss( in );
 	return process( iss );
 }
 
 template<class Env>
-void Shell<Env>::include( const std::string& filename )
+void Shell<Env>::process( const std::string& filename, elpa_ostream& eos )
+{
+	std::ifstream ifs( filename );
+	if( !ifs )
+		throw Error<Runtime>( "File not found '"s + filename + "'" );
+
+	if( !_processing.insert( filename ).second )
+		throw Error<Runtime>( "File included recursively '"s + filename + "'" );
+
+	process( ifs, eos );
+
+	System::assert( _processing.erase( filename ) == 1, "Failed to register processed file" );
+}
+
+template<class Env>
+void Shell<Env>::process( const std::string& filename )
 {
 	std::ifstream ifs( filename );
 	if( !ifs )

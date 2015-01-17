@@ -84,7 +84,7 @@ struct Tester
 
         auto test_op = [&]( const std::string& in, const std::string& out )
         {
-            std::string found = print( shell.process( in ) );
+            std::string found = print( shell.parse( in ) );
 
             test( found == out, "Op failed for: '" + in + "'\nExpected: '" + out + "'\nFound:    '" + found + "'" );
         };
@@ -93,7 +93,7 @@ struct Tester
         {
             try
             {
-                std::string found = print( shell.process( in ) );
+                std::string found = print( shell.parse( in ) );
                 fail( "Op failed for: '" + in + "'\nExpected error: '" + msg + "'\nFound:    '" + found + "'" );
             }
             catch( const Error<IllegalOp>& e )
@@ -103,9 +103,9 @@ struct Tester
             }
         };
 
-        shell.process( ":def nil 0" );
-        shell.process( ":def const 0" );
-        shell.process( ":def select 1" );
+        shell.parse( ":def nil 0" );
+        shell.parse( ":def const 0" );
+        shell.parse( ":def select 1" );
 
         //Constant
         test_op( ".[0 21]", "[0 21]" );

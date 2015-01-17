@@ -308,25 +308,25 @@ struct Tester
     {TEST
     	Shell< Env > shell( 1024 );
 
-    	test( shell.process( "" ).is_undef(), "Blank script doesn't process to undefined" );
-		test( print( shell.process( "8" ) ) == "8", "Byte doesn't process to itself" );
-		test( print( shell.process( "[8 9]" ) ) == "[8 9]", "Pair doesn't process to itself" );
-		test( print( shell.process( "[8 9]\n[0 1]" ) ) == "[0 1]", "2 expressions don't process to last" );
-		test( print( shell.process( "[8 9]\n[it 8]" ) ) == "[[8 9] 8]", "Use of 'it' failed" );
-		test( print( shell.process( ":def t [1 2] \n"
-									"\t0 \n"
-									":gc\n"
-									":sys\n"	//check noisiness
-									":def h it\n"
-									"[h t]" ) ) == "[0 1 2]", "Complex shell script failed" );
+    	test( shell.parse( "" ).is_undef(), "Blank script doesn't process to undefined" );
+		test( print( shell.parse( "8" ) ) == "8", "Byte doesn't process to itself" );
+		test( print( shell.parse( "[8 9]" ) ) == "[8 9]", "Pair doesn't process to itself" );
+		test( print( shell.parse( "[8 9]\n[0 1]" ) ) == "[0 1]", "2 expressions don't process to last" );
+		test( print( shell.parse( "[8 9]\n[it 8]" ) ) == "[[8 9] 8]", "Use of 'it' failed" );
+		test( print( shell.parse( ":def t [1 2] \n"
+                                  "\t0 \n"
+                                  ":gc\n"
+                                  ":sys\n"	//check noisiness
+                                  ":def h it\n"
+                                  "[h t]" ) ) == "[0 1 2]", "Complex shell script failed" );
 
-		test( print( shell.process( "t" ) ) == "[1 2]", "Failed to hold reference between processes (1)" );
-		test( print( shell.process( "[t t]" ) ) == "[[1 2] 1 2]", "Failed to hold reference between processes (2)" );
+		test( print( shell.parse( "t" ) ) == "[1 2]", "Failed to hold reference between processes (1)" );
+		test( print( shell.parse( "[t t]" ) ) == "[[1 2] 1 2]", "Failed to hold reference between processes (2)" );
 
-		try { shell.process( "z" ); fail( "Shell returned undefined reference (1)" ); }
+		try { shell.parse( "z" ); fail( "Shell returned undefined reference (1)" ); }
 		catch( Error<Syntax,Undef> ) { pass(); }
 
-		try { shell.process( "[z z]" ); fail( "Shell returned undefined reference (2)" ); }
+		try { shell.parse( "[z z]" ); fail( "Shell returned undefined reference (2)" ); }
 		catch( Error<Syntax,Undef> ) { pass(); }
     }
 
