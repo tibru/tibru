@@ -160,7 +160,7 @@ auto KConInterpreter<System, SchemeT, AllocatorT>::execute( elem_t state ) -> el
 {
     bool more = true;
     while( more )
-        state = execute_trace( state.pcell( "! requires cell state" ), more );
+        state = execute_trace( state, more );
 
     return state;
 }
@@ -173,11 +173,11 @@ auto KConInterpreter<System, SchemeT, AllocatorT>::execute_trace( elem_t state, 
     if( stmt->head().is_pcell() )
     {
         more = true;
-        stmt = evaluate( stmt ).pcell( "! requires cell state" );
+        return evaluate( stmt );
     }
     else
     {
-        switch( stmt->tail().byte() )
+        switch( stmt->head().byte() )
         {
             case 0:
                 more = false;
