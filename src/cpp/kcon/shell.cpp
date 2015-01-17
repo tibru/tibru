@@ -121,8 +121,22 @@ auto KConShellManager<System, SchemeT, AllocatorT>::process_operator( char op, e
     }
     else if( op == '!' )
     {
-        if( _tracing )
-            return this->_interpreter.execute_trace( elem, more );
+        if( _trace_limit-- > 1 )
+        {
+            try
+            {
+                elem_t result = this->_interpreter.execute_trace( elem, more );
+                more = more && (_trace_limit != 1);
+                if( !more )
+                    _trace_limit = 32;
+                return result;
+            }
+            catch( ... )
+            {
+                _trace_limit = 32;
+                throw;
+            }
+        }
 
         return this->_interpreter.execute( elem  );
     }
@@ -140,7 +154,7 @@ auto KConShellManager<System, SchemeT, AllocatorT>::process_command( const std::
         if( status != "on" && status != "off" )
             throw Error<Command>( "Trace command requires 'on' or 'off' argument" );
 
-        _tracing = (status == "on");
+        _trace_limit = (status == "on" ? 31 : 0);
     }
     else
         return false;
