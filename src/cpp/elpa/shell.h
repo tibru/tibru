@@ -50,7 +50,7 @@ public:
     static auto operators() -> const Operators& { static const Operators ops; return ops; }
     static void print_help( elpa_ostream<System,SchemeT>& eos ) {}
 
-    auto process_operator( char op, elem_t elem ) -> elem_t { return elem; }
+    auto process_operator( char op, elem_t elem, bool& more ) -> elem_t { return elem; }
 };
 
 template<class Env>

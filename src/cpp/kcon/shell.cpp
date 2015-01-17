@@ -96,7 +96,7 @@ void KConShellManager<System, SchemeT, AllocatorT>::print_help( elpa_ostream<Sys
 }
 
 template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT>
-auto KConShellManager<System, SchemeT, AllocatorT>::process_operator( char op, elem_t elem ) -> elem_t
+auto KConShellManager<System, SchemeT, AllocatorT>::process_operator( char op, elem_t elem, bool& more ) -> elem_t
 {
     if( op == '.' )
     {
@@ -121,13 +121,7 @@ auto KConShellManager<System, SchemeT, AllocatorT>::process_operator( char op, e
     else if( op == '!' )
     {
         if( _tracing )
-        {
-            bool more = true;
-            while( more )
-                elem = this->_interpreter.execute_trace( elem, more );
-
-            return elem;
-        }
+            return this->_interpreter.execute_trace( elem, more );
 
         return this->_interpreter.execute( elem  );
     }

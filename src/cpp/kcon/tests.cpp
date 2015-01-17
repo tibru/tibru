@@ -154,6 +154,7 @@ struct Tester
         test_op( "*[0 [[const 2] [const 3]]]", "[3 2]" );
         test_op( "*[0 [[const 1] [const 2] [const 3]]]", "[3 2 1]" );
         test_op( "*[0 [[const 1] [const 2] [const 3] [const 4]]]", "[4 3 2 1]" );
+        test_op( "*[0 1' 2' 3' 4']", "[4 3 2 1]" );
         test_op( "*[[0 10 20 30 40 50 nil] [[select #1 1] [select #2 1] [select #3 1] [select #4 1]]]", "[40 30 20 10]" );
         test_op_illegal( "*21", "* operates only on cells" );
         test_op_illegal( "*[2 3]", "* requires cell expression" );

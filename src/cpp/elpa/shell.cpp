@@ -143,8 +143,9 @@ auto Shell<Env>::_process_input( std::istream& is, elpa_ostream& eos, bool noisy
                 elem_t elem;
                 eis >> elem >> endofline;
 
+                bool more;
                 if( c != '\0' )
-                    elem = _manager.process_operator( c, elem );
+                    elem = _manager.process_operator( c, elem, more );
 
                 _defns["it"] = elem;
 
