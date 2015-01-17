@@ -297,7 +297,15 @@ void Shell<Env>::process( const std::string& filename, elpa_ostream& eos )
 	if( !_processing.insert( filename ).second )
 		throw Error<Runtime>( "File included recursively '"s + filename + "'" );
 
-	process( ifs, eos );
+    try
+    {
+        process( ifs, eos );
+    }
+    catch( ... )
+    {
+        _processing.erase( filename );
+        throw;
+    }
 
 	System::assert( _processing.erase( filename ) == 1, "Failed to register processed file" );
 }
