@@ -98,6 +98,7 @@ void KConShellManager<System, SchemeT, AllocatorT>::print_help( elpa_ostream<Sys
 template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT>
 auto KConShellManager<System, SchemeT, AllocatorT>::process_operator( char op, elem_t elem, bool& more ) -> elem_t
 {
+    more = false;
     if( op == '.' )
     {
         return this->_interpreter.constant( elem );

@@ -50,7 +50,7 @@ public:
     static auto operators() -> const Operators& { static const Operators ops; return ops; }
     static void print_help( elpa_ostream<System,SchemeT>& eos ) {}
 
-    auto process_operator( char op, elem_t elem, bool& more ) -> elem_t { return elem; }
+    auto process_operator( char op, elem_t elem, bool& more ) -> elem_t { more = false; return elem; }
 };
 
 template<class Env>
@@ -77,6 +77,7 @@ private:
     elpa_map<std::string, elem_t> _defns;
     std::set<std::string> _processing;
 
+    void _print( elpa_ostream& eos, elem_t elem ) const;
     auto _process_command( const std::string& cmd, elpa_istream& eis, elpa_ostream& eos, bool noisy ) -> bool;
     auto _process_input( std::istream& is, elpa_ostream& eos, bool noisy=true ) -> bool;
 public:

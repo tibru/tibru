@@ -114,6 +114,27 @@ auto Shell<Env>::_process_command( const std::string& cmd, elpa_istream& eis, el
 }
 
 template<class Env>
+void Shell<Env>::_print( elpa_ostream& eos, elem_t elem ) const
+{
+    eos << _format << _num_format;
+    if( !_line_format )
+    {
+        int indent = 0;
+        for( ; elem.is_pcell(); elem = elem.pcell()->tail() )
+        {
+            for( int i = 0; i < indent; ++i ) eos << ' ';
+            ++indent;
+
+            eos << elem.pcell()->head() << std::endl;
+        }
+
+        for( int i = 0; i < indent; ++i ) eos << ' ';
+    }
+
+    eos << elem << std::endl;
+}
+
+template<class Env>
 auto Shell<Env>::_process_input( std::istream& is, elpa_ostream& eos, bool noisy ) -> bool
 {
     elpa_istream eis( is, _manager.interpreter().allocator(), _defns, _manager.readers(), _manager.macros() );
@@ -143,31 +164,25 @@ auto Shell<Env>::_process_input( std::istream& is, elpa_ostream& eos, bool noisy
                 elem_t elem;
                 eis >> elem >> endofline;
 
-                bool more;
                 if( c != '\0' )
-                    elem = _manager.process_operator( c, elem, more );
+                {
+                    bool more = true;
+                    while( more )
+                    {
+                        elem = _manager.process_operator( c, elem, more );
+                        if( noisy )
+                            _print( eos, elem );
+                    }
 
-                _defns["it"] = elem;
+                    _defns["it"] = elem;
+                }
+                else
+                {
+                    _defns["it"] = elem;
 
-                if( noisy )
-            	{
-					eos << _format << _num_format;
-                	if( !_line_format )
-                	{
-                        int indent = 0;
-                	    for( ; elem.is_pcell(); elem = elem.pcell()->tail() )
-                	    {
-                            for( int i = 0; i < indent; ++i ) eos << ' ';
-                            ++indent;
-
-                            eos << elem.pcell()->head() << std::endl;
-                	    }
-
-                	    for( int i = 0; i < indent; ++i ) eos << ' ';
-                	}
-
-                	eos << elem << std::endl;
-            	}
+                    if( noisy )
+                        _print( eos, elem );
+                }
 
                 return true;
             }
