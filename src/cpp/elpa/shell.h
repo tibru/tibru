@@ -27,6 +27,9 @@ public:
     typedef std::vector<std::string> Operators;
 
     Interpreter& interpreter() { return _interpreter; }
+
+    virtual auto process_command( const std::string& cmd, elpa_istream<System, SchemeT, AllocatorT>& eis, elpa_ostream<System, SchemeT>& eos, bool noisy ) -> bool { return false; }
+    virtual void print_commands( elpa_ostream<System, SchemeT>& eos ) const {}
 };
 
 template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT>

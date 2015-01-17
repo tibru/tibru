@@ -32,6 +32,8 @@ public:
     static void print_help( elpa_ostream<System,SchemeT>& eos );
 
     auto process_operator( char op, elem_t elem ) -> elem_t;
+    auto process_command( const std::string& cmd, elpa_istream<System, SchemeT, AllocatorT>& eis, elpa_ostream<System, SchemeT>& eos, bool noisy ) -> bool;
+    void print_commands( elpa_ostream<System, SchemeT>& eos ) const;
 };
 
 }   //namespace

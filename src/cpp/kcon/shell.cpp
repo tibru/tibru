@@ -135,6 +135,30 @@ auto KConShellManager<System, SchemeT, AllocatorT>::process_operator( char op, e
     throw Error<Syntax>( "Unimplemented operator '"s + op + "'" );
 }
 
+template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT>
+auto KConShellManager<System, SchemeT, AllocatorT>::process_command( const std::string& cmd, elpa_istream<System, SchemeT, AllocatorT>& eis, elpa_ostream<System, SchemeT>& eos, bool noisy ) -> bool
+{
+    if( cmd == "trace" )
+    {
+        std::string status;
+        eis >> status >> endofline;
+        if( status != "on" && status != "off" )
+            throw Error<Command>( "Trace command requires 'on' or 'off' argument" );
+
+        _tracing = (status == "on");
+    }
+    else
+        return false;
+
+    return true;
+}
+
+template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT>
+void KConShellManager<System, SchemeT, AllocatorT>::print_commands( elpa_ostream<System, SchemeT>& eos ) const
+{
+    eos << ":trace [on|off] - Turn tracing on or off for ! operator\n";
+}
+
 #include "../elpa/runtime.h"
 template class KConShellManager<Debug, SimpleScheme, TestAllocator>;
 template class KConShellManager<Debug, SimpleScheme, SimpleAllocator>;

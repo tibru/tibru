@@ -26,6 +26,10 @@ auto Shell<Env>::_process_command( const std::string& cmd, elpa_istream& eis, el
     	include( filename );
     	return true;
     }
+    else if( _manager.process_command( cmd, eis, eos, noisy ) )
+    {
+        return true;
+    }
 
     eis >> endofline;
 
@@ -94,6 +98,7 @@ auto Shell<Env>::_process_command( const std::string& cmd, elpa_istream& eis, el
             eos << ":help - Show this help\n";
             eos << ":exit - End the shell session\n";
             eos << ":quit - End the shell session\n";
+            _manager.print_commands( eos );
 
             eos << "\nOperators:\n";
     		for( auto op : _manager.operators() )
@@ -147,8 +152,18 @@ auto Shell<Env>::_process_input( std::istream& is, elpa_ostream& eos, bool noisy
             	{
 					eos << _format << _num_format;
                 	if( !_line_format )
+                	{
+                        int indent = 0;
                 	    for( ; elem.is_pcell(); elem = elem.pcell()->tail() )
-                  	      eos << elem.pcell()->head() << std::endl;
+                	    {
+                            for( int i = 0; i < indent; ++i ) eos << ' ';
+                            ++indent;
+
+                            eos << elem.pcell()->head() << std::endl;
+                	    }
+
+                	    for( int i = 0; i < indent; ++i ) eos << ' ';
+                	}
 
                 	eos << elem << std::endl;
             	}
