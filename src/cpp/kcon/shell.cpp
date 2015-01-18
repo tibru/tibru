@@ -133,6 +133,7 @@ auto KConShellManager<System, SchemeT, AllocatorT>::process_operator( char op, e
             }
             catch( ... )
             {
+                more = false;
                 _trace_limit = 32;
                 throw;
             }

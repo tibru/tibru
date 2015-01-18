@@ -7,6 +7,6 @@
 :def y [1 #0 1 #1 1]
 :def z [1 #0 1 #2 1]
 
-![ [[1 2 3 nil] nil] [exit' x] ]
+![ [x exit'] [[1 2 3 nil] nil] ]
 
-![ [[1 2 3 nil] nil] [[exit' env]' env] ]
+![ [env 22' [env exit']'] 23 ]
