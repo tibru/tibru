@@ -27,6 +27,6 @@
 :def inc [1 2 3 4 5 nil]
 /[inc #2 1]
 
-:def next [1' x sel' 255'' inc' [hd tl]']
+:def next [1' x sel' env [inc' tl [tl hd]']']
 ![ [nil' #3' env [hd tl [env next']']'] nil ]
 
