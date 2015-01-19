@@ -175,22 +175,27 @@ auto Shell<Env>::_process_input( std::istream& is, elpa_ostream& eos, bool noisy
                 if( c != '\0' )
                 {
                     bool more = true;
-                    while( more )
+                    for( size_t niter = 0; more; ++niter )
                     {
-                        elem = _manager.process_operator( c, elem, more );
-                        if( noisy )
-                            _print( eos, elem );
-                    }
+                        elem = _manager.process_operator( c, elem, niter, more );
 
-                    _defns["it"] = elem;
+                        if( noisy )
+                        {
+                            if( more )
+                                eos << (niter+1) << ")\t";
+
+                            _print( eos, elem );
+
+                            if( !more && niter > 0 )
+                                eos << std::endl;
+                        }
+                    }
                 }
                 else
-                {
-                    _defns["it"] = elem;
-
                     if( noisy )
                         _print( eos, elem );
-                }
+
+                _defns["it"] = elem;
 
                 return true;
             }
