@@ -150,7 +150,12 @@ auto Shell<Env>::_process_input( std::istream& is, elpa_ostream& eos, bool noisy
     char c;
     if( eis >> c )
     {
-        if( c == ':' )
+        if( c == '%' )
+        {
+            while( c != '\n' )
+                eis.get( c  );
+        }
+        else if( c == ':' )
         {
             std::string cmd;
             if( !(eis >> std::noskipws >> cmd >> std::skipws) )

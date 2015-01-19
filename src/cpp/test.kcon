@@ -1,3 +1,7 @@
+:trace on
+:trace on
+
+% frame based environment defines
 :def env [1 #0 0]
 :def tl [1 #1 0]
 :def tltl [1 #2 0]
@@ -13,24 +17,26 @@
 :def frame hd
 :def self x
 
-:trace on
-
 :def exitenv [env exit']
 
+% select variable x from env
 ![ [x exit'] [[1 2 3 nil] nil] ]
 
+% push 22 onto env
 ![ [env 22' exitenv'] 23 ]
 
+% build a frame [21 22 23] and push onto env
 ![ [nil' 23' 22' 21' env [hd tl [frame exit']']'] nil ]
 
+% infinite recursion on f (put f into env ideally)
 :def f [nil' y self env [hd tl [env self]']']
 ![ [nil' 21' f' env [hd tl [env f']']'] nil ]
 
-:def inc [1 2 3 4 5 nil]
-/[inc #2 1]
+:def inc [#1 #2 #3 #4 #5 nil]
 
-:def next [1' hd 1' #0' sel' env [exit'' tl hd [hd inc' tl]']']
-![next #3 nil]
+% Take head of env and lookup into inc, replacing head of env
+:def next [1' hd 1' #0' sel' env [[tltl [hd tl exit']']' tl hd [hd inc' tl]']']
+![next #3 [1 2 3]]
 
 
 
