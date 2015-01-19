@@ -21,5 +21,12 @@
 
 ![ [nil' 23' 22' 21' env [hd tl [frame exit']']'] nil ]
 
-:def f [nil' self env [hd tl [env self]']']
-![ [nil' f' env [hd tl [env f']']'] nil ]
+:def f [nil' y self env [hd tl [env self]']']
+![ [nil' 21' f' env [hd tl [env f']']'] nil ]
+
+:def inc [1 2 3 4 5 nil]
+/[inc #2 1]
+
+:def next [1' x sel' 255'' inc' [hd tl]']
+![ [nil' #3' env [hd tl [env next']']'] nil ]
+
