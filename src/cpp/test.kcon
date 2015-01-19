@@ -1,4 +1,6 @@
 :def env [1 #0 0]
+:def tl [1 #1 0]
+:def hd [1 #0 1]
 :def nil 0
 :def exit 0
 :def const 0
@@ -6,9 +8,18 @@
 :def x [1 #0 1 #0 1]
 :def y [1 #0 1 #1 1]
 :def z [1 #0 1 #2 1]
+:def frame hd
+:def self x
 
 :trace on
 
+:def exitenv [env exit']
+
 ![ [x exit'] [[1 2 3 nil] nil] ]
 
-![ [env 22' [env exit']'] 23 ]
+![ [env 22' exitenv'] 23 ]
+
+![ [nil' 23' 22' 21' env [hd tl [frame exit']']'] nil ]
+
+:def f [nil' self env [hd tl [env self]']']
+![ [nil' f' env [hd tl [env f']']'] nil ]
