@@ -7,6 +7,8 @@
 :def y [1 #0 1 #1 1]
 :def z [1 #0 1 #2 1]
 
+:trace on
+
 ![ [x exit'] [[1 2 3 nil] nil] ]
 
 ![ [env 22' [env exit']'] 23 ]

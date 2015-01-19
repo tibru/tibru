@@ -18,6 +18,7 @@ auto help( int ret_code ) -> int
     std::cout << "-fast  : Turn off illegal operation checks and assertions\n";
     std::cout << "-safe  : Perfrom illegal operation checks only\n";
     std::cout << "-debug : Perfrom illegal operation checks and assertions\n";
+    std::cout << "-noisy : Show all output\n";
     std::cout << "-repl  : Enter REPL after running all scripts\n";
     std::cout << "-tests : Run internal tests before starting\n";
     std::cout << "-help  : Show this help\n";
@@ -26,12 +27,17 @@ auto help( int ret_code ) -> int
 }
 
 template<class Env>
-auto run( size_t ncells, const std::vector< std::string >& filenames, bool repl ) -> int
+auto run( size_t ncells, const std::vector< std::string >& filenames, bool noisy, bool repl ) -> int
 {
 	Shell< Env > shell( ncells );
 
+	typename Env::elpa_ostream eos( std::cout );
+
     for( auto filename : filenames )
-        shell.process( filename );
+        if( noisy )
+            shell.process( filename, eos );
+        else
+            shell.process( filename );
 
     if( repl )
         shell.interactive( std::cin, std::cout );
@@ -44,6 +50,7 @@ auto main( int argc, const char* argv[] ) -> int
     bool run_tests = false;
     size_t ncells = 0;
     std::string mode = "";
+    bool noisy = false;
     bool repl = false;
     std::vector< std::string > filenames;
 
@@ -70,6 +77,8 @@ auto main( int argc, const char* argv[] ) -> int
                 mode = arg;
             else if( arg == "-repl" )
                 repl = true;
+            else if( arg == "-noisy" )
+                noisy = true;
             else if( arg == "-help" || arg == "--help" )
                 return help( 0 );
             else
@@ -111,11 +120,11 @@ auto main( int argc, const char* argv[] ) -> int
     try
     {
         if( mode == "-debug" )
-            return run< Env<Debug, SimpleScheme, TestAllocator, kcon::KConInterpreter> >( ncells, filenames, repl );
+            return run< Env<Debug, SimpleScheme, TestAllocator, kcon::KConInterpreter> >( ncells, filenames, noisy, repl );
         else if( mode == "-safe" )
-            return run< Env<Safe, OptScheme, OptAllocator, kcon::KConInterpreter> >( ncells, filenames, repl );
+            return run< Env<Safe, OptScheme, OptAllocator, kcon::KConInterpreter> >( ncells, filenames, noisy, repl );
         else if( mode == "-fast" )
-            return run< Env<Fast, OptScheme, OptAllocator, kcon::KConInterpreter> >( ncells, filenames, repl );
+            return run< Env<Fast, OptScheme, OptAllocator, kcon::KConInterpreter> >( ncells, filenames, noisy, repl );
     }
     catch( const Error<Runtime,OutOfMemory>& )
     {
