@@ -182,7 +182,7 @@ auto Shell<Env>::_process_input( std::istream& is, elpa_ostream& eos, bool noisy
                         if( noisy )
                         {
                             if( more )
-                                eos << (niter+1) << ")\t";
+                                eos << (niter+1) << ".\t";
 
                             _print( eos, elem );
 
