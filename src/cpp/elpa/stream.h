@@ -27,8 +27,11 @@ class elpa_ostream
 	std::ostream& _os;
 	bool _flatten;
 
-	auto _format( pcell_t pcell );
-	auto _format( byte_t value );
+	void _format( pcell_t pcell );
+	void _format( byte_t value );
+
+	void _print( pcell_t pcell );
+	void _print( byte_t value );
 
     struct Tail { elem_t elem; size_t len; };
 public:
@@ -37,9 +40,18 @@ public:
 
     auto setflatten( bool b ) -> elpa_ostream& { _flatten = b; return *this; }
 
-	auto operator<<( pcell_t pcell ) -> elpa_ostream&;
-	auto operator<<( byte_t value ) -> elpa_ostream&;
-	auto operator<<( elem_t elem ) -> elpa_ostream&;
+	auto operator<<( pcell_t pcell ) -> elpa_ostream& { _print( pcell ); return *this; }
+	auto operator<<( byte_t value ) -> elpa_ostream& { _print( value ); return *this; }
+	auto operator<<( elem_t elem ) -> elpa_ostream&
+	{
+        if( elem.is_pcell() )
+            _print( elem.pcell() );
+        else if( elem.is_byte() )
+            _print( elem.byte() );
+        else
+            _os << "<undef>";
+        return *this;
+	}
 
 	template<class T>
     auto operator<<( const T& t ) -> elpa_ostream&

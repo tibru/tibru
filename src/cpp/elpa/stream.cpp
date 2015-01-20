@@ -6,36 +6,22 @@
 using namespace elpa;
 
 template<class System, MetaScheme class SchemeT>
-auto elpa_ostream<System, SchemeT>::operator<<( pcell_t pcell ) -> elpa_ostream&
+void elpa_ostream<System, SchemeT>::_print( pcell_t pcell )
 {
 	_os << '[';
 	_format( pcell );
 	_os << ']';
-	return *this;
 }
 
 template<class System, MetaScheme class SchemeT>
-auto elpa_ostream<System, SchemeT>::operator<<( byte_t value ) -> elpa_ostream&
+void elpa_ostream<System, SchemeT>::_print( byte_t value )
 {
 	_format( value );
-	return *this;
-}
-
-template<class System, MetaScheme class SchemeT>
-auto elpa_ostream<System, SchemeT>::operator<<( elem_t elem ) -> elpa_ostream&
-{
-    if( elem.is_pcell() )
-        return elpa_ostream::operator<<( elem.pcell() );
-    else if( elem.is_byte() )
-        return elpa_ostream::operator<<( elem.byte() );
-
-    _os << "<undef>";
-    return *this;
 }
 
 //complicated but avoids recursion on c-stack
 template<class System, MetaScheme class SchemeT>
-auto elpa_ostream<System, SchemeT>::_format( pcell_t pcell )
+void elpa_ostream<System, SchemeT>::_format( pcell_t pcell )
 {
     std::stack<Tail> tails;
     Tail tail{ pcell, 0 };
@@ -110,7 +96,7 @@ auto elpa_ostream<System, SchemeT>::_format( pcell_t pcell )
 }
 
 template<class System, MetaScheme class SchemeT>
-auto elpa_ostream<System, SchemeT>::_format( byte_t value )
+void elpa_ostream<System, SchemeT>::_format( byte_t value )
 {
     _os << short(value);
 }
