@@ -25,25 +25,27 @@ struct SimpleScheme
     {
         value_t _val;
     public:
-        byte_t( value_t val=0, value_t ref=0 ) : _val( val | (ref << 8) )
+        byte_t( value_t val=0, value_t tag=0 ) : _val( val | (tag << 8) )
         {
             System::assert( val < 256, "Byte value too big" );
-            System::assert( ref < 256, "Byte ref too big" );
+            System::assert( tag < 256, "Byte tag too big" );
         }
 
+        static byte_t from_bits( value_t val ) { byte_t b; b._val = val; return b; }
+
         uint8_t value() const { return _val & 0xff; }
-        uint8_t ref() const { return (_val >> 8) & 0xff; }
+        uint8_t tag() const { return (_val >> 8) & 0xff; }
 
         bool operator<( byte_t b ) const { return _val < b._val; }
     };
 
-    static byte_t byte_with_ref( uint8_t value, uint8_t ref ) { return byte_t( value, ref ); }
+    static byte_t byte_with_tag( uint8_t value, uint8_t tag ) { return byte_t( value, tag ); }
     static uint8_t byte_value( byte_t b ) { return b.value(); }
-    static uint8_t byte_ref( byte_t b ) { return b.ref(); }
+    static uint8_t byte_tag( byte_t b ) { return b.tag(); }
 
     class elem_t
     {
-        static const value_t UNDEF = 256;
+        static const value_t UNDEF = 256 * 256;
 
         union {
             value_t _value;
@@ -66,7 +68,7 @@ struct SimpleScheme
             else
                 System::assert( is_byte(), "elem_t is not a byte" );
 
-            return static_cast<byte_t>( _value );
+            return byte_t::from_bits( _value );
         }
 
         pcell_t operator->() const

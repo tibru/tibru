@@ -16,6 +16,13 @@ auto Shell<Env>::_process_command( const std::string& cmd, elpa_istream& eis, el
     	std::string name;
     	elem_t elem;
     	eis >> name >> elem >> endofline;
+
+    	if( elem.is_byte() )
+    	{
+    	    uint8_t val = Scheme::byte_value( elem.byte() );
+            elem = Scheme::byte_with_tag( val, ++_defns_byte_counts[val] );
+    	}
+
     	_defns_with_it[name] = elem;
     	_defns_no_it[name] = elem;
     	return true;

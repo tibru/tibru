@@ -57,6 +57,7 @@ template<class Env>
 struct Shell
 {
 	typedef typename Env::System System;
+	typedef typename Env::Scheme Scheme;
     typedef typename Env::Interpreter::ShellManager ShellManager;
     typedef typename Env::elpa_istream elpa_istream;
     typedef typename Env::elpa_ostream elpa_ostream;
@@ -78,6 +79,7 @@ private:
     elpa_map<std::string, elem_t> _defns_no_it;
     elpa_map<std::string, elem_t> _defns_with_it;
     elpa_map<std::string, elem_t> _defns_none;
+    std::map<uint8_t, uint8_t> _defns_byte_counts;
     std::set<std::string> _processing;
 
     void _print( elpa_ostream& eos, elem_t elem );
