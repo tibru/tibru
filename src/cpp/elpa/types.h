@@ -21,17 +21,20 @@ struct SimpleScheme
     typedef uintptr_t value_t;
     typedef const Cell* pcell_t;
 
+    static const uint8_t MAX_TAG = 3;
+
     class byte_t
     {
         value_t _val;
     public:
-        byte_t( value_t val=0, value_t tag=0 ) : _val( val | (tag << 8) )
+        byte_t( value_t val=0, value_t tag=0 ) : _val( (tag << 8) | val )
         {
             System::assert( val < 256, "Byte value too big" );
             System::assert( tag < 256, "Byte tag too big" );
         }
 
         static byte_t from_bits( value_t val ) { byte_t b; b._val = val; return b; }
+        value_t to_bits() const { return _val; }
 
         uint8_t value() const { return _val & 0xff; }
         uint8_t tag() const { return (_val >> 8) & 0xff; }
@@ -53,7 +56,7 @@ struct SimpleScheme
         };
     public:
         elem_t() : _value( UNDEF ) {}
-        elem_t( byte_t b ) : _value( b.value() ) {}
+        elem_t( byte_t b ) : _value( b.to_bits() ) {}
         elem_t( pcell_t p ) : _pcell( p ) {}
 
         bool is_undef() const { return _value == UNDEF; }
