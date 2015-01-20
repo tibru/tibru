@@ -126,11 +126,11 @@ struct Tester
         try { test_i( "[notfound 0]", "", "" ); fail( "Parsed undefined element" ); }
         catch( Error<Syntax,Undef> ) { pass(); }
 
-    	test_i( "0", "0", "x" );
-    	test_i( "1", "1", "1" );
-    	test_i( "x", "0", "x" );
-    	test_i( "y", "[0 1 0]", "y" );
-    	test_i( "z", "[[0 1 0] 2 0]", "z" );
+    	test_i( "0", "0" );
+    	test_i( "1", "1" );
+    	test_i( "x", "0" );
+    	test_i( "y", "[0 1 0]" );
+    	test_i( "z", "[[0 1 0] 2 0]" );
     	test_i( "[x y z]", "[0 [0 1 0] [0 1 0] 2 0]", "[x y z]" );
     	test_i( "[x 21 z]", "[0 21 [0 1 0] 2 0]", "[x 21 z]" );
     	test_i( "[l $3456]", "[3 4]", "[l 4]" );
@@ -352,7 +352,7 @@ struct Tester
                                   ":def h it\n"
                                   "[h t]" ), shell.names() ) == "[h t]", "Complex shell script failed (with names)" );
 
-		test( print( shell.parse( "t" ), shell.names() ) == "t", "Failed to hold reference between processes (1) (with names)" );
+		test( print( shell.parse( "t" ), shell.names() ) == "[1 2]", "Failed to hold reference between processes (1) (with names)" );
 		test( print( shell.parse( "[t t]" ), shell.names() ) == "[t t]", "Failed to hold reference between processes (2) (with names)" );
 		test( print( shell.parse( "[t t it]" ), shell.names() ) == "[t t t t]", "Failed to hold reference between processes (3) (with names)" );
 

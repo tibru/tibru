@@ -27,9 +27,11 @@ class elpa_ostream
 	std::ostream& _os;
 	bool _flatten;
 
+    void _format_elem( elem_t elem, const std::map<byte_t, std::string>& byte_names, const std::map<pcell_t, std::string>& cell_names );
 	void _format( pcell_t pcell, const std::map<byte_t, std::string>& byte_names, const std::map<pcell_t, std::string>& cell_names );
 	void _format( byte_t value, const std::map<byte_t, std::string>& byte_names );
 
+    void _print_elem( elem_t elem, const std::map<byte_t, std::string>& byte_names, const std::map<pcell_t, std::string>& cell_names );
 	void _print( pcell_t pcell, const std::map<byte_t, std::string>& byte_names, const std::map<pcell_t, std::string>& cell_names );
 	void _print( byte_t value, const std::map<byte_t, std::string>& byte_names );
 
@@ -47,12 +49,7 @@ public:
 	    std::map<byte_t, std::string> byte_names;
 	    std::map<pcell_t, std::string> cell_names;
 
-        if( elem.is_pcell() )
-            _print( elem.pcell(), byte_names, cell_names );
-        else if( elem.is_byte() )
-            _print( elem.byte(), byte_names );
-        else
-            _os << "<undef>";
+        _print_elem( elem, byte_names, cell_names );
         return *this;
 	}
 
@@ -72,12 +69,7 @@ public:
 
 	    elem_t elem = named_elem.second;
 
-        if( elem.is_pcell() )
-            _print( elem.pcell(), byte_names, cell_names );
-        else if( elem.is_byte() )
-            _print( elem.byte(), byte_names );
-        else
-            _os << "<undef>";
+        _print_elem( elem, byte_names, cell_names );
         return *this;
 	}
 

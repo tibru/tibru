@@ -6,36 +6,67 @@
 using namespace elpa;
 
 template<class System, MetaScheme class SchemeT>
+void elpa_ostream<System, SchemeT>::_print_elem( elem_t elem, const std::map<byte_t, std::string>& byte_names, const std::map<pcell_t, std::string>& cell_names )
+{
+    if( elem.is_pcell() )
+        _print( elem.pcell(), byte_names, cell_names );
+    else if( elem.is_byte() )
+        _print( elem.byte(), byte_names );
+    else
+        _os << "<undef>";
+}
+
+template<class System, MetaScheme class SchemeT>
 void elpa_ostream<System, SchemeT>::_print( pcell_t pcell, const std::map<byte_t, std::string>& byte_names, const std::map<pcell_t, std::string>& cell_names )
 {
-    if( cell_names.find( pcell ) != cell_names.end() )
+    _os << '[';
+    if( pcell->head().is_pcell() && cell_names.find( pcell->head().pcell() ) == cell_names.end() )
     {
-        _os << cell_names.at( pcell );
+        _os << '[';
+        _format( pcell->head().pcell(), byte_names, cell_names );
+        _os << ']';
     }
     else
-	{
-	    _os << '[';
-        _format( pcell, byte_names, cell_names );
+    {
+        _format_elem( pcell->head(), byte_names, cell_names );
+    }
+
+    _os << ' ';
+
+    if( pcell->tail().is_pcell() && cell_names.find( pcell->tail().pcell() ) == cell_names.end() && !_flatten )
+    {
+        _os << '[';
+        _format( pcell->tail().pcell(), byte_names, cell_names );
         _os << ']';
-	}
+    }
+    else
+    {
+        _format_elem( pcell->tail(), byte_names, cell_names );
+    }
+    _os << ']';
 }
 
 template<class System, MetaScheme class SchemeT>
 void elpa_ostream<System, SchemeT>::_print( byte_t value, const std::map<byte_t, std::string>& byte_names )
 {
-	_format( value, byte_names );
+	_os << (short) Scheme::byte_value( value );
+}
+
+template<class System, MetaScheme class SchemeT>
+void elpa_ostream<System, SchemeT>::_format_elem( elem_t elem, const std::map<byte_t, std::string>& byte_names, const std::map<pcell_t, std::string>& cell_names )
+{
+    if( elem.is_pcell() )
+        _format( elem.pcell(), byte_names, cell_names );
+    else if( elem.is_byte() )
+        _format( elem.byte(), byte_names );
+    else
+        _os << "<undef>";
 }
 
 //complicated but avoids recursion on c-stack
 template<class System, MetaScheme class SchemeT>
 void elpa_ostream<System, SchemeT>::_format( pcell_t pcell, const std::map<byte_t, std::string>& byte_names, const std::map<pcell_t, std::string>& cell_names )
 {
-    if( cell_names.find( pcell ) != cell_names.end() )
-    {
-        _os << cell_names.at( pcell );
-        return;
-    }
-
     std::stack<Tail> tails;
     Tail tail{ pcell, 0 };
 
