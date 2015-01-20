@@ -72,19 +72,23 @@ private:
     ElpaManip _format;
     BaseManip _num_format;
     bool _line_format;
+    bool _use_names;
 
     ShellManager _manager;
-    elpa_map<std::string, elem_t> _defns;
+    elpa_map<std::string, elem_t> _defns_no_it;
+    elpa_map<std::string, elem_t> _defns_with_it;
+    elpa_map<std::string, elem_t> _defns_none;
     std::set<std::string> _processing;
 
-    void _print( elpa_ostream& eos, elem_t elem ) const;
+    void _print( elpa_ostream& eos, elem_t elem );
     auto _process_command( const std::string& cmd, elpa_istream& eis, elpa_ostream& eos, bool noisy ) -> bool;
     auto _process_input( std::istream& is, elpa_ostream& eos, bool noisy=true ) -> bool;
 public:
     struct MoreToRead {};
 
     Shell( size_t ncells )
-        : _format( flat ), _num_format( std::dec ), _line_format( true ), _manager( ncells ), _defns( _manager.interpreter().allocator() ) {}
+        : _format( flat ), _num_format( std::dec ), _line_format( true ), _use_names( false ), _manager( ncells ),
+          _defns_no_it( _manager.interpreter().allocator() ), _defns_with_it( _manager.interpreter().allocator() ), _defns_none( _manager.interpreter().allocator() ) {}
 
     void interactive( std::istream& in, std::ostream& out );
     auto process( std::istream& in, elpa_ostream& eos ) -> elem_t;
@@ -92,6 +96,11 @@ public:
 	void process( const std::string& filename, elpa_ostream& eos );
 	void process( const std::string& filename );
 	auto parse( const std::string& in ) -> elem_t;
+
+	const elpa_map<std::string, elem_t>& names() const
+	{
+	    return _use_names ? _defns_no_it : _defns_none;
+    }
 };
 
 }   //namespace

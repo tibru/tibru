@@ -47,10 +47,10 @@ struct Tester
     	return parse( allocator, in, defns, readers, macros );
     }
 
-    static auto print( elem_t e, ElpaManip m=flat ) -> std::string
+    static auto print( elem_t e, const Defns& defns, ElpaManip m=flat ) -> std::string
     {
         std::ostringstream oss;
-        elpa_ostream( oss ) << m << e;
+        elpa_ostream( oss ) << m << std::make_pair( &defns, e );
         return oss.str();
     }
 
@@ -58,17 +58,19 @@ struct Tester
     {TEST
         Allocator a( 1024 );
 
+        Defns defns( a );
+
         auto_root<elem_t> p( a, a.new_Cell(
                         1,
                         a.new_Cell(
                             a.new_Cell( 3, 3 ),
                             2 ) ) );
 
-        auto found_flat = print( p, flat );
+        auto found_flat = print( p, defns, flat );
         auto expected_flat = "[1 [3 3] 2]";
         test( found_flat == expected_flat, "Incorrect flat printing found '" + found_flat + "'\nExpected '" + expected_flat + "'" );
 
-        auto found_deep = print( p, deep );
+        auto found_deep = print( p, defns, deep );
         auto expected_deep = "[1 [[3 3] 2]]";
         test( found_deep == expected_deep, "Incorrect deep printing found '" + found_deep + "'\nExpected '" + expected_deep + "'" );
     }
@@ -105,27 +107,34 @@ struct Tester
         defns["z"] = parse( "[y 2 x]" );
         defns["l"] = parse( "$123" );
 
-        auto test_i = [&]( std::string in, std::string out )
+        auto test_i = [&]( std::string in, std::string out, std::string named_out="" )
         {
-        	auto r = print( parse( in ) );
-        	test( r == out, "Named parse of '"s + in + "' incorrect.\nExpected " + out + "\nFound: " + r );
+        	auto r = print( parse( in ), Defns(a) );
+        	test( r == out, "Unamed parse of '"s + in + "' incorrect.\nExpected " + out + "\nFound: " + r );
+
+            if( named_out != "" )
+        	{
+        	    auto s = print( parse( in ), defns );
+                test( s == named_out, "Named parse of '"s + in + "' incorrect.\nExpected " + named_out + "\nFound: " + s );
+        	}
         };
 
-        try { test_i( "notfound", "" ); fail( "Parsed undefined element" ); }
+        try { test_i( "notfound", "", "" ); fail( "Parsed undefined element" ); }
         catch( Error<Syntax,Undef> ) { pass(); }
 
-        try { test_i( "[notfound 0]", "" ); fail( "Parsed undefined element" ); }
+        try { test_i( "[notfound 0]", "", "" ); fail( "Parsed undefined element" ); }
         catch( Error<Syntax,Undef> ) { pass(); }
 
-    	test_i( "0", "0" );
-    	test_i( "x", "0" );
-    	test_i( "y", "[0 1 0]" );
-    	test_i( "z", "[[0 1 0] 2 0]" );
-    	test_i( "[x y z]", "[0 [0 1 0] [0 1 0] 2 0]" );
-    	test_i( "[l $3456]", "[3 4]" );
-    	test_i( "[4 [5 6] %]", "[4 [5 6] 5 6]" );
-    	test_i( "[4 4 +]", "[4 5]" );
-    	test_i( "[4 4+]", "[4 5]" );
+    	test_i( "0", "0", "x" );
+    	test_i( "1", "1", "1" );
+    	test_i( "x", "0", "x" );
+    	test_i( "y", "[0 1 0]", "y" );
+    	test_i( "z", "[[0 1 0] 2 0]", "z" );
+    	test_i( "[x y z]", "[0 [0 1 0] [0 1 0] 2 0]", "[x y z]" );
+    	test_i( "[l $3456]", "[3 4]", "[l 4]" );
+    	test_i( "[4 [5 6] %]", "[4 [5 6] 5 6]", "[4 [5 6] 5 6]" );
+    	test_i( "[4 4 +]", "[4 5]", "[4 5]" );
+    	test_i( "[4 4+]", "[4 5]", "[4 5]" );
     	test_i( "4 +", "5" );
     	test_i( "4++", "6" );
     	test_i( "y <dontparsethis>", "[0 1 0]" );
@@ -140,9 +149,10 @@ struct Tester
             out = in;
 
         Allocator a( 1024 );
+        Defns defns( a );
         std::ostringstream oss;
 
-        auto found = print( parse( a, in ), m );
+        auto found = print( parse( a, in ), defns, m );
 
         test( found == out, "IO failed for: '" + in + "'\nExpected: '" + out + "'\nFound:    '" + found + "'" );
     }
@@ -151,11 +161,12 @@ struct Tester
     static void test_io_error( const std::string& in, const std::string& msg )
     {
         Allocator a( 1024 );
+        Defns defns( a );
 
         std::string found;
         try
         {
-            found = print( parse( a, in ) );
+            found = print( parse( a, in ), defns );
             fail( "IO failed for: '" + in + "'\nExpected error: '" + msg + "'\nFound:    '" + found + "'" );
         }
         catch( const Error<Syntax,SubType>& e )
@@ -227,6 +238,8 @@ struct Tester
 
         {
             Allocator a( 1024 );
+            Defns defns( a );
+
             auto_root<elem_t> p( parse( a, "[0 [1 [2 3] 4] 5 6]" ) );
             auto_root<elem_t> q( parse( a, "[0 [1 [2 3] 4] 5 6]" ) );
 
@@ -235,12 +248,14 @@ struct Tester
             test( a.gc_count() > 0, "GC failed to run with 2 roots" );
             test( a.num_allocated() == 12, "Failed to hold all cells in GC" );
 
-            test( print( p ) == "[0 [1 [2 3] 4] 5 6]", "Complex tree (1) altered by GC" );
-            test( print( q ) == "[0 [1 [2 3] 4] 5 6]", "Complex tree (2) altered by GC" );
+            test( print( p, defns ) == "[0 [1 [2 3] 4] 5 6]", "Complex tree (1) altered by GC" );
+            test( print( q, defns ) == "[0 [1 [2 3] 4] 5 6]", "Complex tree (2) altered by GC" );
         }
 
         {
             Allocator a( 1024 );
+            Defns defns( a );
+
             elem_t pp = parse( a, "[0 [1 [2 3] 4] 5 6]" );
             {
             	auto_root<elem_t> p( a, pp );
@@ -249,9 +264,9 @@ struct Tester
             	a.gc();
 
 	            test( a.gc_count() > 0, "GC failed to run with 1 root" );
- 	           test( a.num_allocated() == 6, "Failed to hold and cleanup all cells in GC" );
+                test( a.num_allocated() == 6, "Failed to hold and cleanup all cells in GC" );
 
-	            test( print( p ) == "[0 [1 [2 3] 4] 5 6]", "Complex tree (3) altered by GC" );
+	            test( print( p, defns ) == "[0 [1 [2 3] 4] 5 6]", "Complex tree (3) altered by GC" );
 	            pp = p;
             }
 
@@ -260,7 +275,7 @@ struct Tester
             a.gc();
 
             test( a.num_allocated() == 5, "Failed to hold and cleanup tail cells in GC" );
-            test( print( t ) == "[[1 [2 3] 4] 5 6]", "Complex tree tail altered by GC" );
+            test( print( t, defns ) == "[[1 [2 3] 4] 5 6]", "Complex tree tail altered by GC" );
         }
 
         {
@@ -287,13 +302,15 @@ struct Tester
                 try
                 {
                     Allocator a( n );
+                    Defns defns( a );
+
                     auto_root<elem_t> p( parse( a, "[0 [1 [2 3] 4] 5 6]" ) );
 
                     test( a.gc_count() > 0, "GC failed to run during low memory parse" );
 
                     a.gc();
 
-                    test( print( p ) == "[0 [1 [2 3] 4] 5 6]", "Low memory parse tree tail altered by GC" );
+                    test( print( p, defns ) == "[0 [1 [2 3] 4] 5 6]", "Low memory parse tree tail altered by GC" );
                     test( a.num_allocated() == 6, "Failed to hold and cleanup all cells in GC" );
                 }
                 catch( const Error<Runtime,OutOfMemory>& )
@@ -309,19 +326,33 @@ struct Tester
     	Shell< Env > shell( 1024 );
 
     	test( shell.parse( "" ).is_undef(), "Blank script doesn't process to undefined" );
-		test( print( shell.parse( "8" ) ) == "8", "Byte doesn't process to itself" );
-		test( print( shell.parse( "[8 9]" ) ) == "[8 9]", "Pair doesn't process to itself" );
-		test( print( shell.parse( "[8 9]\n[0 1]" ) ) == "[0 1]", "2 expressions don't process to last" );
-		test( print( shell.parse( "[8 9]\n[it 8]" ) ) == "[[8 9] 8]", "Use of 'it' failed" );
+		test( print( shell.parse( "8" ), shell.names() ) == "8", "Byte doesn't process to itself" );
+		test( print( shell.parse( "[8 9]" ), shell.names() ) == "[8 9]", "Pair doesn't process to itself" );
+		test( print( shell.parse( "[8 9]\n[0 1]" ), shell.names() ) == "[0 1]", "2 expressions don't process to last" );
+		test( print( shell.parse( "[8 9]\n[it 8]" ), shell.names() ) == "[[8 9] 8]", "Use of 'it' failed" );
 		test( print( shell.parse( ":def t [1 2] \n"
                                   "\t0 \n"
                                   ":gc\n"
                                   ":sys\n"	//check noisiness
                                   ":def h it\n"
-                                  "[h t]" ) ) == "[0 1 2]", "Complex shell script failed" );
+                                  "[h t]" ), shell.names() ) == "[0 1 2]", "Complex shell script failed" );
 
-		test( print( shell.parse( "t" ) ) == "[1 2]", "Failed to hold reference between processes (1)" );
-		test( print( shell.parse( "[t t]" ) ) == "[[1 2] 1 2]", "Failed to hold reference between processes (2)" );
+		test( print( shell.parse( "t" ), shell.names() ) == "[1 2]", "Failed to hold reference between processes (1)" );
+		test( print( shell.parse( "[t t]" ), shell.names() ) == "[[1 2] 1 2]", "Failed to hold reference between processes (2)" );
+		test( print( shell.parse( "[t t it]" ), shell.names() ) == "[[1 2] [1 2] [1 2] 1 2]", "Failed to hold reference between processes (3)" );
+
+		shell.parse( ":names on" );
+
+		test( print( shell.parse( ":def t [1 2] \n"
+                                  "\t0 \n"
+                                  ":gc\n"
+                                  ":sys\n"	//check noisiness
+                                  ":def h it\n"
+                                  "[h t]" ), shell.names() ) == "[h t]", "Complex shell script failed (with names)" );
+
+		test( print( shell.parse( "t" ), shell.names() ) == "t", "Failed to hold reference between processes (1) (with names)" );
+		test( print( shell.parse( "[t t]" ), shell.names() ) == "[t t]", "Failed to hold reference between processes (2) (with names)" );
+		test( print( shell.parse( "[t t it]" ), shell.names() ) == "[t t t t]", "Failed to hold reference between processes (3) (with names)" );
 
 		try { shell.parse( "z" ); fail( "Shell returned undefined reference (1)" ); }
 		catch( Error<Syntax,Undef> ) { pass(); }

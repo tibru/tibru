@@ -16,7 +16,8 @@ auto Shell<Env>::_process_command( const std::string& cmd, elpa_istream& eis, el
     	std::string name;
     	elem_t elem;
     	eis >> name >> elem >> endofline;
-    	_defns[name] = elem;
+    	_defns_with_it[name] = elem;
+    	_defns_no_it[name] = elem;
     	return true;
     }
     else if( cmd == "process" )
@@ -32,6 +33,16 @@ auto Shell<Env>::_process_command( const std::string& cmd, elpa_istream& eis, el
     	eis >> filename >> endofline;
     	process( filename );
     	return true;
+    }
+    else if( cmd == "names" )
+    {
+        std::string status;
+        eis >> status >> endofline;
+        if( status != "on" && status != "off" )
+            throw Error<Command>( "Name command requires 'on' or 'off' argument" );
+
+        _use_names = (status == "on");
+        return true;
     }
     else if( _manager.process_command( cmd, eis, eos, noisy ) )
     {
@@ -57,7 +68,7 @@ auto Shell<Env>::_process_command( const std::string& cmd, elpa_istream& eis, el
     else if( cmd == "defs" )
     {
     	if( noisy )
-    		for( auto defn : _defns )
+    		for( auto defn : _defns_with_it )
     			eos << defn.first << std::endl;
     }
     else if( cmd == "sys" )
@@ -100,6 +111,7 @@ auto Shell<Env>::_process_command( const std::string& cmd, elpa_istream& eis, el
             eos << ":deep - Show cells as pairs\n";
             eos << ":line - Show expressions on a single line (default)\n";
             eos << ":list - Show expressions over multiple lines in list format\n";
+            eos << ":names [on|off] - Show named expressions as defined names\n";
             eos << ":defs - Show all defined names\n";
             eos << ":sys  - Show information about the system\n";
             eos << ":gc   - Run the garbage collector\n";
@@ -122,7 +134,7 @@ auto Shell<Env>::_process_command( const std::string& cmd, elpa_istream& eis, el
 }
 
 template<class Env>
-void Shell<Env>::_print( elpa_ostream& eos, elem_t elem ) const
+void Shell<Env>::_print( elpa_ostream& eos, elem_t elem )
 {
     eos << _format << _num_format;
     if( !_line_format )
@@ -139,13 +151,16 @@ void Shell<Env>::_print( elpa_ostream& eos, elem_t elem ) const
         for( int i = 0; i < indent; ++i ) eos << ' ';
     }
 
-    eos << elem << std::endl;
+    if( _use_names )
+        eos << std::make_pair( &_defns_no_it, elem ) << std::endl;
+    else
+        eos << elem << std::endl;
 }
 
 template<class Env>
 auto Shell<Env>::_process_input( std::istream& is, elpa_ostream& eos, bool noisy ) -> bool
 {
-    elpa_istream eis( is, _manager.interpreter().allocator(), _defns, _manager.readers(), _manager.macros() );
+    elpa_istream eis( is, _manager.interpreter().allocator(), _defns_with_it, _manager.readers(), _manager.macros() );
 
     char c;
     if( eis >> c )
@@ -200,7 +215,7 @@ auto Shell<Env>::_process_input( std::istream& is, elpa_ostream& eos, bool noisy
                     if( noisy )
                         _print( eos, elem );
 
-                _defns["it"] = elem;
+                _defns_with_it["it"] = elem;
 
                 return true;
             }
@@ -276,7 +291,7 @@ auto Shell<Env>::process( std::istream& in, elpa_ostream& eos ) -> elem_t
 	while( in )
 		_process_input( in, eos, true );
 
-	return _defns.find("it") != _defns.end() ? _defns["it"] : elem_t();
+	return _defns_with_it.find("it") != _defns_with_it.end() ? _defns_with_it["it"] : elem_t();
 }
 
 template<class Env>
@@ -287,7 +302,7 @@ auto Shell<Env>::process( std::istream& in ) -> elem_t
 	while( in )
 		_process_input( in, eos, false );
 	System::assert( oss.str() == "", "Processing produced output" );
-	return _defns.find("it") != _defns.end() ? _defns["it"] : elem_t();
+	return _defns_with_it.find("it") != _defns_with_it.end() ? _defns_with_it["it"] : elem_t();
 }
 
 template<class Env>

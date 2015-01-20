@@ -27,11 +27,11 @@ class elpa_ostream
 	std::ostream& _os;
 	bool _flatten;
 
-	void _format( pcell_t pcell );
-	void _format( byte_t value );
+	void _format( pcell_t pcell, const std::map<byte_t, std::string>& byte_names, const std::map<pcell_t, std::string>& cell_names );
+	void _format( byte_t value, const std::map<byte_t, std::string>& byte_names );
 
-	void _print( pcell_t pcell );
-	void _print( byte_t value );
+	void _print( pcell_t pcell, const std::map<byte_t, std::string>& byte_names, const std::map<pcell_t, std::string>& cell_names );
+	void _print( byte_t value, const std::map<byte_t, std::string>& byte_names );
 
     struct Tail { elem_t elem; size_t len; };
 public:
@@ -40,14 +40,42 @@ public:
 
     auto setflatten( bool b ) -> elpa_ostream& { _flatten = b; return *this; }
 
-	auto operator<<( pcell_t pcell ) -> elpa_ostream& { _print( pcell ); return *this; }
-	auto operator<<( byte_t value ) -> elpa_ostream& { _print( value ); return *this; }
+	auto operator<<( pcell_t pcell ) -> elpa_ostream& { _print( pcell, std::map<byte_t, std::string>(), std::map<pcell_t, std::string>() ); return *this; }
+	auto operator<<( byte_t value ) -> elpa_ostream& { _print( value, std::map<byte_t, std::string>() ); return *this; }
 	auto operator<<( elem_t elem ) -> elpa_ostream&
 	{
+	    std::map<byte_t, std::string> byte_names;
+	    std::map<pcell_t, std::string> cell_names;
+
         if( elem.is_pcell() )
-            _print( elem.pcell() );
+            _print( elem.pcell(), byte_names, cell_names );
         else if( elem.is_byte() )
-            _print( elem.byte() );
+            _print( elem.byte(), byte_names );
+        else
+            _os << "<undef>";
+        return *this;
+	}
+
+    template<class PMap>
+	auto operator<<( const std::pair<PMap,elem_t> named_elem ) -> elpa_ostream&
+	{
+	    std::map<byte_t, std::string> byte_names;
+	    std::map<pcell_t, std::string> cell_names;
+
+	    for( auto named : *named_elem.first )
+	    {
+            if( named.second.is_byte() )
+                byte_names[named.second.byte()] = named.first;
+            else if( named.second.is_pcell() )
+                cell_names[named.second.pcell()] = named.first;
+	    }
+
+	    elem_t elem = named_elem.second;
+
+        if( elem.is_pcell() )
+            _print( elem.pcell(), byte_names, cell_names );
+        else if( elem.is_byte() )
+            _print( elem.byte(), byte_names );
         else
             _os << "<undef>";
         return *this;
