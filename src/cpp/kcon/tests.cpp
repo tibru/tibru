@@ -124,6 +124,7 @@ struct Tester
         test_op( "/[[[0 1 2 3 nil] [1 2 3 4 nil] [2 3 4 5 nil] nil] #1 1 #3 1]", "4");
         test_op( "/[[[0 1 2 3 nil] [1 2 3 4 nil] [2 3 4 5 nil] nil] #2 1 #2 1]", "4");
         test_op( "/[[[0 1 2 3 nil] [1 2 3 4 nil] [2 3 4 5 nil] nil] #0 1 #0 1]", "0");
+
         test_op_illegal( "/0", "/ operates only on cells" );
         test_op_illegal( "/[[1 2 3] 0]", "/ requires paths of the form [([] b)+]" );
         test_op_illegal( "/[[1 2 3] [0 0]]", "Path tails count must be cells" );

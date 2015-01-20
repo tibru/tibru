@@ -22,7 +22,7 @@ auto KConInterpreter<System, SchemeT, AllocatorT>::_parse_count( pcell_t tails )
     int scale = 0;
     while( true )
     {
-        count += (tails->head().byte( "Path tails count must be of the form [b b ...]" ) << scale);
+        count += Scheme::byte_value( tails->head().byte( "Path tails count must be of the form [b b ...]" ) ) << scale;
         scale += 8;
         System::check( scale != sizeof(void*) * 8, "Path tail count overflow" );
 
@@ -32,19 +32,19 @@ auto KConInterpreter<System, SchemeT, AllocatorT>::_parse_count( pcell_t tails )
         tails = tails->tail().pcell( "Tails tail expected to be pcell" );
     }
 
-    count += (tails->tail().byte() << scale);
+    count += Scheme::byte_value( tails->tail().byte() ) << scale;
 
     return count;
 }
 
 template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT>
-auto KConInterpreter<System, SchemeT, AllocatorT>::_parse_path_elem( pcell_t path, size_t& tcount, byte_t& hcount ) -> pcell_t
+auto KConInterpreter<System, SchemeT, AllocatorT>::_parse_path_elem( pcell_t path, size_t& tcount, size_t& hcount ) -> pcell_t
 {
     tcount = _parse_count( path->head().pcell( "Path tails count must be cells" ) );
 
     if( path->tail().is_byte() )
     {
-        hcount = path->tail().byte();
+        hcount = Scheme::byte_value( path->tail().byte() );
         return 0;
     }
 
@@ -52,7 +52,7 @@ auto KConInterpreter<System, SchemeT, AllocatorT>::_parse_path_elem( pcell_t pat
 
     path = path->tail().pcell();
 
-    hcount = path->head().byte( "Path head count must be a byte" );
+    hcount = Scheme::byte_value( path->head().byte( "Path head count must be a byte" ) );
 
     return path->tail().pcell( "Path tail count must not be a byte" );
 }
@@ -63,7 +63,7 @@ auto KConInterpreter<System, SchemeT, AllocatorT>::_select( elem_t env, pcell_t 
     while( path != 0 )
     {
         size_t tcount;
-        byte_t hcount;
+        size_t hcount;
 
         path = _parse_path_elem( path, tcount, hcount );
 
@@ -106,7 +106,7 @@ auto KConInterpreter<System, SchemeT, AllocatorT>::ifcell( elem_t elem ) -> elem
 template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT>
 auto KConInterpreter<System, SchemeT, AllocatorT>::_reduce( elem_t env, pcell_t expr ) -> elem_t
 {
-    byte_t code = expr->head().byte( "@ requires expression code to be a byte" );
+    uint8_t code = Scheme::byte_value( expr->head().byte( "@ requires expression code to be a byte" ) );
     if( code == 0 )
         return _constant( env, expr->tail() );
     else if( code == 1 )
@@ -176,7 +176,7 @@ auto KConInterpreter<System, SchemeT, AllocatorT>::execute_trace( elem_t state, 
     {
         return _evaluate( env, stmt.pcell() );
     }
-    else if( stmt.byte() == 0 )
+    else if( Scheme::byte_value( stmt.byte() ) == 0 )
     {
         more = false;
         return env;

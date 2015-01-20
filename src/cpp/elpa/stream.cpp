@@ -135,7 +135,7 @@ void elpa_ostream<System, SchemeT>::_format( byte_t value, const std::map<byte_t
     auto i = byte_names.find( value );
 
     if( i == byte_names.end() )
-        _os << short(value);
+        _os << (short) Scheme::byte_value( value );
     else
         _os << i->second;
 }

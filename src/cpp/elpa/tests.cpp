@@ -13,6 +13,7 @@ using container::valrange;
 template<class Env>
 struct Tester
 {
+    typedef typename Env::Scheme Scheme;
     typedef typename Env::Allocator Allocator;
     typedef typename Env::elpa_ostream elpa_ostream;
     typedef typename Env::elpa_istream elpa_istream;
@@ -21,9 +22,9 @@ struct Tester
     typedef typename elpa_istream::Macros Macros;
     typedef typename Env::elpa_ostream::ElpaManip ElpaManip;
 
-    typedef typename Env::Scheme::pcell_t pcell_t;
-    typedef typename Env::Scheme::elem_t elem_t;
-    typedef typename Env::Scheme::byte_t byte_t;
+    typedef typename Scheme::pcell_t pcell_t;
+    typedef typename Scheme::elem_t elem_t;
+    typedef typename Scheme::byte_t byte_t;
 
     template<class T>
     using auto_root_ref = typename Allocator::template auto_root_ref<T>;
@@ -61,10 +62,10 @@ struct Tester
         Defns defns( a );
 
         auto_root<elem_t> p( a, a.new_Cell(
-                        1,
+                        byte_t(1),
                         a.new_Cell(
-                            a.new_Cell( 3, 3 ),
-                            2 ) ) );
+                            a.new_Cell( byte_t(3), byte_t(3) ),
+                            byte_t(2) ) ) );
 
         auto found_flat = print( p, defns, flat );
         auto expected_flat = "[1 [3 3] 2]";
@@ -82,13 +83,13 @@ struct Tester
         Defns defns( a );
         Readers readers = {
             {'$', []( Allocator& a, std::istream& is ) -> elem_t {
-                byte_t l = 0;
+                uint8_t l = 0;
                 char c;
                 while( is.get( c ) && isdigit(c) )
-                    l++;
+                    ++l;
                 if( !isdigit(c) )
                     is.putback( c );
-                return l;
+                return byte_t( l );
             } }
         };
 
@@ -97,7 +98,7 @@ struct Tester
                 return a.new_Cell( tail.pcell()->head(), tail );
             } },
             {'+', []( Allocator& a, elem_t tail ) -> elem_t {
-                return a.new_Cell( tail.pcell()->head().byte() + 1, tail.pcell()->tail() );
+                return a.new_Cell( byte_t( Scheme::byte_value( tail.pcell()->head().byte() ) + 1 ), tail.pcell()->tail() );
             } }
         };
 
@@ -212,8 +213,8 @@ struct Tester
         try
         {
             Allocator a( 1 );
-            auto_root<elem_t> p( a, a.new_Cell( 1, 1 ) );
-            a.new_Cell( 1, 1 );
+            auto_root<elem_t> p( a, a.new_Cell( byte_t(1), byte_t(1) ) );
+            a.new_Cell( byte_t(1), byte_t(1) );
 
             fail( "Failed to catch out of memory" );
         }
@@ -221,18 +222,18 @@ struct Tester
 
         {
             Allocator a( 10 );
-            auto_root<elem_t> p( a, a.new_Cell( 1, 2 ) );
-            a.new_Cell( 1, 1 );
+            auto_root<elem_t> p( a, a.new_Cell( byte_t(1), byte_t(2) ) );
+            a.new_Cell( byte_t(1), byte_t(1) );
 
             test( a.num_allocated() == 2, "Failed to register allocated cells" );
 
-            test( p->head().is_byte() && p->head().byte() == 1, "Cell head incorrect before GC" );
-            test( p->tail().is_byte() && p->tail().byte() == 2, "Cell tail incorrect before GC" );
+            test( p->head().is_byte() && Scheme::byte_value( p->head().byte() ) == 1, "Cell head incorrect before GC" );
+            test( p->tail().is_byte() && Scheme::byte_value( p->tail().byte() ) == 2, "Cell tail incorrect before GC" );
 
             a.gc();
 
-            test( p->head().is_byte() && p->head().byte() == 1, "Cell head incorrect after GC" );
-            test( p->tail().is_byte() && p->tail().byte() == 2, "Cell tail incorrect after GC" );
+            test( p->head().is_byte() && Scheme::byte_value( p->head().byte() ) == 1, "Cell head incorrect after GC" );
+            test( p->tail().is_byte() && Scheme::byte_value( p->tail().byte() ) == 2, "Cell tail incorrect after GC" );
 
             test( a.num_allocated() == 1, "Failed to cleanup after GC" );
         }

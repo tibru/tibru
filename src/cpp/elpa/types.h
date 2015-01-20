@@ -18,9 +18,28 @@ struct SimpleScheme
 
     struct Cell;
 
-    typedef uint8_t byte_t;
     typedef uintptr_t value_t;
     typedef const Cell* pcell_t;
+
+    class byte_t
+    {
+        value_t _val;
+    public:
+        byte_t( value_t val=0, value_t ref=0 ) : _val( val | (ref << 8) )
+        {
+            System::assert( val < 256, "Byte value too big" );
+            System::assert( ref < 256, "Byte ref too big" );
+        }
+
+        uint8_t value() const { return _val & 0xff; }
+        uint8_t ref() const { return (_val >> 8) & 0xff; }
+
+        bool operator<( byte_t b ) const { return _val < b._val; }
+    };
+
+    static byte_t byte_with_ref( uint8_t value, uint8_t ref ) { return byte_t( value, ref ); }
+    static uint8_t byte_value( byte_t b ) { return b.value(); }
+    static uint8_t byte_ref( byte_t b ) { return b.ref(); }
 
     class elem_t
     {
@@ -32,7 +51,7 @@ struct SimpleScheme
         };
     public:
         elem_t() : _value( UNDEF ) {}
-        elem_t( byte_t b ) : _value( b ) {}
+        elem_t( byte_t b ) : _value( b.value() ) {}
         elem_t( pcell_t p ) : _pcell( p ) {}
 
         bool is_undef() const { return _value == UNDEF; }

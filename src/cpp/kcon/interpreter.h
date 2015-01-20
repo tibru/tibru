@@ -23,7 +23,7 @@ class KConInterpreter : public InterpreterBase<System, SchemeT, AllocatorT>
     using auto_root = typename Allocator::template auto_root<T>;
 
     static auto _parse_count( pcell_t bytes ) -> size_t;
-    static auto _parse_path_elem( pcell_t path, size_t& tcount, byte_t& hcount ) -> pcell_t;
+    static auto _parse_path_elem( pcell_t path, size_t& tcount, size_t& hcount ) -> pcell_t;
 
     auto _constant( elem_t env, elem_t k ) -> elem_t;
     auto _select( elem_t env, pcell_t path ) -> elem_t;
