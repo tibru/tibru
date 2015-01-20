@@ -111,7 +111,7 @@ auto Shell<Env>::_process_command( const std::string& cmd, elpa_istream& eis, el
             eos << ":deep - Show cells as pairs\n";
             eos << ":line - Show expressions on a single line (default)\n";
             eos << ":list - Show expressions over multiple lines in list format\n";
-            eos << ":names [on|off] - Show named expressions as defined names\n";
+            eos << ":names [on|off] - Show named expressions as defined names (works best in debug modes)\n";
             eos << ":defs - Show all defined names\n";
             eos << ":sys  - Show information about the system\n";
             eos << ":gc   - Run the garbage collector\n";
