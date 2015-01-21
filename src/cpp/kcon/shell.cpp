@@ -43,7 +43,7 @@ auto KConShellManager<System, SchemeT, AllocatorT>::macros() -> const Macros&
 
         	auto_root<elem_t> t( alloc, tail );
             auto_root<elem_t> r( alloc );
-            r = alloc.new_Cell( byte_t(0), r );
+            r = alloc.new_Cell( Scheme::byte_with_tag(0,1), r );
             r = alloc.new_Cell( t.pcell()->head(), r );
             return alloc.new_Cell( r, t.pcell()->tail() );
         } },
