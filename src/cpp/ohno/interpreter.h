@@ -12,6 +12,7 @@ template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT>
 class OhNoInterpreter : public kcon::KConInterpreter<System, SchemeT, AllocatorT>
 {
 public:
+    typedef OhNoShellManager<System, SchemeT, AllocatorT> ShellManager;
 };
 
 }   //namespace

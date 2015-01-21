@@ -104,6 +104,9 @@
 		<Unit filename="ohno/interpreter.h">
 			<Option virtualFolder="ohno/" />
 		</Unit>
+		<Unit filename="ohno/shell.cpp">
+			<Option virtualFolder="ohno/" />
+		</Unit>
 		<Unit filename="ohno/shell.h">
 			<Option virtualFolder="ohno/" />
 		</Unit>
