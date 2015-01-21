@@ -140,3 +140,8 @@ auto Console<InterpreterT>::go( int argc, const char* argv[] ) -> int
 #include "../kcon/shell.h"
 
 template class Console<kcon::KConInterpreter>;
+
+#include "../ohno/interpreter.h"
+#include "../ohno/shell.h"
+
+template class Console<ohno::OhNoInterpreter>;

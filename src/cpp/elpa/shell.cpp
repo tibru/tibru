@@ -381,3 +381,9 @@ template class Shell< Env<Debug, SimpleScheme, TestAllocator, kcon::KConInterpre
 template class Shell< Env<Debug, SimpleScheme, SimpleAllocator, kcon::KConInterpreter> >;
 template class Shell< Env<Safe, OptScheme, OptAllocator, kcon::KConInterpreter> >;
 template class Shell< Env<Fast, OptScheme, OptAllocator, kcon::KConInterpreter> >;
+
+#include "../ohno/interpreter.h"
+#include "../ohno/shell.h"
+template class Shell< Env<Debug, SimpleScheme, TestAllocator, ohno::OhNoInterpreter> >;
+template class Shell< Env<Safe, OptScheme, OptAllocator, ohno::OhNoInterpreter> >;
+template class Shell< Env<Fast, OptScheme, OptAllocator, ohno::OhNoInterpreter> >;

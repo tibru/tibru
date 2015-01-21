@@ -1,6 +1,6 @@
-#include "kcon/console.h"
+#include "ohno/console.h"
 
 auto main( int argc, const char* argv[] ) -> int
 {
-    return kcon::KConConsole().go( argc, argv );
+    return ohno::OhNoConsole().go( argc, argv );
 }

@@ -5,7 +5,7 @@
 		<Option title="OhNo" />
 		<Option pch_mode="2" />
 		<Option compiler="gcc" />
-		<Option virtualFolders="elpa/;kcon/;elpa/container/;" />
+		<Option virtualFolders="elpa/;kcon/;elpa/container/;ohno/;" />
 		<Build>
 			<Target title="Release">
 				<Option output="bin/Release/OhNo" prefix_auto="1" extension_auto="1" />
@@ -76,7 +76,9 @@
 		<Unit filename="elpa/types.h">
 			<Option virtualFolder="elpa/" />
 		</Unit>
-		<Unit filename="kcon/console.h" />
+		<Unit filename="kcon/console.h">
+			<Option virtualFolder="kcon/" />
+		</Unit>
 		<Unit filename="kcon/interpreter.cpp">
 			<Option virtualFolder="kcon/" />
 		</Unit>
@@ -96,6 +98,21 @@
 			<Option virtualFolder="kcon/" />
 		</Unit>
 		<Unit filename="ohno.cpp" />
+		<Unit filename="ohno/console.h">
+			<Option virtualFolder="ohno/" />
+		</Unit>
+		<Unit filename="ohno/interpreter.h">
+			<Option virtualFolder="ohno/" />
+		</Unit>
+		<Unit filename="ohno/shell.h">
+			<Option virtualFolder="ohno/" />
+		</Unit>
+		<Unit filename="ohno/tests.cpp">
+			<Option virtualFolder="ohno/" />
+		</Unit>
+		<Unit filename="ohno/tests.h">
+			<Option virtualFolder="ohno/" />
+		</Unit>
 		<Extensions>
 			<code_completion />
 			<debugger />
