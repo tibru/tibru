@@ -1,5 +1,5 @@
-#ifndef CONSOLE_H_INCLUDED
-#define CONSOLE_H_INCLUDED
+#ifndef ELPA_CONSOLE_H_INCLUDED
+#define ELPA_CONSOLE_H_INCLUDED
 
 #include "common.h"
 #include "interpreter.h"
@@ -21,4 +21,4 @@ struct Console
 
 }   //namespace
 
-#endif // CONSOLE_H_INCLUDED
+#endif // ELPA_CONSOLE_H_INCLUDED

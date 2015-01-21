@@ -2,31 +2,17 @@
 <CodeBlocks_project_file>
 	<FileVersion major="1" minor="6" />
 	<Project>
-		<Option title="KCon" />
+		<Option title="OhNo" />
 		<Option pch_mode="2" />
 		<Option compiler="gcc" />
-		<Option virtualFolders="elpa/;elpa/container/;kcon/;" />
+		<Option virtualFolders="elpa/;kcon/;elpa/container/;" />
 		<Build>
 			<Target title="Release">
-				<Option output="bin/Release/KCon" prefix_auto="1" extension_auto="1" />
+				<Option output="bin/Release/OhNo" prefix_auto="1" extension_auto="1" />
 				<Option object_output="obj/Release/" />
 				<Option type="1" />
 				<Option compiler="gcc" />
-				<Option parameters="-tests -repl test.elpa" />
-				<Compiler>
-					<Add option="-O2" />
-					<Add option="-fexceptions -std=c++14" />
-				</Compiler>
-				<Linker>
-					<Add option="-s" />
-				</Linker>
-			</Target>
-			<Target title="Matlis">
-				<Option output="bin/Matlis/KCon" prefix_auto="1" extension_auto="1" />
-				<Option working_dir="bin/Matlis/" />
-				<Option object_output="obj/Matlis/" />
-				<Option type="1" />
-				<Option compiler="gcc" />
+				<Option parameters="-tests -repl" />
 				<Compiler>
 					<Add option="-O2" />
 				</Compiler>
@@ -37,18 +23,16 @@
 		</Build>
 		<Compiler>
 			<Add option="-Wall" />
-			<Add option="-fexceptions" />
+			<Add option="-fexceptions -std=c++14" />
 		</Compiler>
 		<Unit filename="elpa/common.h">
 			<Option virtualFolder="elpa/" />
 		</Unit>
 		<Unit filename="elpa/console.cpp">
 			<Option virtualFolder="elpa/" />
-			<Option target="Release" />
 		</Unit>
 		<Unit filename="elpa/console.h">
 			<Option virtualFolder="elpa/" />
-			<Option target="Release" />
 		</Unit>
 		<Unit filename="elpa/container/elpa_map.h">
 			<Option virtualFolder="elpa/container/" />
@@ -92,11 +76,7 @@
 		<Unit filename="elpa/types.h">
 			<Option virtualFolder="elpa/" />
 		</Unit>
-		<Unit filename="kcon.cpp" />
-		<Unit filename="kcon/console.h">
-			<Option virtualFolder="kcon/" />
-			<Option target="Release" />
-		</Unit>
+		<Unit filename="kcon/console.h" />
 		<Unit filename="kcon/interpreter.cpp">
 			<Option virtualFolder="kcon/" />
 		</Unit>
@@ -111,12 +91,11 @@
 		</Unit>
 		<Unit filename="kcon/tests.cpp">
 			<Option virtualFolder="kcon/" />
-			<Option target="Release" />
 		</Unit>
 		<Unit filename="kcon/tests.h">
 			<Option virtualFolder="kcon/" />
-			<Option target="Release" />
 		</Unit>
+		<Unit filename="ohno.cpp" />
 		<Extensions>
 			<code_completion />
 			<debugger />
