@@ -4,14 +4,11 @@
 #include "shell.h"
 #include "container/range.h"
 
-#include "../kcon/tests.h"
-#include "../kcon/interpreter.h"
-#include "../kcon/shell.h"
-
 using namespace elpa;
 using namespace elpa::container;
 
-auto Console::help( int ret_code ) -> int
+template<MetaInterpreter class InterpreterT>
+auto Console<InterpreterT>::help( int ret_code ) -> int
 {
     std::cout << "usage: kcon [option] <filenames>\n";
     std::cout << "Options are:\n";
@@ -27,8 +24,9 @@ auto Console::help( int ret_code ) -> int
     return ret_code;
 }
 
+template<MetaInterpreter class InterpreterT>
 template<class Env>
-auto Console::run( size_t ncells, const std::vector< std::string >& filenames, bool noisy, bool repl ) -> int
+auto Console<InterpreterT>::run( size_t ncells, const std::vector< std::string >& filenames, bool noisy, bool repl ) -> int
 {
     Shell< Env > shell( ncells );
 
@@ -46,7 +44,8 @@ auto Console::run( size_t ncells, const std::vector< std::string >& filenames, b
     return 0;
 }
 
-auto Console::go( int argc, const char* argv[] ) -> int
+template<MetaInterpreter class InterpreterT>
+auto Console<InterpreterT>::go( int argc, const char* argv[] ) -> int
 {
     bool run_tests = false;
     size_t ncells = 0;
@@ -108,7 +107,7 @@ auto Console::go( int argc, const char* argv[] ) -> int
         try
         {
             elpa::run_tests();
-            kcon::run_tests();
+            this->run_tests();
             std::cout << "\n** All tests passed **\n";
         }
         catch( const Error<Test>& e )
@@ -121,11 +120,11 @@ auto Console::go( int argc, const char* argv[] ) -> int
     try
     {
         if( mode == "-debug" )
-            return run< Env<Debug, SimpleScheme, TestAllocator, kcon::KConInterpreter> >( ncells, filenames, noisy, repl );
+            return run< Env<Debug, SimpleScheme, TestAllocator, InterpreterT> >( ncells, filenames, noisy, repl );
         else if( mode == "-safe" )
-            return run< Env<Safe, OptScheme, OptAllocator, kcon::KConInterpreter> >( ncells, filenames, noisy, repl );
+            return run< Env<Safe, OptScheme, OptAllocator, InterpreterT> >( ncells, filenames, noisy, repl );
         else if( mode == "-fast" )
-            return run< Env<Fast, OptScheme, OptAllocator, kcon::KConInterpreter> >( ncells, filenames, noisy, repl );
+            return run< Env<Fast, OptScheme, OptAllocator, InterpreterT> >( ncells, filenames, noisy, repl );
     }
     catch( const Error<Runtime,OutOfMemory>& )
     {
@@ -136,3 +135,8 @@ auto Console::go( int argc, const char* argv[] ) -> int
     std::cerr << "Unknown mode: "s + mode;
     return 1;
 }
+
+#include "../kcon/interpreter.h"
+#include "../kcon/shell.h"
+
+template class Console<kcon::KConInterpreter>;

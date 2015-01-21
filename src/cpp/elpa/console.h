@@ -2,17 +2,21 @@
 #define CONSOLE_H_INCLUDED
 
 #include "common.h"
+#include "interpreter.h"
 
 namespace elpa {
 
+template<MetaInterpreter class Interpreter>
 struct Console
 {
-    static auto help( int ret_code ) -> int;
+    virtual auto help( int ret_code ) -> int;
+    virtual void run_tests() const = 0;
 
     template<class Env>
-    static auto run( size_t ncells, const std::vector< std::string >& filenames, bool noisy, bool repl ) -> int;
+    auto run( size_t ncells, const std::vector< std::string >& filenames, bool noisy, bool repl ) -> int;
 
-    static auto go( int argc, const char* argv[] ) -> int;
+    auto go( int argc, const char* argv[] ) -> int;
+
 };
 
 }   //namespace
