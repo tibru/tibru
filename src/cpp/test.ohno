@@ -24,5 +24,10 @@
 :def f id
 
 % call a function
-![f [exitenv #21 nil]]
+% ![f [exitenv #21 nil]]
+
+% stage a function call
+![[env #22' id' exitenv' %] nil]
+
+
 
