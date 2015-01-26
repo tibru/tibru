@@ -86,7 +86,7 @@ auto KConInterpreter<System, SchemeT, AllocatorT>::select( elem_t elem ) -> elem
 }
 
 template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT>
-auto KConInterpreter<System, SchemeT, AllocatorT>::_ifcell( pcell_t choices, elem_t cond ) -> elem_t
+auto KConInterpreter<System, SchemeT, AllocatorT>::_ifcell( elem_t env, pcell_t choices, elem_t cond ) -> elem_t
 {
     if( cond.is_pcell() )
         return choices->tail();
@@ -100,17 +100,26 @@ auto KConInterpreter<System, SchemeT, AllocatorT>::ifcell( elem_t elem ) -> elem
 {
     pcell_t p = elem.pcell( "? operates only on cells" );
 
-    return _ifcell( p->head().pcell( "? Requires two choices not a byte"), p->tail() );
+    return _ifcell( elem_t(), p->head().pcell( "? Requires two choices not a byte"), p->tail() );
 }
 
 template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT>
 auto KConInterpreter<System, SchemeT, AllocatorT>::_reduce( elem_t env, pcell_t expr ) -> elem_t
 {
     uint8_t code = Scheme::byte_value( expr->head().byte( "@ requires expression code to be a byte" ) );
+    elem_t params = expr->tail();
+
     if( code == 0 )
-        return _constant( env, expr->tail() );
+        return _constant( env, params );
     else if( code == 1 )
-        return _select( env, expr->tail().pcell( "@ 1 requires cell based path" ) );
+        return _select( env, params.pcell( "@ 1 requires cell based path" ) );
+    else if( code == 2 )
+    {
+        pcell_t p = params.pcell( "@ 2 requires cell based choices and condition" );
+        pcell_t choices = p->head().pcell( "@ 2 requires cell based choices" );
+        elem_t cond = p->tail();
+        return _ifcell( env, choices, cond );
+    }
     else
         System::check( false, "@ requires expression code to be 0 or 1" );
 

@@ -106,6 +106,7 @@ struct Tester
         shell.parse( ":def nil 0" );
         shell.parse( ":def const 0" );
         shell.parse( ":def select 1" );
+        shell.parse( ":def ifcell 2" );
 
         //Constant
         test_op( ".[0 21]", "[0 21]" );
@@ -144,9 +145,13 @@ struct Tester
         test_op( "@[nil const 21]", "21" );
         test_op( "@[[10 20 30] select #1 1]", "20" );
         test_op( "@[[10 20 30] select #1 0 #1 0]", "30" );
+        test_op( "@[[10 20 30] ifcell [0 1] [0 0]]", "1" );
+        test_op( "@[[10 20 30] ifcell [0 1] 0]", "0" );
         test_op_illegal( "@21", "@ operates only on cells" );
         test_op_illegal( "@[2 3]", "@ requires cell expression" );
         test_op_illegal( "@[nil 3 0]", "@ requires expression code to be 0 or 1" );
+        test_op_illegal( "@[[10 20 30] ifcell 0]", "@ 2 requires cell based choices and condition" );
+        test_op_illegal( "@[[10 20 30] ifcell 0 0]", "@ 2 requires cell based choices" );
 
         //Evaluate
         test_op( "*[nil const 21]", "21" );
