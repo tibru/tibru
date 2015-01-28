@@ -72,8 +72,7 @@ auto KConShellManager<System, SchemeT, AllocatorT>::operators() -> const Operato
     static const Operators ops = {
         "![[f x] v]        -> ![*[v f] *[v x]]",
         "![0 x]            -> x",
-        "![1 e [x y]]      -> ?[[x y] c]",
-        "![2 x r y]        -> +[x r y]",
+        "![1 x y r]        -> +[x y r]",
         "*[v [[x y] .. z]] -> [@[v z] @[v [x y]]]",
         "*[v e]            -> @[v e]",
         "@[v 0 x]          -> .x",
@@ -83,7 +82,7 @@ auto KConShellManager<System, SchemeT, AllocatorT>::operators() -> const Operato
         "/[v [t1 ..] h1 r] -> /[head{h1}( tail{t1 + 256*t2 ...}(v) ) r]",
         "?[[x y] [a b]]    -> y",
         "?[[x y] a]        -> x",
-        "+[x r y]          -> append y onto x at r"
+        "+[x y r]          -> append y onto x at r"
     };
     return ops;
 }
