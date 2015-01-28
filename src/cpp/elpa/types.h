@@ -42,7 +42,7 @@ struct SimpleScheme
         bool operator<( byte_t b ) const { return _val < b._val; }
     };
 
-    static byte_t byte_with_tag( uint8_t value, uint8_t tag ) { return byte_t( value, tag ); }
+    static byte_t new_byte( uint8_t value, uint8_t tag=0 ) { return byte_t( value, tag ); }
     static uint8_t byte_value( byte_t b ) { return b.value(); }
     static uint8_t byte_tag( byte_t b ) { return b.tag(); }
 

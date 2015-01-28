@@ -118,16 +118,16 @@ public:
 
 	void gc();
 
-    auto new_Cell( const elem_t& head, const elem_t& tail ) -> const Cell*
+    auto new_Cell( const elem_t& head, const elem_t& tail ) -> pcell_t
     {
-		elem_t e = System::check_address( new Cell( head, tail ) );	//switch pcell_t
-		_allocated.insert( e.pcell() );
-        this->add_root( &e );
+		pcell_t p = System::check_address( new Cell( head, tail ) );
+		_allocated.insert( p );
+        this->add_root( &p );
         _shift();
         if( _allocated.size() == this->_ncells )
             gc();
-        this->del_root( &e );
-        return e.pcell();
+        this->del_root( &p );
+        return p;
     }
 
     auto num_allocated() const -> size_t
@@ -211,17 +211,15 @@ public:
     	return this->_ncells;
     }
 
-    auto new_Cell( const elem_t& head, const elem_t& tail ) -> const Cell*
+    auto new_Cell( const elem_t& head, const elem_t& tail ) -> pcell_t
     {
         pcell_t p = new (_next()) Cell( head, tail );
 
         if( _free_list == 0 )
         {
-            elem_t e = p;
-            this->add_root( &e);
+            this->add_root( &p );
             gc();
-            this->del_root( &e );
-            p = e.pcell();
+            this->del_root( &p );
         }
 
         return p;

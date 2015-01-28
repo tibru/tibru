@@ -27,13 +27,13 @@ auto Shell<Env>::_process_command( const std::string& cmd, elpa_istream& eis, el
     	    if( _defns_byte_counts[val] < Scheme::MAX_TAG )
     	    {
                 _defns_byte_counts[val]++;
-                elem = Scheme::byte_with_tag( val, _defns_byte_counts[val] );
+                elem = Scheme::new_byte( val, _defns_byte_counts[val] );
 
                 _defns_no_it[name] = elem;
     	    }
             else
             {
-                elem = Scheme::byte_with_tag( val, 0 );
+                elem = Scheme::new_byte( val );
             }
     	}
         else

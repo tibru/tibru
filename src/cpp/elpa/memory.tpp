@@ -49,21 +49,22 @@ void TestAllocator<System, SchemeT>::_shift()
         old_to_new[p] = q;
     }
 
-    auto move = [&old_to_new]( elem_t e ) { return e.is_pcell() ? old_to_new[e.pcell()] : e; };
+    auto move_elem = [&old_to_new]( elem_t e ) { return e.is_pcell() ? old_to_new[e.pcell()] : e; };
+    auto move_pcell = [&old_to_new]( pcell_t p ) { return old_to_new[p]; };
 
     for( auto p : old_to_new )
     {
-        new (p.second) Cell( move( p.first->head() ), move( p.first->tail() ) );
+        new (p.second) Cell( move_elem( p.first->head() ), move_elem( p.first->tail() ) );
         new ((Cell*) p.first) Cell( elem_t(), elem_t() );
         delete p.first;
     }
 
     for( auto r : this->_elem_roots )
         if( r->is_pcell() )
-            *r = move( *r ).pcell();
+            *r = move_elem( *r ).pcell();
 
     for( auto r : this->_pcell_roots )
-        *r = move( *r ).pcell();
+        *r = move_pcell( *r );
 }
 
 template<class System, MetaScheme class SchemeT>

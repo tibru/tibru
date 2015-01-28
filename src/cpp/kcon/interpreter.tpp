@@ -141,12 +141,45 @@ auto KConInterpreter<System, SchemeT, AllocatorT>::reduce( elem_t elem ) -> elem
 template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT>
 auto KConInterpreter<System, SchemeT, AllocatorT>::_graft( elem_t env, elem_t elem, pcell_t path ) -> elem_t
 {
-    while( path != 0 )
+    auto_root<elem_t> v( this->allocator(), env );
+    auto_root<elem_t> e( this->allocator(), elem );
+    auto_root<pcell_t> pth( this->allocator(), path );
+
+    elpa_stack<elem_t> route( this->allocator() );
+    auto_root<pcell_t> rpth( this->allocator(), 0 );
+
+    while( pth != 0 )
     {
         size_t tcount;
         size_t hcount;
 
-        path = _parse_path_elem( path, tcount, hcount );
+        pcell_t tcells = pth->head().pcell( "Path tails count must be a cell" );
+        pth = _parse_path_elem( pth, tcount, hcount );
+
+        if( rpth == 0 )
+            rpth = this->allocator().new_Cell( tcells, Scheme::new_byte( hcount ) );
+        else
+            rpth = this->allocator().new_Cell( tcells, this->allocator().new_Cell( byte_t( hcount ), elem_t( rpth ) ) );
+
+        while( tcount-- > 0 )
+        {
+            route.push( env.pcell( "Tried to access tail of a byte" )->head() );
+            env = env.pcell()->tail();
+        }
+
+        while( hcount-- > 0 )
+        {
+            route.push( env.pcell( "Tried to access head of a byte" )->tail() );
+            env = env.pcell()->head();
+        }
+    }
+
+    while( rpth != 0 )
+    {
+        size_t tcount;
+        size_t hcount;
+
+        rpth = _parse_path_elem( rpth, tcount, hcount );
     }
 
     return env;

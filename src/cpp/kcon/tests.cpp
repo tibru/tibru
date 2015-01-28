@@ -142,7 +142,7 @@ struct Tester
         test_op_illegal( "?0", "? operates only on cells" );
 
         //Graft
-        test_op( "+[0 21 [#0 0]]", "0" );
+        test_op( "+[0 21 [#0 0]]", "21" );
         test_op_illegal( "+[0 0]", "+ requires path and element" );
         test_op_illegal( "+[0 0 0]", "+ requires path to be a cell" );
         test_op_illegal( "+[0 0 [0 0]]", "Path tails count must be cells" );

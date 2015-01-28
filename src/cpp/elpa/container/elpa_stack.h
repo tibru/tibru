@@ -68,9 +68,9 @@ struct elpa_stack<System, SchemeT, AllocatorT, typename SchemeT<System>::pcell_t
     elpa_stack( Allocator& alloc )
         : basic_elpa_stack<System, SchemeT, AllocatorT>( alloc ) {}
 
-    void push( pcell_t item, const typename Allocator::Roots& roots={} )
+    void push( pcell_t item )
     {
-        this->_push( item, roots );
+        this->_push( item );
     }
 
     auto top() -> pcell_t

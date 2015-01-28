@@ -20,6 +20,9 @@ class KConInterpreter : public InterpreterBase<System, SchemeT, AllocatorT>
     typedef typename Scheme::elem_t elem_t;
 
     template<class T>
+    using elpa_stack = elpa::container::elpa_stack<System, SchemeT, AllocatorT, T>;
+
+    template<class T>
     using auto_root = typename Allocator::template auto_root<T>;
 
     static auto _parse_count( pcell_t bytes ) -> size_t;
