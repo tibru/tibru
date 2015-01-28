@@ -30,6 +30,7 @@ class KConInterpreter : public InterpreterBase<System, SchemeT, AllocatorT>
     auto _ifcell( elem_t env, pcell_t choices, elem_t cond ) -> elem_t;
     auto _reduce( elem_t env, pcell_t expr ) -> elem_t;
     auto _evaluate( elem_t env, pcell_t expr ) -> elem_t;
+    auto _graft( elem_t env, elem_t elem, pcell_t path ) -> elem_t;
 public:
     KConInterpreter( size_t ncells )
         : InterpreterBase<System, SchemeT, AllocatorT>( ncells ) {}
@@ -41,6 +42,7 @@ public:
     auto ifcell( elem_t elem ) -> elem_t;
     auto reduce( elem_t elem ) -> elem_t;
     auto evaluate( elem_t elem ) -> elem_t;
+    auto graft( elem_t elem ) -> elem_t;
     auto execute( elem_t stmt ) -> elem_t;
     auto execute_trace( elem_t state, bool& more ) -> elem_t;
 };

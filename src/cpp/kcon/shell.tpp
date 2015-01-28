@@ -123,6 +123,10 @@ auto KConShellManager<System, SchemeT, AllocatorT>::process_operator( char op, e
     {
         return this->_interpreter.evaluate( elem  );
     }
+    else if( op == '+' )
+    {
+        return this->_interpreter.graft( elem );
+    }
     else if( op == '!' )
     {
         if( _trace_limit > 0 )

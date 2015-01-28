@@ -139,6 +139,29 @@ auto KConInterpreter<System, SchemeT, AllocatorT>::reduce( elem_t elem ) -> elem
 }
 
 template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT>
+auto KConInterpreter<System, SchemeT, AllocatorT>::_graft( elem_t env, elem_t elem, pcell_t path ) -> elem_t
+{
+    while( path != 0 )
+    {
+        size_t tcount;
+        size_t hcount;
+
+        path = _parse_path_elem( path, tcount, hcount );
+    }
+
+    return env;
+}
+
+template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT>
+auto KConInterpreter<System, SchemeT, AllocatorT>::graft( elem_t elem ) -> elem_t
+{
+    pcell_t p = elem.pcell( "+ operates only on cells" );
+    pcell_t params = p->tail().pcell( "+ requires path and element");
+
+    return _graft( p->head(), params->head(), params->tail().pcell( "+ requires path to be a cell" ) );
+}
+
+template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT>
 auto KConInterpreter<System, SchemeT, AllocatorT>::_evaluate( elem_t env, pcell_t expr ) -> elem_t
 {
     if( expr->head().is_byte() )
@@ -193,6 +216,15 @@ auto KConInterpreter<System, SchemeT, AllocatorT>::execute_trace( elem_t state, 
     {
         more = false;
         return env;
+    }
+    else if( Scheme::byte_value( stmt.byte() ) == 1 )
+    {
+        pcell_t params = env.pcell( "! graft form requires environment, path and element" );
+        env = params->head();
+        params = params->tail().pcell( "! graft form requires path and element" );
+        elem_t elem = params->head();
+        pcell_t path = params->tail().pcell( "! graft form requires cell based path" );
+        return _graft( env, elem, path );
     }
     else
         System::check( false, "! statement code must be 0" );
