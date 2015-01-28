@@ -143,9 +143,17 @@ struct Tester
 
         //Graft
         test_op( "+[0 21 [#0 0]]", "21" );
+        test_op( "+[[0 1] 21 [#1 0]]", "[0 21]" );
+        test_op( "+[[0 1 2] [21 22] [#2 0]]", "[0 1 21 22]" );
+        test_op( "+[[0 1 2] [21 22] [#0 1]]", "[[21 22] 1 2]" );
+        test_op( "+[[[0 1] [2 3]] [21 22] [#1 1]]", "[[0 1] [21 22] 3]" );
+        test_op( "+[[[[1 2] [3 4]] [[5 6] [7 8]]] 21 #1 1 #1 0]", "[[[1 2] 3 4] [5 21] 7 8]" );
+        test_op( "+[[[[1 2] [3 4]] [[5 6] [7 8]]] 21 #1 1 #0 1]", "[[[1 2] 3 4] [21 6] 7 8]" );
         test_op_illegal( "+[0 0]", "+ requires path and element" );
         test_op_illegal( "+[0 0 0]", "+ requires path to be a cell" );
         test_op_illegal( "+[0 0 [0 0]]", "Path tails count must be cells" );
+        test_op_illegal( "+[0 21 [#1 0]]", "Tried to access tail of a byte" );
+        test_op_illegal( "+[0 21 [#0 1]]", "Tried to access head of a byte" );
 
         //Reduce
         test_op( "@[nil const 21]", "21" );

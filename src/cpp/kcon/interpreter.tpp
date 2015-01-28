@@ -147,30 +147,31 @@ auto KConInterpreter<System, SchemeT, AllocatorT>::_graft( elem_t env, elem_t el
 
     elpa_stack<elem_t> route( this->allocator() );
     auto_root<pcell_t> rpth( this->allocator(), 0 );
+    auto_root<pcell_t> tcells( this->allocator() );
 
     while( pth != 0 )
     {
         size_t tcount;
         size_t hcount;
 
-        pcell_t tcells = pth->head().pcell( "Path tails count must be cells" );
+        tcells = pth->head().pcell( "Path tails count must be cells" );
         pth = _parse_path_elem( pth, tcount, hcount );
 
         if( rpth == 0 )
-            rpth = this->allocator().new_Cell( tcells, Scheme::new_byte( hcount ) );
+            rpth = this->allocator().new_Cell( elem_t( tcells ), Scheme::new_byte( hcount ) );
         else
-            rpth = this->allocator().new_Cell( tcells, this->allocator().new_Cell( byte_t( hcount ), elem_t( rpth ) ) );
+            rpth = this->allocator().new_Cell( elem_t( tcells ), this->allocator().new_Cell( byte_t( hcount ), elem_t( rpth ) ) );
 
         while( tcount-- > 0 )
         {
-            route.push( env.pcell( "Tried to access tail of a byte" )->head() );
-            env = env.pcell()->tail();
+            route.push( v.pcell( "Tried to access tail of a byte" )->head() );
+            v = v.pcell()->tail();
         }
 
         while( hcount-- > 0 )
         {
-            route.push( env.pcell( "Tried to access head of a byte" )->tail() );
-            env = env.pcell()->head();
+            route.push( v.pcell( "Tried to access head of a byte" )->tail() );
+            v = v.pcell()->head();
         }
     }
 
