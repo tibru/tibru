@@ -42,11 +42,11 @@
 		<Unit filename="elpa/common.h">
 			<Option virtualFolder="elpa/" />
 		</Unit>
-		<Unit filename="elpa/console.cpp">
+		<Unit filename="elpa/console.h">
 			<Option virtualFolder="elpa/" />
 			<Option target="Release" />
 		</Unit>
-		<Unit filename="elpa/console.h">
+		<Unit filename="elpa/console.tpp">
 			<Option virtualFolder="elpa/" />
 			<Option target="Release" />
 		</Unit>
@@ -68,6 +68,10 @@
 		<Unit filename="elpa/memory.h">
 			<Option virtualFolder="elpa/" />
 		</Unit>
+		<Unit filename="elpa/memory.tpp">
+			<Option virtualFolder="elpa/" />
+			<Option target="Release" />
+		</Unit>
 		<Unit filename="elpa/runtime.h">
 			<Option virtualFolder="elpa/" />
 		</Unit>
@@ -77,11 +81,19 @@
 		<Unit filename="elpa/shell.h">
 			<Option virtualFolder="elpa/" />
 		</Unit>
+		<Unit filename="elpa/shell.tpp">
+			<Option virtualFolder="elpa/" />
+			<Option target="Release" />
+		</Unit>
 		<Unit filename="elpa/stream.cpp">
 			<Option virtualFolder="elpa/" />
 		</Unit>
 		<Unit filename="elpa/stream.h">
 			<Option virtualFolder="elpa/" />
+		</Unit>
+		<Unit filename="elpa/stream.tpp">
+			<Option virtualFolder="elpa/" />
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="elpa/tests.cpp">
 			<Option virtualFolder="elpa/" />
@@ -93,6 +105,10 @@
 			<Option virtualFolder="elpa/" />
 		</Unit>
 		<Unit filename="kcon.cpp" />
+		<Unit filename="kcon/console.cpp">
+			<Option virtualFolder="kcon/" />
+			<Option target="Release" />
+		</Unit>
 		<Unit filename="kcon/console.h">
 			<Option virtualFolder="kcon/" />
 			<Option target="Release" />
@@ -103,11 +119,19 @@
 		<Unit filename="kcon/interpreter.h">
 			<Option virtualFolder="kcon/" />
 		</Unit>
+		<Unit filename="kcon/interpreter.tpp">
+			<Option virtualFolder="kcon/" />
+			<Option target="Release" />
+		</Unit>
 		<Unit filename="kcon/shell.cpp">
 			<Option virtualFolder="kcon/" />
 		</Unit>
 		<Unit filename="kcon/shell.h">
 			<Option virtualFolder="kcon/" />
+		</Unit>
+		<Unit filename="kcon/shell.tpp">
+			<Option virtualFolder="kcon/" />
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="kcon/tests.cpp">
 			<Option virtualFolder="kcon/" />

@@ -1,11 +1,13 @@
+#ifndef ELPA_CONSOLE_TPP_INCLUDED
+#define ELPA_CONSOLE_TPP_INCLUDED
+
 #include "console.h"
 #include "tests.h"
 #include "runtime.h"
 #include "shell.h"
 #include "container/range.h"
 
-using namespace elpa;
-using namespace elpa::container;
+namespace elpa {
 
 template<MetaInterpreter class InterpreterT>
 auto Console<InterpreterT>::help( int ret_code ) -> int
@@ -54,7 +56,7 @@ auto Console<InterpreterT>::go( int argc, const char* argv[] ) -> int
     bool repl = false;
     std::vector< std::string > filenames;
 
-    for( const std::string arg : range( argv + 1, argv + argc ) )
+    for( const std::string arg : container::range( argv + 1, argv + argc ) )
     {
         if( arg.length() > 1 && arg[0] == '-' )
         {
@@ -136,12 +138,6 @@ auto Console<InterpreterT>::go( int argc, const char* argv[] ) -> int
     return 1;
 }
 
-#include "../kcon/interpreter.h"
-#include "../kcon/shell.h"
+}   //namespace
 
-template class Console<kcon::KConInterpreter>;
-
-#include "../ohno/interpreter.h"
-#include "../ohno/shell.h"
-
-template class Console<ohno::OhNoInterpreter>;
+#endif

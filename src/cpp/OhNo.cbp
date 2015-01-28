@@ -34,6 +34,9 @@
 		<Unit filename="elpa/console.h">
 			<Option virtualFolder="elpa/" />
 		</Unit>
+		<Unit filename="elpa/console.tpp">
+			<Option virtualFolder="elpa/" />
+		</Unit>
 		<Unit filename="elpa/container/elpa_map.h">
 			<Option virtualFolder="elpa/container/" />
 		</Unit>
@@ -52,6 +55,9 @@
 		<Unit filename="elpa/memory.h">
 			<Option virtualFolder="elpa/" />
 		</Unit>
+		<Unit filename="elpa/memory.tpp">
+			<Option virtualFolder="elpa/" />
+		</Unit>
 		<Unit filename="elpa/runtime.h">
 			<Option virtualFolder="elpa/" />
 		</Unit>
@@ -67,6 +73,9 @@
 		<Unit filename="elpa/stream.h">
 			<Option virtualFolder="elpa/" />
 		</Unit>
+		<Unit filename="elpa/stream.tpp">
+			<Option virtualFolder="elpa/" />
+		</Unit>
 		<Unit filename="elpa/tests.cpp">
 			<Option virtualFolder="elpa/" />
 		</Unit>
@@ -75,6 +84,9 @@
 		</Unit>
 		<Unit filename="elpa/types.h">
 			<Option virtualFolder="elpa/" />
+		</Unit>
+		<Unit filename="kcon/console.cpp">
+			<Option virtualFolder="kcon/" />
 		</Unit>
 		<Unit filename="kcon/console.h">
 			<Option virtualFolder="kcon/" />
@@ -85,10 +97,16 @@
 		<Unit filename="kcon/interpreter.h">
 			<Option virtualFolder="kcon/" />
 		</Unit>
+		<Unit filename="kcon/interpreter.tpp">
+			<Option virtualFolder="kcon/" />
+		</Unit>
 		<Unit filename="kcon/shell.cpp">
 			<Option virtualFolder="kcon/" />
 		</Unit>
 		<Unit filename="kcon/shell.h">
+			<Option virtualFolder="kcon/" />
+		</Unit>
+		<Unit filename="kcon/shell.tpp">
 			<Option virtualFolder="kcon/" />
 		</Unit>
 		<Unit filename="kcon/tests.cpp">
@@ -108,6 +126,9 @@
 			<Option virtualFolder="ohno/" />
 		</Unit>
 		<Unit filename="ohno/shell.h">
+			<Option virtualFolder="ohno/" />
+		</Unit>
+		<Unit filename="ohno/shell.tpp">
 			<Option virtualFolder="ohno/" />
 		</Unit>
 		<Unit filename="ohno/tests.cpp">
