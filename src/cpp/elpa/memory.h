@@ -50,6 +50,13 @@ public:
 
         auto_root_ref( Allocator& a, const T& root ) : T( root ), alloc( a ) {}
 
+        auto_root_ref& operator=( const auto_root_ref& ar )
+        {
+            System::assert( &this->alloc == &ar.alloc, "Mismatch of allocator in auto_root_ref assignment" );
+            T::operator=( ar );
+            return *this;
+        }
+
         T* addr() { return this; }
     };
 
@@ -57,9 +64,14 @@ public:
     class auto_root : public auto_root_ref<T>
     {
         explicit auto_root( const auto_root& );
-        auto_root& operator=( const auto_root& );
     public:
         typedef auto_root_ref<T> ref;
+
+        auto_root& operator=( const auto_root& ar )
+        {
+            ref::operator=( ar );
+            return *this;
+        }
 
         auto_root( Allocator& alloc, const T& root=T() ) : ref( alloc, root ) { this->alloc.add_root( this->addr() ); }
         auto_root( const auto_root_ref<T>& r ) : ref( r ) { this->alloc.add_root( this->addr() ); }

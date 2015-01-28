@@ -153,7 +153,7 @@ auto KConInterpreter<System, SchemeT, AllocatorT>::_graft( elem_t env, elem_t el
         size_t tcount;
         size_t hcount;
 
-        pcell_t tcells = pth->head().pcell( "Path tails count must be a cell" );
+        pcell_t tcells = pth->head().pcell( "Path tails count must be cells" );
         pth = _parse_path_elem( pth, tcount, hcount );
 
         if( rpth == 0 )
@@ -174,15 +174,29 @@ auto KConInterpreter<System, SchemeT, AllocatorT>::_graft( elem_t env, elem_t el
         }
     }
 
+    v = e;
+
     while( rpth != 0 )
     {
         size_t tcount;
         size_t hcount;
 
         rpth = _parse_path_elem( rpth, tcount, hcount );
+
+        while( hcount-- > 0 )
+        {
+            v = this->allocator().new_Cell( v, route.top() );
+            route.pop();
+        }
+
+        while( tcount-- > 0 )
+        {
+            v = this->allocator().new_Cell( route.top(), v );
+            route.pop();
+        }
     }
 
-    return env;
+    return v;
 }
 
 template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT>
