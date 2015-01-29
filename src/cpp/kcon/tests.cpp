@@ -47,6 +47,14 @@ struct Tester
         return oss.str();
     }
 
+    static auto print( elem_t e, const Defns& defns ) -> std::string
+    {
+        std::ostringstream oss;
+        elpa_ostream( oss ) << std::make_pair( &defns, e );
+        return oss.str();
+    }
+
+
     static void test_parse()
     {TEST
         Allocator a( 1024 );
@@ -76,6 +84,25 @@ struct Tester
         test_parse( "[[1 2 < 3] 2 [0 < 1] [10 20 <] <]", "[[20 10] [0 1] 2 2 1 3]" );
 
         test_parse( "[1'' 9]", "[[0 0 1] 9]" );
+        test_parse( "[1' 2' 3' < 4']", "[[0 3] [0 2] [0 1] 0 4]" );
+    }
+
+    static void test_shell()
+    {TEST
+        Shell< Env > shell( 100 );
+
+        shell.parse( ":names on" );
+        shell.parse( ":def qt 0" );
+        shell.parse( ":def x 0" );
+
+        auto test_parse = [&]( const std::string& in, const std::string& out )
+        {
+            std::string found = print( shell.parse( in ), shell.names() );
+
+            test( found == out, "Parse failed for: '" + in + "'\nExpected: '" + out + "'\nFound:    '" + found + "'" );
+        };
+
+        test_parse( "[1' 2' 3' x <]", "[x [qt 3] [qt 2] qt 1]" );
     }
 
     static void test_operators()
@@ -188,6 +215,7 @@ struct Tester
         std::cout << "TEST: " << TYPENAME( Env );
 
         test_parse();
+        test_shell();
         test_operators();
 
         std::cout << "\n\n";

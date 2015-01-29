@@ -41,7 +41,7 @@ template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT>
 auto KConShellManager<System, SchemeT, AllocatorT>::macros() -> const Macros&
 {
     static Macros macros = {
-        { '\'', []( Allocator& alloc, elem_t tail ) -> elem_t {
+        { '\'', []( Allocator& alloc, elem_t tail, std::vector<std::string>& names ) -> elem_t {
         	if( !tail.is_pcell() )
         		throw Error<Syntax>( "Invalid application of '" );
 
@@ -51,7 +51,7 @@ auto KConShellManager<System, SchemeT, AllocatorT>::macros() -> const Macros&
             r = alloc.new_Cell( t.pcell()->head(), r );
             return alloc.new_Cell( r, t.pcell()->tail() );
         } },
-        { '<', []( Allocator& alloc, elem_t tail ) -> elem_t {
+        { '<', []( Allocator& alloc, elem_t tail, std::vector<std::string>& names ) -> elem_t {
 			auto_root<elem_t> t( alloc, tail );
             auto_root<elem_t> r( alloc );
             while( t.is_pcell() )

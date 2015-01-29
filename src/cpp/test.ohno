@@ -41,7 +41,6 @@
 
 % define a function
 :def inc [pop1 v0 inc_table' lookup1' k %]
-![exit inc]
-% ![inc [exitenv #3 heap]]
+![inc [exitenv #3 heap]]
 
 

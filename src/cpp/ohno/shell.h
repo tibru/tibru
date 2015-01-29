@@ -19,6 +19,8 @@ class OhNoShellManager : public kcon::KConShellManager<System, SchemeT, Allocato
 
     template<class T>
     using auto_root = typename Allocator::template auto_root<T>;
+
+    static auto _count_undef( elem_t e ) -> size_t;
 public:
     OhNoShellManager( size_t ncells )
         : Base( ncells ) {}

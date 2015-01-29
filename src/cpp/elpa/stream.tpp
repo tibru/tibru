@@ -194,9 +194,9 @@ auto elpa_istream<System, SchemeT, AllocatorT>::_parse_reader( char c ) -> elem_
 }
 
 template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT>
-auto elpa_istream<System, SchemeT, AllocatorT>::_parse_macro( char c, elem_t tail ) -> elem_t
+auto elpa_istream<System, SchemeT, AllocatorT>::_parse_macro( char c, elem_t tail, std::vector<std::string>& names ) -> elem_t
 {
-    return _macros.at(c)( _alloc, tail );
+    return _macros.at(c)( _alloc, tail, names );
 }
 
 template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT>
@@ -271,7 +271,7 @@ auto elpa_istream<System, SchemeT, AllocatorT>::_parse_elems( std::vector< std::
 		    if( tail.is_undef() )
                 throw Error<Syntax>( "Unexpected macro '"s + c + "'" );
 
-		    tail = _parse_macro( c, tail );
+		    tail = _parse_macro( c, tail, names );
 		}
 		else
 			throw Error<Syntax>( "Unexpected '"s + c + "'" );
@@ -293,7 +293,7 @@ auto elpa_istream<System, SchemeT, AllocatorT>::_parse_elems( std::vector< std::
                     return tail;
                 }
 
-                tail = _parse_macro( c, tail );
+                tail = _parse_macro( c, tail, names );
             }
         }
 	}

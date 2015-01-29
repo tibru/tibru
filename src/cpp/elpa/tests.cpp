@@ -94,10 +94,10 @@ struct Tester
         };
 
         Macros macros = {
-            {'%', []( Allocator& a, elem_t tail ) -> elem_t {
+            {'%', []( Allocator& a, elem_t tail, std::vector<std::string>& names ) -> elem_t {
                 return a.new_Cell( tail.pcell()->head(), tail );
             } },
-            {'+', []( Allocator& a, elem_t tail ) -> elem_t {
+            {'+', []( Allocator& a, elem_t tail, std::vector<std::string>& names ) -> elem_t {
                 return a.new_Cell( byte_t( Scheme::byte_value( tail.pcell()->head().byte() ) + 1 ), tail.pcell()->tail() );
             } }
         };

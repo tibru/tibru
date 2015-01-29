@@ -137,7 +137,7 @@ class elpa_istream
 public:
 	typedef elpa_map<std::string,elem_t> Defns;
 	typedef std::map<char, std::function< auto (Allocator&, std::istream&) -> elem_t> > Readers;
-	typedef std::map<char, std::function< auto (Allocator&, elem_t) -> elem_t> > Macros;
+	typedef std::map<char, std::function< auto (Allocator&, elem_t, std::vector<std::string>&) -> elem_t> > Macros;
 private:
     std::istream& _is;
     Allocator& _alloc;
@@ -147,7 +147,7 @@ private:
 
 	auto _parse_name() -> std::string;
 	auto _parse_reader( char c ) -> elem_t;
-	auto _parse_macro( char c, elem_t tail ) -> elem_t;
+	auto _parse_macro( char c, elem_t tail, std::vector<std::string>& names ) -> elem_t;
     auto _parse_byte() -> byte_t;
 	auto _parse_elems( std::vector< std::string >& names, size_t depth ) -> elem_t;
 	auto _reverse_and_reduce( elem_t p, const std::vector< std::string >& names ) -> elem_t;
