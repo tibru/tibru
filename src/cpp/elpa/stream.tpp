@@ -178,7 +178,7 @@ auto elpa_istream<System, SchemeT, AllocatorT>::_parse_name() -> std::string
 {
 	std::string name;
 	char c;
-	while( _is.get( c ) && isalnum( c ) )
+	while( _is.get( c ) && (isalnum( c ) || c == '_') )
 		name += c;
 
 	if( _is )
@@ -251,7 +251,7 @@ auto elpa_istream<System, SchemeT, AllocatorT>::_parse_elems( std::vector< std::
 			tails.push( tail );
 			tail = elem_t();
 		}
-		else if( isalpha( c ) )
+		else if( isalpha( c ) || c == '_' )
 		{
 			_is.putback( c );
 			names.push_back( _parse_name() );

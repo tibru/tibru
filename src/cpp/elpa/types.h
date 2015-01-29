@@ -21,7 +21,7 @@ struct SimpleScheme
     typedef uintptr_t value_t;
     typedef const Cell* pcell_t;
 
-    static const uint8_t MAX_TAG = 3;
+    static const uint8_t MAX_TAG = 255;
 
     class byte_t
     {

@@ -72,7 +72,7 @@ auto KConShellManager<System, SchemeT, AllocatorT>::operators() -> const Operato
     static const Operators ops = {
         "![[f x] v]        -> ![*[v f] *[v x]]",
         "![0 x]            -> x",
-        "![1 x y r]        -> +[x y r]",
+        "![1 x y r]        -> !+[x y r]",
         "*[v [[x y] .. z]] -> [@[v z] @[v [x y]]]",
         "*[v e]            -> @[v e]",
         "@[v 0 x]          -> .x",
