@@ -35,6 +35,12 @@
 :def inc_table [#1 #2 #3 #4 #5 #6 #7 #8 #9 #10 nil]
 
 :def lookup1 [1' v1 1' #1' sel' env [k' tl pop2' hd [hd tl]']']
-![lookup1 [exitenv inc_table #3 heap]]
+
+% stage a function call
+%![lookup1 [exitenv inc_table #3 heap]]
+
+% define a function
+:def inc [pop1 v0 inc_table' k lookup1']
+![inc [exitenv #3 heap]]
 
 
