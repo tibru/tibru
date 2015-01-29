@@ -58,6 +58,7 @@ struct Tester
         test_parse( "[1 2 %]", "[2 1]" );
         test_parse( "[1 2 3 %]", "[1 3 2]" );
         test_parse( "[1 2 3 4 %]", "[1 2 4 3]" );
+        test_parse( "[1 2 [3 4] [5 6] %]", "[1 2 [5 6] 3 4]" );
     }
 
     static void run_tests()

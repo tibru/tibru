@@ -40,7 +40,8 @@
 %![lookup1 [exitenv inc_table #3 heap]]
 
 % define a function
-:def inc [pop1 v0 inc_table' k lookup1']
-![inc [exitenv #3 heap]]
+:def inc [pop1 v0 inc_table' lookup1' k %]
+![exit inc]
+% ![inc [exitenv #3 heap]]
 
 
