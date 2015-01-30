@@ -8,83 +8,68 @@ namespace kcon {
 using namespace elpa;
 
 template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT>
-auto KConShellManager<System, SchemeT, AllocatorT>::readers() -> const Readers&
+KConShellManager<System, SchemeT, AllocatorT>::KConShellManager( size_t ncells )
+    : elpa::ShellManagerBase<System, SchemeT, AllocatorT, KConInterpreter>( ncells ), _trace_limit( 0 )
 {
-    static Readers readers = {
-        { '#', []( Allocator& alloc, std::istream& is ) -> elem_t {
-            uint32_t n = 0;
-            char c = '\0';
-            while( is.get(c) && isdigit(c) )
-            {
-                uint32_t d = n * 10 + (c - '0');
-                if( d < n )
-                    throw Error<Syntax>( "Integer overflow for #" );
-                n = d;
-            }
-            if( !isdigit(c) && c != '\0' )
-                is.putback( c );
+    this->_def_constant( "qt", Scheme::new_byte( 0, 1 ) );
 
-            auto_root<elem_t> n4( alloc );
-            n4 = alloc.new_Cell( byte_t((n >>  0) & 0xff), n4 );
-            n4 = alloc.new_Cell( byte_t((n >>  8) & 0xff), n4 );
-            n4 = alloc.new_Cell( byte_t((n >> 16) & 0xff), n4 );
-            n4 = alloc.new_Cell( byte_t((n >> 24) & 0xff), n4 );
+    this->_def_reader( '#', []( Allocator& alloc, std::istream& is ) -> elem_t {
+        uint32_t n = 0;
+        char c = '\0';
+        while( is.get(c) && isdigit(c) )
+        {
+            uint32_t d = n * 10 + (c - '0');
+            if( d < n )
+                throw Error<Syntax>( "Integer overflow for #" );
+            n = d;
+        }
+        if( !isdigit(c) && c != '\0' )
+            is.putback( c );
 
-            return n4;
-        } },
-    };
+        auto_root<elem_t> n4( alloc );
+        n4 = alloc.new_Cell( byte_t((n >>  0) & 0xff), n4 );
+        n4 = alloc.new_Cell( byte_t((n >>  8) & 0xff), n4 );
+        n4 = alloc.new_Cell( byte_t((n >> 16) & 0xff), n4 );
+        n4 = alloc.new_Cell( byte_t((n >> 24) & 0xff), n4 );
 
-    return readers;
-}
+        return n4;
+    } );
 
-template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT>
-auto KConShellManager<System, SchemeT, AllocatorT>::macros() -> const Macros&
-{
-    static Macros macros = {
-        { '\'', []( Allocator& alloc, elem_t tail, std::vector<std::string>& names ) -> elem_t {
-        	if( !tail.is_pcell() )
-        		throw Error<Syntax>( "Invalid application of '" );
+    this->_def_macro( '\'', [this]( Allocator& alloc, elem_t tail, std::vector<std::string>& names ) -> elem_t {
+        if( !tail.is_pcell() )
+            throw Error<Syntax>( "Invalid application of '" );
 
-        	auto_root<elem_t> t( alloc, tail );
-            auto_root<elem_t> r( alloc );
-            r = alloc.new_Cell( Scheme::new_byte(0,1), r );
+        auto_root<elem_t> t( alloc, tail );
+        auto_root<elem_t> r( alloc );
+        r = alloc.new_Cell( this->_get_constant( "qt" ), r );
+        r = alloc.new_Cell( t.pcell()->head(), r );
+        return alloc.new_Cell( r, t.pcell()->tail() );
+    } );
+
+    this->_def_macro( '<', []( Allocator& alloc, elem_t tail, std::vector<std::string>& names ) -> elem_t {
+        auto_root<elem_t> t( alloc, tail );
+        auto_root<elem_t> r( alloc );
+        while( t.is_pcell() )
+        {
             r = alloc.new_Cell( t.pcell()->head(), r );
-            return alloc.new_Cell( r, t.pcell()->tail() );
-        } },
-        { '<', []( Allocator& alloc, elem_t tail, std::vector<std::string>& names ) -> elem_t {
-			auto_root<elem_t> t( alloc, tail );
-            auto_root<elem_t> r( alloc );
-            while( t.is_pcell() )
-            {
-            	r = alloc.new_Cell( t.pcell()->head(), r );
-                t = t.pcell()->tail();
-            }
-			return r;
-        } },
-    };
+            t = t.pcell()->tail();
+        }
+        return r;
+    } );
 
-    return macros;
-}
-
-template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT>
-auto KConShellManager<System, SchemeT, AllocatorT>::operators() -> const Operators&
-{
-    static const Operators ops = {
-        "![[f x] v]        -> ![*[v f] *[v x]]",
-        "![0 x]            -> x",
-        "![1 x y r]        -> !+[x y r]",
-        "*[v [[x y] .. z]] -> [@[v z] @[v [x y]]]",
-        "*[v e]            -> @[v e]",
-        "@[v 0 x]          -> .x",
-        "@[v 1 r]          -> /[v r]",
-        ".x                -> x",
-        "/[v [t1 ..] h1]   -> head{h1}( tail{t1 + 256*t2 ...}(v) )",
-        "/[v [t1 ..] h1 r] -> /[head{h1}( tail{t1 + 256*t2 ...}(v) ) r]",
-        "?[[x y] [a b]]    -> y",
-        "?[[x y] a]        -> x",
-        "+[x y r]          -> append y onto x at r"
-    };
-    return ops;
+    this->_def_operator( "![[f x] v]        -> ![*[v f] *[v x]]" );
+    this->_def_operator( "![0 x]            -> x" );
+    this->_def_operator( "![1 x y r]        -> !+[x y r]" );
+    this->_def_operator( "*[v [[x y] .. z]] -> [@[v z] @[v [x y]]]" );
+    this->_def_operator( "*[v e]            -> @[v e]" );
+    this->_def_operator( "@[v 0 x]          -> .x" );
+    this->_def_operator( "@[v 1 r]          -> /[v r]" );
+    this->_def_operator( ".x                -> x" );
+    this->_def_operator( "/[v [t1 ..] h1]   -> head{h1}( tail{t1 + 256*t2 ...}(v) )" );
+    this->_def_operator( "/[v [t1 ..] h1 r] -> /[head{h1}( tail{t1 + 256*t2 ...}(v) ) r]" );
+    this->_def_operator( "?[[x y] [a b]]    -> y" );
+    this->_def_operator( "?[[x y] a]        -> x" );
+    this->_def_operator( "+[x y r]          -> append y onto x at r" );
 }
 
 template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT>

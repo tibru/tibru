@@ -27,7 +27,7 @@ public:
     Error( const std::string& message )
     	: _message( message ) {}
 
-	const char* what() const throw() { return ('\n' + _message).c_str(); }
+	const char* what() const throw() { return ("\nError: "s  + _message).c_str(); }
 	const std::string& message() const { return _message; }
 };
 

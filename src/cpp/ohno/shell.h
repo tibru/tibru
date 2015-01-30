@@ -22,15 +22,11 @@ class OhNoShellManager : public kcon::KConShellManager<System, SchemeT, Allocato
 
     static auto _count_undef( elem_t e ) -> size_t;
 public:
-    OhNoShellManager( size_t ncells )
-        : Base( ncells ) {}
-
-    static auto readers() -> const Readers&;
-    static auto macros() -> const Macros&;
-    static void print_help( elpa_ostream<System,SchemeT>& eos );
+    OhNoShellManager( size_t ncells );
 
     auto process_command( const std::string& cmd, elpa_istream<System, SchemeT, AllocatorT>& eis, elpa_ostream<System, SchemeT>& eos, bool noisy ) -> bool;
     void print_commands( elpa_ostream<System, SchemeT>& eos ) const;
+    void print_help( elpa_ostream<System,SchemeT>& eos );
 };
 
 }   //namespace

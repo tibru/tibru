@@ -114,7 +114,22 @@ auto Console<InterpreterT>::go( int argc, const char* argv[] ) -> int
         }
         catch( const Error<Test>& e )
         {
-            std::cerr << e.message() << std::endl;
+            std::cerr << "Test failed: " + e.message() << std::endl;
+            return 2;
+        }
+        catch( const Error<Assertion>& e )
+        {
+            std::cerr << "Assertion failed: " + e.message() << std::endl;
+            return 2;
+        }
+        catch( const std::exception& e )
+        {
+            std::cerr << e.what() << std::endl;
+            return 2;
+        }
+        catch( ... )
+        {
+            std::cerr << "Unknown exception" << std::endl;
             return 2;
         }
     }

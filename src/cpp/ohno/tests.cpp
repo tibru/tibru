@@ -48,7 +48,6 @@ struct Tester
         Shell< Env > shell( 100 );
 
         shell.parse( ":names on" );
-        shell.parse( ":def qt 0" );
         shell.parse( ":def x 0" );
         shell.parse( ":def y 1" );
         shell.parse( ":def f [1' x' y' 2' %]" );

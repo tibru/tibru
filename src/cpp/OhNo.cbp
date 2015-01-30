@@ -28,9 +28,6 @@
 		<Unit filename="elpa/common.h">
 			<Option virtualFolder="elpa/" />
 		</Unit>
-		<Unit filename="elpa/console.cpp">
-			<Option virtualFolder="elpa/" />
-		</Unit>
 		<Unit filename="elpa/console.h">
 			<Option virtualFolder="elpa/" />
 		</Unit>
@@ -85,9 +82,6 @@
 		<Unit filename="elpa/types.h">
 			<Option virtualFolder="elpa/" />
 		</Unit>
-		<Unit filename="kcon/console.cpp">
-			<Option virtualFolder="kcon/" />
-		</Unit>
 		<Unit filename="kcon/console.h">
 			<Option virtualFolder="kcon/" />
 		</Unit>
@@ -116,6 +110,9 @@
 			<Option virtualFolder="kcon/" />
 		</Unit>
 		<Unit filename="ohno.cpp" />
+		<Unit filename="ohno/console.cpp">
+			<Option virtualFolder="ohno/" />
+		</Unit>
 		<Unit filename="ohno/console.h">
 			<Option virtualFolder="ohno/" />
 		</Unit>

@@ -23,17 +23,12 @@ public:
     template<class T>
     using auto_root = typename Allocator::template auto_root<T>;
 
-    KConShellManager( size_t ncells )
-        : elpa::ShellManagerBase<System, SchemeT, AllocatorT, KConInterpreter>( ncells ), _trace_limit( 0 ) {}
-
-    static auto readers() -> const Readers&;
-    static auto macros() -> const Macros&;
-    static auto operators() -> const Operators&;
-    static void print_help( elpa_ostream<System,SchemeT>& eos );
+    KConShellManager( size_t ncells );
 
     auto process_operator( char op, elem_t elem, size_t niter, bool& more ) -> elem_t;
     auto process_command( const std::string& cmd, elpa_istream<System, SchemeT, AllocatorT>& eis, elpa_ostream<System, SchemeT>& eos, bool noisy ) -> bool;
     void print_commands( elpa_ostream<System, SchemeT>& eos ) const;
+     void print_help( elpa_ostream<System,SchemeT>& eos );
 };
 
 }   //namespace

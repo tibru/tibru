@@ -20,6 +20,9 @@ auto Shell<Env>::_process_command( const std::string& cmd, elpa_istream& eis, el
     	elem_t elem;
     	eis >> name >> elem >> endofline;
 
+    	if( _manager.constants().find( name ) != _manager.constants().end() )
+            throw Error<Runtime>( "Can't redefine constant '"s + name + "'" );
+
     	if( elem.is_byte() )
     	{
     	    uint8_t val = Scheme::byte_value( elem.byte() );

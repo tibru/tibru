@@ -32,12 +32,12 @@ struct Tester
         return auto_root_ref<elem_t>( allocator, elem );
     }
 
-    static auto parse( Allocator& allocator, const std::string& in ) -> auto_root_ref<elem_t>
+    static auto parse( ShellManager& manager, const std::string& in ) -> auto_root_ref<elem_t>
     {
-    	Defns defns( allocator );
-    	Readers readers = ShellManager::readers();
-    	Macros macros = ShellManager::macros();
-    	return parse( allocator, in, defns, readers, macros );
+    	Defns defns( manager.interpreter().allocator() );
+    	Readers readers = manager.readers();
+    	Macros macros = manager.macros();
+    	return parse( manager.interpreter().allocator(), in, defns, readers, macros );
     }
 
     static auto print( elem_t e ) -> std::string
@@ -57,19 +57,19 @@ struct Tester
 
     static void test_parse()
     {TEST
-        Allocator a( 1024 );
-        test( print( parse( a, "#1000" ) ) == "[232 3 0 0]", "Incorrect parse of #" );
+        ShellManager m( 1024 );
+        test( print( parse( m, "#1000" ) ) == "[232 3 0 0]", "Incorrect parse of #" );
 
         try
         {
-            parse( a, "#40000000000" );
+            parse( m, "#40000000000" );
             fail( "Parsed integer larger that 32bits with #" );
         }
         catch( Error<Syntax> ) { pass(); }
 
         auto test_parse = [&]( const std::string& in, const std::string& out )
         {
-            elem_t elem = parse( a, in );
+            elem_t elem = parse( m, in );
 
             std::string found = print( elem );
 
@@ -92,7 +92,6 @@ struct Tester
         Shell< Env > shell( 100 );
 
         shell.parse( ":names on" );
-        shell.parse( ":def qt 0" );
         shell.parse( ":def x 0" );
 
         auto test_parse = [&]( const std::string& in, const std::string& out )
