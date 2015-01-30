@@ -1,10 +1,7 @@
 :trace on
 :names on
 
-:def qt 0
 :def nil 0
-:def exit 0
-:def sel 1
 :def env [1 #0 0]
 :def stk [1 #0 0]
 :def hd [sel #0 1]

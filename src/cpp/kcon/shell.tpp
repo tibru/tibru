@@ -12,6 +12,11 @@ KConShellManager<System, SchemeT, AllocatorT>::KConShellManager( size_t ncells )
     : elpa::ShellManagerBase<System, SchemeT, AllocatorT, KConInterpreter>( ncells ), _trace_limit( 0 )
 {
     this->_def_constant( "qt", Scheme::new_byte( 0, 1 ) );
+    this->_def_constant( "sel", Scheme::new_byte( 1, 1 ) );
+    this->_def_constant( "if", Scheme::new_byte( 2, 1 ) );
+
+    this->_def_constant( "exit", Scheme::new_byte( 0, 2 ) );
+    this->_def_constant( "graft", Scheme::new_byte( 1, 2 ) );
 
     this->_def_reader( '#', []( Allocator& alloc, std::istream& is ) -> elem_t {
         uint32_t n = 0;
