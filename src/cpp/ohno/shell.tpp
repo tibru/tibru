@@ -10,9 +10,9 @@ OhNoShellManager<System, SchemeT, AllocatorT>::OhNoShellManager( size_t ncells )
     : Base( ncells )
 {
     this->_def_macro( '@', []( Allocator& alloc, elem_t tail, std::vector<std::string>& names ) -> elem_t {
-        auto_root<elem_t> e1( alloc, tail.pcell("% Requires at least a 3 element list")->head() );
-        auto_root<elem_t> e2( alloc, tail.pcell()->tail().pcell("% Requires at least a 3 element list")->head() );
-        auto_root<elem_t> e3( alloc, tail.pcell()->tail().pcell()->tail().pcell("% Requires at least a 3 element list")->head() );
+        auto_root<elem_t> e1( alloc, tail.pcell("@ Requires at least a 3 element list")->head() );
+        auto_root<elem_t> e2( alloc, tail.pcell()->tail().pcell("@ Requires at least a 3 element list")->head() );
+        auto_root<elem_t> e3( alloc, tail.pcell()->tail().pcell()->tail().pcell("@ Requires at least a 3 element list")->head() );
 
         const size_t e1_count = _count_undef( e1 );
         const size_t e2_count = _count_undef( e2 );

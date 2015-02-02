@@ -182,8 +182,8 @@ struct Tester
         test_op( "@[nil qt 21]", "21" );
         test_op( "@[[10 20 30] sel #1 1]", "20" );
         test_op( "@[[10 20 30] sel #1 0 #1 0]", "30" );
-        test_op( "@[[10 20 30] if [0 1] [0 0]]", "1" );
-        test_op( "@[[10 20 30] if [0 1] 0]", "0" );
+        test_op( "@[[10 20 30] if [0 1] T]", "1" );
+        test_op( "@[[10 20 30] if [0 1] F]", "0" );
         test_op_illegal( "@21", "@ operates only on cells" );
         test_op_illegal( "@[2 3]", "@ requires cell expression" );
         test_op_illegal( "@[nil 3 0]", "@ requires expression code to be 0 or 1" );

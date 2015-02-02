@@ -11,6 +11,8 @@
 :def pop1 [sel #3 0]
 :def pop2 [sel #4 0]
 :def pop3 [sel #5 0]
+:def _kont [sel #2 1]
+:def _pop1 [sel #4 0]
 :def ___kont [sel #4 1]
 :def ___pop2 [sel #7 0]
 :def call [sel #1 0]
@@ -44,9 +46,17 @@
 	[#4 #5 #6 #7 #8 #9 nil]
 	[#5 #6 #7 #8 #9 #10 nil]
 nil]
+:def lt_table [
+	[F T T T T T nil]
+	[F F T T T T nil]
+	[F F F T T T nil]
+	[F F F F T T nil]
+	[F F F F F T nil]
+	[F F F F F F nil]
+nil]
 
 :def lookup1 [1' v1 1' #2' sel' env [kont' heap' tl pop2' hd [hd tl]']']
-:def lookup2 [1' v2 1' v1 1' #2' sel' env [kont' heap' tl pop3' hd [hd tl]']']
+:def lookup2 [1' v1 1' v2 1' #2' sel' env [kont' heap' tl pop3' hd [hd tl]']']
 
 % stage a function call
 % ![lookup1 [memory exitenv inc_table #3 nil]]
@@ -55,14 +65,19 @@ nil]
 % define a function
 :def inc [pop1 v0 inc_table' heap lookup1' kont @]
 :def add [pop2 v0 v1 add_table' heap lookup2' kont @]
+:def lt [pop2 v0 v1 lt_table' heap lookup2' kont @]
 % ![inc [memory exitval #3 nil]]
 % ![add [memory exitval #3 #4 nil]]
+% ![lt [memory exitval #3 #4 nil]]
 
 % :def f [call v0 heap' inc' exitenv' @]
 :def f [call v0 heap inc' [
 			call _v1 heap inc' [
 				call r0 r1 heap add' [
 					___pop2 r0 heap ___kont]' @]' @]' @]
-![f [memory exitenv #3 #4 nil]]
+% ![f [memory exitenv #3 #4 nil]]
 
+:def g [call #2' v0 heap lt' [
+			stk [if [[_pop1 #21' heap _kont] [_pop1 #32' heap _kont]] T]]' @]
 
+![g [memory exitenv #5 nil]]
