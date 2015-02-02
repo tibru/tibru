@@ -50,7 +50,7 @@ struct Tester
         shell.parse( ":names on" );
         shell.parse( ":def x 0" );
         shell.parse( ":def y 1" );
-        shell.parse( ":def f [1' x' y' 2' %]" );
+        shell.parse( ":def f [1' x' y' 2' @]" );
 
         auto test_parse = [&]( const std::string& in, const std::string& out )
         {
@@ -59,17 +59,17 @@ struct Tester
             test( found == out, "Parse failed for: '" + in + "'\nExpected: '" + out + "'\nFound:    '" + found + "'" );
         };
 
-        test_parse( "[1 2 %]", "[2 1]" );
-        test_parse( "[1 2 3 %]", "[1 3 2]" );
-        test_parse( "[1 2 3 4 %]", "[1 2 4 3]" );
-        test_parse( "[1 2 [3 4] [5 6] %]", "[1 2 [5 6] 3 4]" );
-        test_parse( "[1 2 [3 4 %] [5 6 %] %]", "[1 2 [6 5] 4 3]" );
+        test_parse( "[1 2 3 @]", "[3 1 2]" );
+        test_parse( "[1 2 3 4 @]", "[1 4 2 3]" );
+        test_parse( "[1 2 3 4 5 @]", "[1 2 5 3 4]" );
+        test_parse( "[1 2 [3 4] [5 6] @]", "[1 [5 6] 2 3 4]" );
+        test_parse( "[1 2 [3 4 5 @] [5 6 7 @] @]", "[1 [7 5 6] 2 5 3 4]" );
 
         test_parse( "[1' 2' 3' x <]", "[x [qt 3] [qt 2] qt 1]" );
-        test_parse( "f", "[[qt 1] [qt x] [qt 2] qt y]" );
-        test_parse( "[1 x y 2 %]", "[1 x 2 y]" );
-        test_parse( "[1 [x y %] [0 x %] %]", "[1 [x 0] y x]" );
-        test_parse( "[1 2 [qt x] y %]", "[1 2 y qt x]" );
+        test_parse( "f", "[[qt 1] [qt 2] [qt x] qt y]" );
+        test_parse( "[1 x y 2 @]", "[1 2 x y]" );
+        test_parse( "[1 [x y 2 @] [0 1 x @] @]", "[[x 0 1] 1 2 x y]" );
+        test_parse( "[1 2 [qt x] y @]", "[1 y 2 qt x]" );
     }
 
     static void run_tests()
