@@ -18,6 +18,8 @@ KConShellManager<System, SchemeT, AllocatorT>::KConShellManager( size_t ncells )
     this->_def_constant( "exit", Scheme::new_byte( 0, 2 ) );
     this->_def_constant( "graft", Scheme::new_byte( 1, 2 ) );
 
+    this->_def_constant( "nil", Scheme::new_byte( 0, 2 ) );
+
     this->_def_reader( '#', []( Allocator& alloc, std::istream& is ) -> elem_t {
         uint32_t n = 0;
         char c = '\0';

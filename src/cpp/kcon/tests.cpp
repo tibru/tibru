@@ -108,9 +108,11 @@ struct Tester
     {TEST
         Shell< Env > shell( 100 );
 
+        shell.parse( ":names on" );
+
         auto test_op = [&]( const std::string& in, const std::string& out )
         {
-            std::string found = print( shell.parse( in ) );
+            std::string found = print( shell.parse( in ), shell.names() );
 
             test( found == out, "Op failed for: '" + in + "'\nExpected: '" + out + "'\nFound:    '" + found + "'" );
         };
@@ -128,11 +130,6 @@ struct Tester
                 pass();
             }
         };
-
-        shell.parse( ":def nil 0" );
-        shell.parse( ":def const 0" );
-        shell.parse( ":def select 1" );
-        shell.parse( ":def ifcell 2" );
 
         //Constant
         test_op( ".[0 21]", "[0 21]" );
@@ -182,31 +179,41 @@ struct Tester
         test_op_illegal( "+[0 21 [#0 1]]", "Tried to access head of a byte" );
 
         //Reduce
-        test_op( "@[nil const 21]", "21" );
-        test_op( "@[[10 20 30] select #1 1]", "20" );
-        test_op( "@[[10 20 30] select #1 0 #1 0]", "30" );
-        test_op( "@[[10 20 30] ifcell [0 1] [0 0]]", "1" );
-        test_op( "@[[10 20 30] ifcell [0 1] 0]", "0" );
+        test_op( "@[nil qt 21]", "21" );
+        test_op( "@[[10 20 30] sel #1 1]", "20" );
+        test_op( "@[[10 20 30] sel #1 0 #1 0]", "30" );
+        test_op( "@[[10 20 30] if [0 1] [0 0]]", "1" );
+        test_op( "@[[10 20 30] if [0 1] 0]", "0" );
         test_op_illegal( "@21", "@ operates only on cells" );
         test_op_illegal( "@[2 3]", "@ requires cell expression" );
         test_op_illegal( "@[nil 3 0]", "@ requires expression code to be 0 or 1" );
-        test_op_illegal( "@[[10 20 30] ifcell 0]", "@ 2 requires cell based choices and condition" );
-        test_op_illegal( "@[[10 20 30] ifcell 0 0]", "@ 2 requires cell based choices" );
+        test_op_illegal( "@[[10 20 30] if 0]", "@ 2 requires cell based choices and condition" );
+        test_op_illegal( "@[[10 20 30] if 0 0]", "@ 2 requires cell based choices" );
 
         //Evaluate
-        test_op( "*[nil const 21]", "21" );
-        test_op( "*[[10 20 30] select #1 1]", "20" );
-        test_op( "*[[10 20 30] select #1 0 #1 0]", "30" );
-        test_op( "*[0 [[const 2] [const 3]]]", "[3 2]" );
-        test_op( "*[0 [[const 1] [const 2] [const 3]]]", "[3 2 1]" );
-        test_op( "*[0 [[const 1] [const 2] [const 3] [const 4]]]", "[4 3 2 1]" );
+        test_op( "*[nil qt 21]", "21" );
+        test_op( "*[[10 20 30] sel #1 1]", "20" );
+        test_op( "*[[10 20 30] sel #1 0 #1 0]", "30" );
+        test_op( "*[0 [[qt 2] [qt 3]]]", "[3 2]" );
+        test_op( "*[0 [[qt 1] [qt 2] [qt 3]]]", "[3 2 1]" );
+        test_op( "*[0 [[qt 1] [qt 2] [qt 3] [qt 4]]]", "[4 3 2 1]" );
         test_op( "*[0 1' 2' 3' 4']", "[4 3 2 1]" );
-        test_op( "*[[0 10 20 30 40 50 nil] [[select #1 1] [select #2 1] [select #3 1] [select #4 1]]]", "[40 30 20 10]" );
-        test_op( "*[nil [ifcell [0 1] 0] [ifcell [0 1] [0 0]]]", "[1 0]" );
+        test_op( "*[[0 10 20 30 40 50 nil] [[sel #1 1] [sel #2 1] [sel #3 1] [sel #4 1]]]", "[40 30 20 10]" );
+        test_op( "*[nil [if [0 1] 0] [if [0 1] [0 0]]]", "[1 0]" );
         test_op_illegal( "*21", "* operates only on cells" );
         test_op_illegal( "*[2 3]", "* requires cell expression" );
         test_op_illegal( "*[nil 3 0]", "@ requires expression code to be 0 or 1" );
-        test_op_illegal( "*[0 [[const 2] 0]]", "* cons form requires at least 2 cell based expressions" );
+        test_op_illegal( "*[0 [[qt 2] 0]]", "* cons form requires at least 2 cell based expressions" );
+
+        shell.parse( ":def env [1 #0 0]" );
+        shell.parse( ":def exitenv [env exit']" );
+
+        //Execute
+        test_op( "![exit 21]", "21" );
+        test_op( "![exit 21']", "[qt 21]" );
+        test_op( "![[env 22' exitenv'] 23]", "[22 23]" );
+        test_op( "![graft [1 2 3] [exit 21'] [#0 0]]", "[qt 21]" );
+        test_op( "![graft [exit 21] 22 [#1 0]]", "22" );
     }
 
     static void run_tests()
