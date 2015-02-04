@@ -70,7 +70,7 @@ void TestAllocator<System, SchemeT>::_shift()
 template<class System, MetaScheme class SchemeT>
 void TestAllocator<System, SchemeT>::_mark( std::set<pcell_t>& live, pcell_t p )
 {
-    if( live.find( p ) == live.end() )
+    if( (p != 0) && (live.find( p ) == live.end()) )
     {
         live.insert( p );
 
@@ -87,7 +87,7 @@ void TestAllocator<System, SchemeT>::_mark( std::set<pcell_t>& live, pcell_t p )
 template<class System, MetaScheme class SchemeT>
 void SimpleAllocator<System, SchemeT>::_mark( std::set<pcell_t>& live, pcell_t p )
 {
-    if( live.find( p ) == live.end() )
+    if( (p != 0) && (live.find( p ) == live.end()) )
     {
         live.insert( p );
 

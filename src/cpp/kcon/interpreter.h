@@ -30,7 +30,7 @@ class KConInterpreter : public InterpreterBase<System, SchemeT, AllocatorT>
 
     auto _constant( elem_t env, elem_t k ) -> elem_t;
     auto _select( elem_t env, pcell_t path ) -> elem_t;
-    auto _ifcell( elem_t cond, pcell_t choices ) -> elem_t;
+    auto _ifcell( elem_t env, elem_t cond, pcell_t choices ) -> pcell_t;
     auto _reduce( elem_t env, pcell_t expr ) -> elem_t;
     auto _evaluate( elem_t env, pcell_t expr ) -> elem_t;
     auto _graft( elem_t env, elem_t elem, pcell_t path ) -> elem_t;

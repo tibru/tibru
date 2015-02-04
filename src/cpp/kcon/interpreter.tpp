@@ -90,21 +90,22 @@ auto KConInterpreter<System, SchemeT, AllocatorT>::select( elem_t elem ) -> elem
 }
 
 template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT>
-auto KConInterpreter<System, SchemeT, AllocatorT>::_ifcell( elem_t cond, pcell_t choices ) -> elem_t
+auto KConInterpreter<System, SchemeT, AllocatorT>::_ifcell( elem_t env, elem_t cond, pcell_t choices ) -> pcell_t
 {
     if( cond.is_pcell() )
-        return choices->tail();
+        return this->allocator().new_Cell( choices->tail(), env );
 
     System::assert( cond.is_byte(), "IF condition was neither cell nor byte" );
-    return choices->head();
+    return this->allocator().new_Cell( choices->head(), env );
 }
 
 template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT>
 auto KConInterpreter<System, SchemeT, AllocatorT>::ifcell( elem_t elem ) -> elem_t
 {
     pcell_t p = elem.pcell( "? operates only on cells" );
+    pcell_t params = p->tail().pcell( "? requires condition and choices" );
 
-    return _ifcell( p->head(), p->tail().pcell( "? Requires two choices not a byte") );
+    return _ifcell( p->head(), params->head(), params->tail().pcell( "? requires two choices not a byte") );
 }
 
 template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT>
@@ -140,7 +141,7 @@ auto KConInterpreter<System, SchemeT, AllocatorT>::_graft( elem_t env, elem_t el
 
     elpa_stack<elem_t> route( this->allocator() );
     auto_root<pcell_t> rpth( this->allocator(), 0 );
-    auto_root<pcell_t> tcells( this->allocator() );
+    auto_root<pcell_t> tcells( this->allocator(), 0 );
 
     while( pth != 0 )
     {
@@ -260,10 +261,12 @@ auto KConInterpreter<System, SchemeT, AllocatorT>::execute_trace( elem_t state, 
     }
     else if( Scheme::byte_value( stmt.byte() ) == 1 )
     {
-        pcell_t params = env.pcell( "! IF form requires cond and choices" );
+        pcell_t params = env.pcell( "! IF form requires environment, condition and choices" );
+        env = params->head();
+        params = params->tail().pcell( "! IF form requires condition and choices" );
         elem_t cond = params->head();
         pcell_t choices = params->tail().pcell( "! IF form requires path and element" );
-        return _ifcell( cond, choices );
+        return _ifcell( env, cond, choices );
     }
     else if( Scheme::byte_value( stmt.byte() ) == 2 )
     {
