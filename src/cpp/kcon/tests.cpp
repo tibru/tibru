@@ -194,16 +194,16 @@ struct Tester
         test_op( "*[nil qt 21]", "21" );
         test_op( "*[[10 20 30] sel #1 1]", "20" );
         test_op( "*[[10 20 30] sel #1 0 #1 0]", "30" );
-        test_op( "*[0 [[qt 2] [qt 3]]]", "[3 2]" );
-        test_op( "*[0 [[qt 1] [qt 2] [qt 3]]]", "[3 2 1]" );
-        test_op( "*[0 [[qt 1] [qt 2] [qt 3] [qt 4]]]", "[4 3 2 1]" );
-        test_op( "*[0 1' 2' 3' 4']", "[4 3 2 1]" );
+        test_op( "*[EXIT [[qt 2] [qt 3]]]", "[3 2]" );
+        test_op( "*[EXIT [[qt 1] [qt 2] [qt 3]]]", "[3 2 1]" );
+        test_op( "*[EXIT [[qt 1] [qt 2] [qt 3] [qt 4]]]", "[4 3 2 1]" );
+        test_op( "*[EXIT 1' 2' 3' 4']", "[4 3 2 1]" );
         test_op( "*[[0 10 20 30 40 50 nil] [[sel #1 1] [sel #2 1] [sel #3 1] [sel #4 1]]]", "[40 30 20 10]" );
         test_op( "*[nil [if [0 1] 0] [if [0 1] [0 0]]]", "[1 0]" );
         test_op_illegal( "*21", "* operates only on cells" );
         test_op_illegal( "*[2 3]", "* requires cell expression" );
         test_op_illegal( "*[nil 3 0]", "@ requires expression code to be 0 or 1" );
-        test_op_illegal( "*[0 [[qt 2] 0]]", "* cons form requires at least 2 cell based expressions" );
+        test_op_illegal( "*[EXIT [[qt 2] 0]]", "* cons form requires at least 2 cell based expressions" );
 
         shell.parse( ":def env [1 #0 0]" );
         shell.parse( ":def EXITENV [env EXIT']" );
