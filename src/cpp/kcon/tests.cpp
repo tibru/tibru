@@ -160,11 +160,10 @@ struct Tester
         test_op_illegal( "/[[1 2 3] #0 4]", "Tried to access head of a byte" );
 
         //IfCell
-        test_op( "?[21 [0 0] 0 1]", "[1 21]" );
-        test_op( "?[21 0 0 1]", "[0 21]" );
+        test_op( "?[[0 0] 0 1]", "1" );
+        test_op( "?[0 0 1]", "0" );
         test_op_illegal( "?0", "? operates only on cells" );
-        test_op_illegal( "?[0 0]", "? requires condition and choices" );
-        test_op_illegal( "?[0 0 0]", "? requires two choices not a byte" );
+        test_op_illegal( "?[0 0]", "? requires two choices not a byte" );
 
         //Graft
         test_op( "+[0 21 [#0 0]]", "21" );
@@ -174,7 +173,7 @@ struct Tester
         test_op( "+[[[0 1] [2 3]] [21 22] [#1 1]]", "[[0 1] [21 22] 3]" );
         test_op( "+[[[[1 2] [3 4]] [[5 6] [7 8]]] 21 #1 1 #1 0]", "[[[1 2] 3 4] [5 21] 7 8]" );
         test_op( "+[[[[1 2] [3 4]] [[5 6] [7 8]]] 21 #1 1 #0 1]", "[[[1 2] 3 4] [21 6] 7 8]" );
-        test_op_illegal( "+[0 0]", "+ requires path and element" );
+        test_op_illegal( "+[0 0]", "+ requires element and path" );
         test_op_illegal( "+[0 0 0]", "+ requires path to be a cell" );
         test_op_illegal( "+[0 0 [0 0]]", "Path tails count must be cells" );
         test_op_illegal( "+[0 21 [#1 0]]", "Tried to access tail of a byte" );
@@ -209,8 +208,8 @@ struct Tester
         test_op( "![EXIT 21]", "21" );
         test_op( "![EXIT 21']", "[qt 21]" );
         test_op( "![[env 22' EXITENV'] 23]", "[22 23]" );
-        test_op( "![GRAFT [1 2 3] [EXIT 21'] [#0 0]]", "[qt 21]" );
-        test_op( "![GRAFT [EXIT 21] 22 [#1 0]]", "22" );
+        //test_op( "![GRAFT [EXIT [sel #0 0]] [1 2 3] 21 [#0 0]]", "[qt 21]" );
+        //test_op( "![GRAFT [1 0] 22 [#1 0] [EXIT [sel #0 0]]]", "22" );
     }
 
     static void run_tests()

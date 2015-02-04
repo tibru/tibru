@@ -90,25 +90,6 @@ auto KConInterpreter<System, SchemeT, AllocatorT>::select( elem_t elem ) -> elem
 }
 
 template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT>
-auto KConInterpreter<System, SchemeT, AllocatorT>::_ifcell( elem_t env, elem_t cond, pcell_t choices ) -> pcell_t
-{
-    if( cond.is_pcell() )
-        return this->allocator().new_Cell( choices->tail(), env );
-
-    System::assert( cond.is_byte(), "IF condition was neither cell nor byte" );
-    return this->allocator().new_Cell( choices->head(), env );
-}
-
-template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT>
-auto KConInterpreter<System, SchemeT, AllocatorT>::ifcell( elem_t elem ) -> elem_t
-{
-    pcell_t p = elem.pcell( "? operates only on cells" );
-    pcell_t params = p->tail().pcell( "? requires condition and choices" );
-
-    return _ifcell( p->head(), params->head(), params->tail().pcell( "? requires two choices not a byte") );
-}
-
-template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT>
 auto KConInterpreter<System, SchemeT, AllocatorT>::_reduce( elem_t env, pcell_t expr ) -> elem_t
 {
     uint8_t code = Scheme::byte_value( expr->head().byte( "@ requires expression code to be a byte" ) );
@@ -133,23 +114,41 @@ auto KConInterpreter<System, SchemeT, AllocatorT>::reduce( elem_t elem ) -> elem
 }
 
 template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT>
+auto KConInterpreter<System, SchemeT, AllocatorT>::_ifcell( elem_t cond, pcell_t choices ) -> elem_t
+{
+    if( cond.is_pcell() )
+        return choices->tail();
+
+    System::assert( cond.is_byte(), "IF condition was neither cell nor byte" );
+    return choices->head();
+}
+
+template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT>
+auto KConInterpreter<System, SchemeT, AllocatorT>::ifcell( elem_t elem ) -> elem_t
+{
+    pcell_t params = elem.pcell( "? operates only on cells" );
+
+    return _ifcell( params->head(), params->tail().pcell( "? requires two choices not a byte") );
+}
+
+template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT>
 auto KConInterpreter<System, SchemeT, AllocatorT>::_graft( elem_t env, elem_t elem, pcell_t path ) -> elem_t
 {
     auto_root<elem_t> v( this->allocator(), env );
     auto_root<elem_t> e( this->allocator(), elem );
-    auto_root<pcell_t> pth( this->allocator(), path );
+    auto_root<pcell_t> p( this->allocator(), path );
 
     elpa_stack<elem_t> route( this->allocator() );
     auto_root<pcell_t> rpth( this->allocator(), 0 );
     auto_root<pcell_t> tcells( this->allocator(), 0 );
 
-    while( pth != 0 )
+    while( p != 0 )
     {
         size_t tcount;
         size_t hcount;
 
-        tcells = pth->head().pcell( "Path tails count must be cells" );
-        pth = _parse_path_elem( pth, tcount, hcount );
+        tcells = p->head().pcell( "Path tails count must be cells" );
+        p = _parse_path_elem( p, tcount, hcount );
 
         if( rpth == 0 )
             rpth = this->allocator().new_Cell( elem_t( tcells ), Scheme::new_byte( hcount ) );
@@ -195,12 +194,15 @@ auto KConInterpreter<System, SchemeT, AllocatorT>::_graft( elem_t env, elem_t el
 }
 
 template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT>
-auto KConInterpreter<System, SchemeT, AllocatorT>::graft( elem_t elem ) -> elem_t
+auto KConInterpreter<System, SchemeT, AllocatorT>::graft( elem_t e ) -> elem_t
 {
-    pcell_t p = elem.pcell( "+ operates only on cells" );
-    pcell_t params = p->tail().pcell( "+ requires path and element");
+    pcell_t p = e.pcell( "+ operates only on cells" );
+    elem_t env = p->head();
+    pcell_t params = p->tail().pcell( "+ requires element and path");
+    elem_t elem = params->head();
+    pcell_t path = params->tail().pcell( "+ requires path to be a cell" );
 
-    return _graft( p->head(), params->head(), params->tail().pcell( "+ requires path to be a cell" ) );
+    return _graft( env, elem, path );
 }
 
 template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT>
@@ -261,21 +263,13 @@ auto KConInterpreter<System, SchemeT, AllocatorT>::execute_trace( elem_t state, 
     }
     else if( Scheme::byte_value( stmt.byte() ) == 1 )
     {
-        pcell_t params = env.pcell( "! IF form requires environment, condition and choices" );
-        env = params->head();
-        params = params->tail().pcell( "! IF form requires condition and choices" );
-        elem_t cond = params->head();
-        pcell_t choices = params->tail().pcell( "! IF form requires path and element" );
-        return _ifcell( env, cond, choices );
+        pcell_t params = env.pcell( "! IF form requires environment, condition and continuations" );
+        return this->allocator().new_Cell( ifcell( params->tail() ), params->head() );
     }
     else if( Scheme::byte_value( stmt.byte() ) == 2 )
     {
-        pcell_t params = env.pcell( "! GRAFT form requires environment, path and element" );
-        env = params->head();
-        params = params->tail().pcell( "! GRAFT form requires path and element" );
-        elem_t elem = params->head();
-        pcell_t path = params->tail().pcell( "! GRAFT form requires cell based path" );
-        return _graft( env, elem, path );
+        pcell_t params = env.pcell( "! GRAFT form requires environment, element, path and continuation" );
+        return this->allocator().new_Cell( graft( params->tail() ), params->head() );
     }
     else
         System::check( false, "! statement code must be 0" );

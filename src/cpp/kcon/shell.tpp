@@ -68,8 +68,8 @@ KConShellManager<System, SchemeT, AllocatorT>::KConShellManager( size_t ncells )
 
     this->_def_operator( "![[f x] v]        -> ![*[v f] *[v x]]" );
     this->_def_operator( "![0 x]            -> x" );
-    this->_def_operator( "![1 x y r]        -> !+[x y r]" );
-    this->_def_operator( "![2 c x y]        -> !?[c x y]" );
+    this->_def_operator( "![1 v c k1 k2]    -> ![?[c k1 k2] v]" );
+    this->_def_operator( "![2 v e r k]      -> ![v +[e r k]]" );
     this->_def_operator( "*[v [[x y] .. z]] -> [@[v z] @[v [x y]]]" );
     this->_def_operator( "*[v e]            -> @[v e]" );
     this->_def_operator( "@[v 0 x]          -> .x" );
@@ -77,9 +77,9 @@ KConShellManager<System, SchemeT, AllocatorT>::KConShellManager( size_t ncells )
     this->_def_operator( ".x                -> x" );
     this->_def_operator( "/[v [t1 ..] h1]   -> head{h1}( tail{t1 + 256*t2 ...}(v) )" );
     this->_def_operator( "/[v [t1 ..] h1 r] -> /[head{h1}( tail{t1 + 256*t2 ...}(v) ) r]" );
-    this->_def_operator( "?[[a b] x y]    -> y" );
-    this->_def_operator( "?[a x y]        -> x" );
-    this->_def_operator( "+[x y r]          -> append y onto x at r" );
+    this->_def_operator( "?[a b] x y]       -> y" );
+    this->_def_operator( "?[a x y]          -> x" );
+    this->_def_operator( "+[v e r k]        -> [e++v|r k] where e++v|r := append e onto v at r" );
 }
 
 template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT>
