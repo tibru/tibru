@@ -15,8 +15,9 @@ KConShellManager<System, SchemeT, AllocatorT>::KConShellManager( size_t ncells )
     this->_def_constant( "sel", Scheme::new_byte( 1, 1 ) );
     this->_def_constant( "if", Scheme::new_byte( 2, 1 ) );
 
-    this->_def_constant( "exit", Scheme::new_byte( 0, 2 ) );
-    this->_def_constant( "graft", Scheme::new_byte( 1, 2 ) );
+    this->_def_constant( "EXIT", Scheme::new_byte( 0, 2 ) );
+    this->_def_constant( "IF", Scheme::new_byte( 1, 2 ) );
+    this->_def_constant( "GRAFT", Scheme::new_byte( 2, 2 ) );
 
     this->_def_constant( "nil", Scheme::new_byte( 0, 2 ) );
     this->_def_constant( "F", Scheme::new_byte( 0, 3 ) );

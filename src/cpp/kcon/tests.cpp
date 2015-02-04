@@ -206,14 +206,14 @@ struct Tester
         test_op_illegal( "*[0 [[qt 2] 0]]", "* cons form requires at least 2 cell based expressions" );
 
         shell.parse( ":def env [1 #0 0]" );
-        shell.parse( ":def exitenv [env exit']" );
+        shell.parse( ":def EXITENV [env EXIT']" );
 
         //Execute
-        test_op( "![exit 21]", "21" );
-        test_op( "![exit 21']", "[qt 21]" );
-        test_op( "![[env 22' exitenv'] 23]", "[22 23]" );
-        test_op( "![graft [1 2 3] [exit 21'] [#0 0]]", "[qt 21]" );
-        test_op( "![graft [exit 21] 22 [#1 0]]", "22" );
+        test_op( "![EXIT 21]", "21" );
+        test_op( "![EXIT 21']", "[qt 21]" );
+        test_op( "![[env 22' EXITENV'] 23]", "[22 23]" );
+        test_op( "![GRAFT [1 2 3] [EXIT 21'] [#0 0]]", "[qt 21]" );
+        test_op( "![GRAFT [EXIT 21] 22 [#1 0]]", "22" );
     }
 
     static void run_tests()

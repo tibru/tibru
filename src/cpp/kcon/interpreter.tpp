@@ -267,6 +267,10 @@ auto KConInterpreter<System, SchemeT, AllocatorT>::execute_trace( elem_t state, 
     }
     else if( Scheme::byte_value( stmt.byte() ) == 1 )
     {
+        throw Error<NotImplemented>( "Not doing if yet" );
+    }
+    else if( Scheme::byte_value( stmt.byte() ) == 2 )
+    {
         pcell_t params = env.pcell( "! graft form requires environment, path and element" );
         env = params->head();
         params = params->tail().pcell( "! graft form requires path and element" );

@@ -12,16 +12,16 @@
 :def frame hd
 :def self x
 
-:def exitenv [env exit']
+:def EXITENV [env EXIT']
 
 % select variable x from env
-![ [x exit'] [[1 2 3 nil] nil] ]
+![ [x EXIT'] [[1 2 3 nil] nil] ]
 
 % push 22 onto env
-![ [env 22' exitenv'] 23 ]
+![ [env 22' EXITENV'] 23 ]
 
 % build a frame [21 22 23] and push onto env
-![ [nil' 23' 22' 21' env [hd tl [frame exit']']'] nil ]
+![ [nil' 23' 22' 21' env [hd tl [frame EXIT']']'] nil ]
 
 % infinite recursion on f (put f into env ideally)
 :def f [nil' y self env [hd tl [env self]']']
@@ -30,7 +30,7 @@
 :def inc [#1 #2 #3 #4 #5 nil]
 
 % Take head of env and lookup into inc, replacing head of env
-:def next [1' hd 1' #0' sel' env [[tltl [hd tl exit']']' tl hd [hd inc' tl]']']
+:def next [1' hd 1' #0' sel' env [[tltl [hd tl EXIT']']' tl hd [hd inc' tl]']']
 ![next #3 [1 2 3]]
 
 
