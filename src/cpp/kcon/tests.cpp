@@ -160,8 +160,8 @@ struct Tester
         test_op_illegal( "/[[1 2 3] #0 4]", "Tried to access head of a byte" );
 
         //IfCell
-        test_op( "?[[0 0] 0 1]", "1" );
-        test_op( "?[0 0 1]", "0" );
+        test_op( "?[[0 0] 0 1]", "0" );
+        test_op( "?[0 0 1]", "1" );
         test_op_illegal( "?0", "? operates only on cells" );
         test_op_illegal( "?[0 0]", "? requires two choices not a byte" );
 

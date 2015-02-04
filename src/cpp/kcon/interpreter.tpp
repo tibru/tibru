@@ -117,10 +117,10 @@ template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT>
 auto KConInterpreter<System, SchemeT, AllocatorT>::_ifcell( elem_t cond, pcell_t choices ) -> elem_t
 {
     if( cond.is_pcell() )
-        return choices->tail();
+        return choices->head();
 
     System::assert( cond.is_byte(), "IF condition was neither cell nor byte" );
-    return choices->head();
+    return choices->tail();
 }
 
 template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT>
@@ -264,7 +264,11 @@ auto KConInterpreter<System, SchemeT, AllocatorT>::execute_trace( elem_t state, 
     else if( Scheme::byte_value( stmt.byte() ) == 1 )
     {
         pcell_t params = env.pcell( "! IF form requires environment, condition and continuations" );
-        return this->allocator().new_Cell( ifcell( params->tail() ), params->head() );
+        elem_t cond = params->head();
+        params = params->tail().pcell();
+        pcell_t konts = params->head().pcell();
+        env = params->tail();
+        return this->allocator().new_Cell( _ifcell( cond, konts ), env );
     }
     else if( Scheme::byte_value( stmt.byte() ) == 2 )
     {

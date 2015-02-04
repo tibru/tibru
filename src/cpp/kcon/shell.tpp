@@ -77,8 +77,8 @@ KConShellManager<System, SchemeT, AllocatorT>::KConShellManager( size_t ncells )
     this->_def_operator( ".x                -> x" );
     this->_def_operator( "/[v [t1 ..] h1]   -> head{h1}( tail{t1 + 256*t2 ...}(v) )" );
     this->_def_operator( "/[v [t1 ..] h1 r] -> /[head{h1}( tail{t1 + 256*t2 ...}(v) ) r]" );
-    this->_def_operator( "?[a b] x y]       -> y" );
-    this->_def_operator( "?[a x y]          -> x" );
+    this->_def_operator( "?[a b] x y]       -> x" );
+    this->_def_operator( "?[a x y]          -> y" );
     this->_def_operator( "+[v e r k]        -> [e++v|r k] where e++v|r := append e onto v at r" );
 }
 
