@@ -78,10 +78,8 @@ nil]
 % ![f [memory EXITENV #3 #4 nil]]
 
 :def g [call #2' v0 heap lt' [
-			r0 [
-				[_pop1 #21' heap _kont]
-				[_pop1 #32' heap _kont]
-			]' if' stk' stk [hd tl]'
-		]' @]
+				[_pop1 #21' heap _kont]'
+				[_pop1 #32' heap _kont]'
+			r0 IF']' @]
 
 ![g [memory EXITENV #0 nil]]

@@ -160,8 +160,8 @@ struct Tester
         test_op_illegal( "/[[1 2 3] #0 4]", "Tried to access head of a byte" );
 
         //IfCell
-        test_op( "?[[0 1] [0 0]]", "1" );
-        test_op( "?[[0 1] 0]", "0" );
+        test_op( "?[[0 0] 0 1]", "1" );
+        test_op( "?[0 0 1]", "0" );
         test_op_illegal( "?0", "? operates only on cells" );
 
         //Graft
@@ -182,13 +182,9 @@ struct Tester
         test_op( "@[nil qt 21]", "21" );
         test_op( "@[[10 20 30] sel #1 1]", "20" );
         test_op( "@[[10 20 30] sel #1 0 #1 0]", "30" );
-        test_op( "@[[10 20 30] if [0 1] T]", "1" );
-        test_op( "@[[10 20 30] if [0 1] F]", "0" );
         test_op_illegal( "@21", "@ operates only on cells" );
         test_op_illegal( "@[2 3]", "@ requires cell expression" );
         test_op_illegal( "@[nil 3 0]", "@ requires expression code to be 0 or 1" );
-        test_op_illegal( "@[[10 20 30] if 0]", "@ 2 requires cell based choices and condition" );
-        test_op_illegal( "@[[10 20 30] if 0 0]", "@ 2 requires cell based choices" );
 
         //Evaluate
         test_op( "*[nil qt 21]", "21" );
@@ -199,7 +195,6 @@ struct Tester
         test_op( "*[EXIT [[qt 1] [qt 2] [qt 3] [qt 4]]]", "[4 3 2 1]" );
         test_op( "*[EXIT 1' 2' 3' 4']", "[4 3 2 1]" );
         test_op( "*[[0 10 20 30 40 50 nil] [[sel #1 1] [sel #2 1] [sel #3 1] [sel #4 1]]]", "[40 30 20 10]" );
-        test_op( "*[nil [if [0 1] 0] [if [0 1] [0 0]]]", "[1 0]" );
         test_op_illegal( "*21", "* operates only on cells" );
         test_op_illegal( "*[2 3]", "* requires cell expression" );
         test_op_illegal( "*[nil 3 0]", "@ requires expression code to be 0 or 1" );

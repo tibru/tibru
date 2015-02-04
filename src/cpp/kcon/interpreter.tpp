@@ -90,12 +90,12 @@ auto KConInterpreter<System, SchemeT, AllocatorT>::select( elem_t elem ) -> elem
 }
 
 template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT>
-auto KConInterpreter<System, SchemeT, AllocatorT>::_ifcell( elem_t env, pcell_t choices, elem_t cond ) -> elem_t
+auto KConInterpreter<System, SchemeT, AllocatorT>::_ifcell( elem_t cond, pcell_t choices ) -> elem_t
 {
     if( cond.is_pcell() )
         return choices->tail();
 
-    System::assert( cond.is_byte(), "If condition was neither cell nor byte" );
+    System::assert( cond.is_byte(), "IF condition was neither cell nor byte" );
     return choices->head();
 }
 
@@ -104,7 +104,7 @@ auto KConInterpreter<System, SchemeT, AllocatorT>::ifcell( elem_t elem ) -> elem
 {
     pcell_t p = elem.pcell( "? operates only on cells" );
 
-    return _ifcell( elem_t(), p->head().pcell( "? Requires two choices not a byte"), p->tail() );
+    return _ifcell( p->head(), p->tail().pcell( "? Requires two choices not a byte") );
 }
 
 template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT>
@@ -117,13 +117,6 @@ auto KConInterpreter<System, SchemeT, AllocatorT>::_reduce( elem_t env, pcell_t 
         return _constant( env, params );
     else if( code == 1 )
         return _select( env, params.pcell( "@ 1 requires cell based path" ) );
-    else if( code == 2 )
-    {
-        pcell_t p = params.pcell( "@ 2 requires cell based choices and condition" );
-        pcell_t choices = p->head().pcell( "@ 2 requires cell based choices" );
-        elem_t cond = p->tail();
-        return _ifcell( env, choices, cond );
-    }
     else
         System::check( false, "@ requires expression code to be 0 or 1" );
 
@@ -252,8 +245,8 @@ auto KConInterpreter<System, SchemeT, AllocatorT>::execute( elem_t state ) -> el
 template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT>
 auto KConInterpreter<System, SchemeT, AllocatorT>::execute_trace( elem_t state, bool& more ) -> elem_t
 {
-    elem_t env = state.pcell( "! requires cell state" )->tail();
     elem_t stmt = state.pcell()->head();
+    elem_t env = state.pcell( "! requires cell state" )->tail();
 
     more = true;
     if( stmt.is_pcell() )
@@ -267,15 +260,18 @@ auto KConInterpreter<System, SchemeT, AllocatorT>::execute_trace( elem_t state, 
     }
     else if( Scheme::byte_value( stmt.byte() ) == 1 )
     {
-        throw Error<NotImplemented>( "Not doing if yet" );
+        pcell_t params = env.pcell( "! IF form requires cond and choices" );
+        elem_t cond = params->head();
+        pcell_t choices = params->tail().pcell( "! IF form requires path and element" );
+        return _ifcell( cond, choices );
     }
     else if( Scheme::byte_value( stmt.byte() ) == 2 )
     {
-        pcell_t params = env.pcell( "! graft form requires environment, path and element" );
+        pcell_t params = env.pcell( "! GRAFT form requires environment, path and element" );
         env = params->head();
-        params = params->tail().pcell( "! graft form requires path and element" );
+        params = params->tail().pcell( "! GRAFT form requires path and element" );
         elem_t elem = params->head();
-        pcell_t path = params->tail().pcell( "! graft form requires cell based path" );
+        pcell_t path = params->tail().pcell( "! GRAFT form requires cell based path" );
         return _graft( env, elem, path );
     }
     else

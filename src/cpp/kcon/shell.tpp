@@ -13,7 +13,6 @@ KConShellManager<System, SchemeT, AllocatorT>::KConShellManager( size_t ncells )
 {
     this->_def_constant( "qt", Scheme::new_byte( 0, 1 ) );
     this->_def_constant( "sel", Scheme::new_byte( 1, 1 ) );
-    this->_def_constant( "if", Scheme::new_byte( 2, 1 ) );
 
     this->_def_constant( "EXIT", Scheme::new_byte( 0, 2 ) );
     this->_def_constant( "IF", Scheme::new_byte( 1, 2 ) );
@@ -70,6 +69,7 @@ KConShellManager<System, SchemeT, AllocatorT>::KConShellManager( size_t ncells )
     this->_def_operator( "![[f x] v]        -> ![*[v f] *[v x]]" );
     this->_def_operator( "![0 x]            -> x" );
     this->_def_operator( "![1 x y r]        -> !+[x y r]" );
+    this->_def_operator( "![2 c x y]        -> !?[c x y]" );
     this->_def_operator( "*[v [[x y] .. z]] -> [@[v z] @[v [x y]]]" );
     this->_def_operator( "*[v e]            -> @[v e]" );
     this->_def_operator( "@[v 0 x]          -> .x" );
@@ -77,8 +77,8 @@ KConShellManager<System, SchemeT, AllocatorT>::KConShellManager( size_t ncells )
     this->_def_operator( ".x                -> x" );
     this->_def_operator( "/[v [t1 ..] h1]   -> head{h1}( tail{t1 + 256*t2 ...}(v) )" );
     this->_def_operator( "/[v [t1 ..] h1 r] -> /[head{h1}( tail{t1 + 256*t2 ...}(v) ) r]" );
-    this->_def_operator( "?[[x y] [a b]]    -> y" );
-    this->_def_operator( "?[[x y] a]        -> x" );
+    this->_def_operator( "?[[a b] x y]    -> y" );
+    this->_def_operator( "?[a x y]        -> x" );
     this->_def_operator( "+[x y r]          -> append y onto x at r" );
 }
 
