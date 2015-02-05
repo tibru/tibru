@@ -92,7 +92,20 @@ auto OhNoShellManager<System, SchemeT, AllocatorT>::process_command( const std::
 {
     if( cmd == "fn" )
     {
-
+        throw Error<NotImplemented>(
+                    "The idea here is to parse something like:\n"
+                    ":fn fib( fib, n ) -> if( n <= 2 ) fib( n-1 ) + fib( n-2 ) else 1\n"
+                    "  into\n"
+                    "[call #2' v1 heap lt' [\n"
+					"   stk r0 IF' [\n"
+					"	    [_pop2 #1' heap _kont]\n"
+					"	    [call #1' _v1 heap sub'\n"
+					"		    [call r0 __v0 heap __v0\n"
+					"			    [call #2' ___v1 heap sub'\n"
+					"				    [call r0 ____v0 heap ____v0\n"
+					"					    [call r0 r2 heap add'\n"
+					"						    [______pop2 r0 heap ______kont]' @]' @]' @]' @]' @]\n"
+					"   ]' @]' @]" );
     }
     else
         return Base::process_command( cmd, eis, eos, noisy );
