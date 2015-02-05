@@ -40,6 +40,7 @@
 
 :def r0 [sel #1 1]
 :def r1 [sel #2 1]
+:def r2 [sel #3 1]
 
 :def EXITENV [env EXIT']
 :def EXITVAL [[sel #1 1] EXIT']
@@ -125,8 +126,8 @@ nil]
 							[call r0 __v0 heap __v0
 								[call #2' ___v1 heap sub'
 									[call r0 ____v0 heap ____v0
-										[call r0 r1 heap add'
+										[call r0 r2 heap add'
 											[______pop2 r0 heap ______kont]' @]' @]' @]' @]' @]
 					]' @]' @]
 
-![fib [memory EXITENV fib #7 nil]]
+![fib [memory EXITENV fib #6 nil]]
