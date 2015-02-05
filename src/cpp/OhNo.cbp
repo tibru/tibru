@@ -64,6 +64,9 @@
 		<Unit filename="elpa/shell.h">
 			<Option virtualFolder="elpa/" />
 		</Unit>
+		<Unit filename="elpa/shell.tpp">
+			<Option virtualFolder="elpa/" />
+		</Unit>
 		<Unit filename="elpa/stream.cpp">
 			<Option virtualFolder="elpa/" />
 		</Unit>

@@ -1,4 +1,4 @@
-:trace on
+:trace off
 :names on
 
 :def env [1 #0 0]
@@ -13,8 +13,17 @@
 :def pop3 [sel #5 0]
 :def _kont [sel #2 1]
 :def _pop1 [sel #4 0]
+:def _pop2 [sel #5 0]
+:def __kont [sel #3 1]
+:def __pop2 [sel #6 0]
 :def ___kont [sel #4 1]
 :def ___pop2 [sel #7 0]
+:def ____kont [sel #5 1]
+:def ____pop2 [sel #8 0]
+:def _____kont [sel #6 1]
+:def _____pop2 [sel #9 0]
+:def ______kont [sel #7 1]
+:def ______pop2 [sel #10 0]
 :def call [sel #1 0]
 :def _call [sel #2 0]
 :def v0 [sel #2 1]
@@ -22,6 +31,12 @@
 :def v2 [sel #4 1]
 :def _v0 [sel #3 1]
 :def _v1 [sel #4 1]
+:def __v0 [sel #4 1]
+:def __v1 [sel #5 1]
+:def ___v0 [sel #5 1]
+:def ___v1 [sel #6 1]
+:def ____v0 [sel #6 1]
+:def ____v1 [sel #7 1]
 
 :def r0 [sel #1 1]
 :def r1 [sel #2 1]
@@ -39,20 +54,40 @@
 
 :def inc_table [#1 #2 #3 #4 #5 #6 #7 #8 #9 #10 nil]
 :def add_table [
-	[#0 #1 #2 #3 #4 #5 nil]
-	[#1 #2 #3 #4 #5 #6 nil]
-	[#2 #3 #4 #5 #6 #7 nil]
-	[#3 #4 #5 #6 #7 #8 nil]
-	[#4 #5 #6 #7 #8 #9 nil]
-	[#5 #6 #7 #8 #9 #10 nil]
+	[#0  #1  #2  #3  #4  #5  #6  #7  #8  #9  #10 nil]
+	[#1  #2  #3  #4  #5  #6  #7  #8  #9  #10 #11 nil]
+	[#2  #3  #4  #5  #6  #7  #8  #9  #10 #11 #12 nil]
+	[#3  #4  #5  #6  #7  #8  #9  #10 #11 #12 #13 nil]
+	[#4  #5  #6  #7  #8  #9  #10 #11 #12 #13 #14 nil]
+	[#5  #6  #7  #8  #9  #10 #11 #12 #13 #14 #15 nil]
+	[#6  #7  #8  #9  #10 #11 #12 #13 #14 #15 #16 nil]
+	[#7  #8  #9  #10 #11 #12 #13 #14 #15 #16 #17 nil]
+	[#8  #9  #10 #11 #12 #13 #14 #15 #16 #17 #18 nil]
+	[#9  #10 #11 #12 #13 #14 #15 #16 #17 #18 #19 nil]
+	[#10 #11 #12 #13 #14 #15 #16 #17 #18 #19 #20 nil]
+nil]
+:def sub_table [
+	[#0  F  F  F  F  F  F  F  F  F  nil]
+	[#1 #0  F  F  F  F  F  F  F  F  nil]
+	[#2 #1 #0  F  F  F  F  F  F  F  nil]
+	[#3 #2 #1 #0  F  F  F  F  F  F  nil]
+	[#4 #3 #2 #1 #0  F  F  F  F  F  nil]
+	[#5 #4 #3 #2 #1 #0  F  F  F  F  nil]
+	[#6 #5 #4 #3 #2 #1 #0  F  F  F  nil]
+	[#7 #6 #5 #4 #3 #2 #1 #0  F  F  nil]
+	[#8 #7 #6 #5 #4 #3 #2 #1 #0  F  nil]
+	[#9 #8 #7 #6 #5 #4 #3 #2 #1 #0  nil]
 nil]
 :def lt_table [
-	[F T T T T T nil]
-	[F F T T T T nil]
-	[F F F T T T nil]
-	[F F F F T T nil]
-	[F F F F F T nil]
-	[F F F F F F nil]
+	[F T T T T T T T T nil]
+	[F F T T T T T T T nil]
+	[F F F T T T T T T nil]
+	[F F F F T T T T T nil]
+	[F F F F F T T T T nil]
+	[F F F F F F T T T nil]
+	[F F F F F F F T T nil]
+	[F F F F F F F F T nil]
+	[F F F F F F F F F nil]
 nil]
 
 :def lookup1 [1' v1 1' #2' sel' env [kont' heap' tl pop2' hd [hd tl]']']
@@ -65,6 +100,7 @@ nil]
 % define a function
 :def inc [pop1 v0 inc_table' heap lookup1' kont @]
 :def add [pop2 v0 v1 add_table' heap lookup2' kont @]
+:def sub [pop2 v0 v1 sub_table' heap lookup2' kont @]
 :def lt [pop2 v0 v1 lt_table' heap lookup2' kont @]
 % ![inc [memory EXITVAL #3 nil]]
 % ![add [memory EXITVAL #3 #4 nil]]
@@ -82,4 +118,15 @@ nil]
 						[_pop1 #21' heap _kont]
 						[_pop1 #32' heap _kont]]' @]' @]
 
-![g [memory EXITENV #5 nil]]
+:def fib [call #2' v1 heap lt' [
+					stk r0 IF' [
+						[_pop2 #1' heap _kont]
+						[call #1' _v1 heap sub'
+							[call r0 __v0 heap __v0
+								[call #2' ___v1 heap sub'
+									[call r0 ____v0 heap ____v0
+										[call r0 r1 heap add'
+											[______pop2 r0 heap ______kont]' @]' @]' @]' @]' @]
+					]' @]' @]
+
+![fib [memory EXITENV fib #7 nil]]

@@ -143,10 +143,17 @@ auto KConShellManager<System, SchemeT, AllocatorT>::process_command( const std::
     {
         std::string status;
         eis >> status >> endofline;
-        if( status != "on" && status != "off" )
-            throw Error<Command>( "Trace command requires 'on' or 'off' argument" );
 
-        _trace_limit = (status == "on" ? 31 : 0);
+        if( status == "off" )
+        {
+            _trace_limit = 0;
+        }
+        else
+        {
+            std::istringstream iss( status );
+            if( !(iss >> _trace_limit) )
+                throw Error<Command>( "Trace command requires 'on' or 'off' argument" );
+        }
     }
     else
         return false;
@@ -157,7 +164,7 @@ auto KConShellManager<System, SchemeT, AllocatorT>::process_command( const std::
 template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT>
 void KConShellManager<System, SchemeT, AllocatorT>::print_commands( elpa_ostream<System, SchemeT>& eos ) const
 {
-    eos << ":trace [on|off] - Turn tracing on or off for ! operator\n";
+    eos << ":trace [<limit>|off] - Turn tracing on or off for ! operator\n";
 }
 
 }   //namespace
