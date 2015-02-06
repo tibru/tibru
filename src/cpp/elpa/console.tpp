@@ -14,14 +14,15 @@ auto Console<InterpreterT>::help( int ret_code ) -> int
 {
     std::cout << "usage: kcon [option] <filenames>\n";
     std::cout << "Options are:\n";
-    std::cout << "-mem=n : Limit memory usage to only n cells\n";
-    std::cout << "-fast  : Turn off illegal operation checks and assertions\n";
-    std::cout << "-safe  : Perfrom illegal operation checks only\n";
-    std::cout << "-debug : Perfrom illegal operation checks and assertions\n";
-    std::cout << "-noisy : Show all output\n";
-    std::cout << "-repl  : Enter REPL after running all scripts\n";
-    std::cout << "-tests : Run internal tests before starting\n";
-    std::cout << "-help  : Show this help\n";
+    std::cout << "-mem=n      : Limit memory usage to only n cells\n";
+    std::cout << "-fast       : Turn off illegal operation checks and assertions\n";
+    std::cout << "-safe       : Perfrom illegal operation checks only\n";
+    std::cout << "-debug      : Perfrom illegal operation checks and assertions\n";
+    std::cout << "-superdebug : Likedebug but memory allocator shifts cell on each allocation\n";
+    std::cout << "-noisy      : Show all output\n";
+    std::cout << "-repl       : Enter REPL after running all scripts\n";
+    std::cout << "-tests      : Run internal tests before starting\n";
+    std::cout << "-help       : Show this help\n";
     std::cout << std::endl;
     return ret_code;
 }
@@ -75,7 +76,7 @@ auto Console<InterpreterT>::go( int argc, const char* argv[] ) -> int
                     ncells = 10 * ncells + (c - '0');
                 }
             }
-            else if( arg == "-debug" || arg == "-safe" || arg == "-fast" )
+            else if( arg == "-superdebug" || arg == "-debug" || arg == "-safe" || arg == "-fast" )
                 mode = arg;
             else if( arg == "-repl" )
                 repl = true;
@@ -136,8 +137,10 @@ auto Console<InterpreterT>::go( int argc, const char* argv[] ) -> int
 
     try
     {
-        if( mode == "-debug" )
+        if( mode == "-superdebug" )
             return run< Env<Debug, SimpleScheme, TestAllocator, InterpreterT> >( ncells, filenames, noisy, repl );
+        else if( mode == "-debug" )
+            return run< Env<Debug, SimpleScheme, SimpleAllocator, InterpreterT> >( ncells, filenames, noisy, repl );
         else if( mode == "-safe" )
             return run< Env<Safe, OptScheme, OptAllocator, InterpreterT> >( ncells, filenames, noisy, repl );
         else if( mode == "-fast" )
