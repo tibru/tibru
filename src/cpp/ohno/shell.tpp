@@ -84,7 +84,7 @@ template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT>
 void OhNoShellManager<System, SchemeT, AllocatorT>::print_help( elpa_ostream<System,SchemeT>& eos )
 {
     Base::print_help( eos );
-    eos << "% - Swap last two elements of a list\n";
+    eos << "@ - Rotate last 3 elements of a list\n";
 }
 
 template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT>

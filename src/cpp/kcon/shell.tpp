@@ -68,7 +68,7 @@ KConShellManager<System, SchemeT, AllocatorT>::KConShellManager( size_t ncells )
 
     this->_def_operator( "![[f x] v]        -> ![*[v f] *[v x]]" );
     this->_def_operator( "![0 x]            -> x" );
-    this->_def_operator( "![1 v c k1 k2]    -> ![?[c k1 k2] v]" );
+    this->_def_operator( "![1 c k1 k2 v]    -> ![?[c k1 k2] v]" );
     this->_def_operator( "![2 v e r k]      -> ![v +[e r k]]" );
     this->_def_operator( "*[v [[x y] .. z]] -> [@[v z] @[v [x y]]]" );
     this->_def_operator( "*[v e]            -> @[v e]" );

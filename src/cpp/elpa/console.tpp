@@ -43,6 +43,8 @@ auto Console<InterpreterT>::run( size_t ncells, const std::vector< std::string >
 
     if( repl )
         shell.interactive( std::cin, std::cout );
+    else if( !noisy  )
+        shell.print( eos, shell.it() );
 
     return 0;
 }

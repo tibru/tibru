@@ -125,7 +125,6 @@ private:
     std::map<uint8_t, uint8_t> _defns_byte_counts;
     std::set<std::string> _processing;
 
-    void _print( elpa_ostream& eos, elem_t elem );
     auto _process_command( const std::string& cmd, elpa_istream& eis, elpa_ostream& eos, bool noisy ) -> bool;
     auto _process_input( std::istream& is, elpa_ostream& eos, bool noisy=true ) -> bool;
 public:
@@ -159,10 +158,19 @@ public:
 	void process( const std::string& filename, elpa_ostream& eos );
 	void process( const std::string& filename );
 	auto parse( const std::string& in ) -> elem_t;
+	void print( elpa_ostream& eos, elem_t elem );
 
 	const elpa_map<std::string, elem_t>& names() const
 	{
 	    return _use_names ? _defns_no_it : _defns_none;
+    }
+
+    auto it() const -> elem_t
+    {
+        if( _defns_with_it.find("it") != _defns_with_it.end() )
+            return _defns_with_it.at("it");
+        else
+            return elem_t();
     }
 };
 

@@ -1,4 +1,4 @@
-:trace on
+:trace 32
 
 % frame based environment defines
 :def env [1 #0 0]

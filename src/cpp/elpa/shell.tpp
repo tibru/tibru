@@ -162,7 +162,7 @@ auto Shell<Env>::_process_command( const std::string& cmd, elpa_istream& eis, el
 }
 
 template<class Env>
-void Shell<Env>::_print( elpa_ostream& eos, elem_t elem )
+void Shell<Env>::print( elpa_ostream& eos, elem_t elem )
 {
     eos << _format << _num_format;
     if( !_line_format )
@@ -232,7 +232,7 @@ auto Shell<Env>::_process_input( std::istream& is, elpa_ostream& eos, bool noisy
                             if( more )
                                 eos << (niter+1) << ".\t";
 
-                            _print( eos, elem );
+                            print( eos, elem );
 
                             if( !more && niter > 0 )
                                 eos << std::endl;
@@ -241,7 +241,7 @@ auto Shell<Env>::_process_input( std::istream& is, elpa_ostream& eos, bool noisy
                 }
                 else
                     if( noisy )
-                        _print( eos, elem );
+                        print( eos, elem );
 
                 _defns_with_it["it"] = elem;
 
