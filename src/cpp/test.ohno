@@ -38,6 +38,10 @@
 :def ____v0 [sel #6 1]
 :def ____v1 [sel #7 1]
 
+:def mem0 [#0 1 #0 1]
+:def mem1 [#0 1 #1 1]
+:def mem2 [#0 1 #2 1]
+
 :def r0 [sel #1 1]
 :def r1 [sel #2 1]
 :def r2 [sel #3 1]
@@ -107,6 +111,9 @@ nil]
 % ![add [memory EXITVAL #3 #4 nil]]
 % ![lt [memory EXITVAL #3 #4 nil]]
 
+:def setheap [[pop2 heap kont]' v1 v0 stk GRAFT']
+%![setheap [memory EXITENV 21 mem2 nil]]
+
 % :def f [call v0 heap' inc' EXITENV' @]
 :def f [call v0 heap inc' [
 			call _v1 heap inc' [
@@ -131,3 +138,4 @@ nil]
 					]' @]' @]
 
 ![fib [memory EXITENV fib #6 nil]]
+

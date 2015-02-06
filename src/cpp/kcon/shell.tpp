@@ -152,7 +152,7 @@ auto KConShellManager<System, SchemeT, AllocatorT>::process_command( const std::
         {
             std::istringstream iss( status );
             if( !(iss >> _trace_limit) )
-                throw Error<Command>( "Trace command requires 'on' or 'off' argument" );
+                throw Error<Command>( "Trace command requires '<num>' or 'off' argument" );
         }
     }
     else

@@ -263,17 +263,24 @@ auto KConInterpreter<System, SchemeT, AllocatorT>::execute_trace( elem_t state, 
     }
     else if( Scheme::byte_value( stmt.byte() ) == 1 )
     {
-        pcell_t params = env.pcell( "! IF form requires environment, condition and continuations" );
+        pcell_t params = env.pcell( "! IF form requires condition, continuations and environment" );
         elem_t cond = params->head();
-        params = params->tail().pcell();
-        pcell_t konts = params->head().pcell();
+        params = params->tail().pcell( "! IF form requires continuations and environment" );
+        pcell_t konts = params->head().pcell( "! IF form requires cell based continuations" );
         env = params->tail();
         return this->allocator().new_Cell( _ifcell( cond, konts ), env );
     }
     else if( Scheme::byte_value( stmt.byte() ) == 2 )
     {
         pcell_t params = env.pcell( "! GRAFT form requires environment, element, path and continuation" );
-        return this->allocator().new_Cell( graft( params->tail() ), params->head() );
+        env = params->head();
+        params = params->tail().pcell( "! GRAFT form requires element, path and continuation" );
+        elem_t elem = params->head();
+        params = params->tail().pcell( "! GRAFT form requires path and continuation" );
+        pcell_t path = params->head().pcell( "! GRAFT form requires cell based path" );
+        elem_t kont = params->tail();
+
+        return this->allocator().new_Cell( kont, _graft( env, elem, path ) );
     }
     else
         System::check( false, "! statement code must be 0" );
