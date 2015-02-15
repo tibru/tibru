@@ -36,3 +36,5 @@ obj/
 *.layout
 *.cbTemp
 *.c
+
+README.html

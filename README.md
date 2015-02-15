@@ -10,7 +10,7 @@ As of writing no further work is being done on the system as it has met its firs
 Build
 =====
 
-To build the 2 main executables 'kcon' and 'ohno' run make within the src/cpp directory.
+To build the 2 main executables 'kcon' and 'ohno' run make within the src/cpp directory. G++ 4.9 or higher is required.
 
 	make
 
@@ -341,3 +341,8 @@ This is what `fib` looks like:
 	[memory [13 0 0 0] nil]
 
 The full source for this is available in the file `test.ohno`.
+
+For the brave without names this becomes:
+
+	>>> fib
+	[[1 [1 0 0 0] 0] [0 2 ...
