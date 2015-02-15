@@ -248,8 +248,8 @@ auto KConInterpreter<System, SchemeT, AllocatorT>::execute( elem_t state ) -> el
 template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT>
 auto KConInterpreter<System, SchemeT, AllocatorT>::execute_trace( elem_t state, bool& more ) -> elem_t
 {
-    elem_t stmt = state.pcell()->head();
-    elem_t env = state.pcell( "! requires cell state" )->tail();
+    elem_t stmt = state.pcell( "! requires cell state" )->head();
+    elem_t env = state.pcell()->tail();
 
     more = true;
     if( stmt.is_pcell() )
