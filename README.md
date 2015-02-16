@@ -1,9 +1,14 @@
 Tibru
 =====
 
-Tibru is an alternative to the nonsense that is the Urbit project. By nonsense I mean poor implementation, unecessarily obfuscated source code and generally poor design decisions leading to high runtime overheads with little advantage. It also suffers from academic elitism and lack of reference to prior art which is rampant throughout its design and documentation. Unfortunately despite its academic roots the chosen runtime language is arbitrary and poorly selected from hundreds of alternatives.
+Tibru is an alternative to the nonsense that is the [Urbit](http://doc.urbit.org/) project.
+By nonsense I mean poor implementation, unnecessarily obfuscated source code and generally poor design decisions leading to high runtime overheads with little advantage. It also suffers from academic elitism and lack of reference to prior art which is rampant throughout its design and documentation. Unfortunately despite its academic roots the chosen runtime language is arbitrary and poorly selected from hundreds of alternatives.
 
-This project has two aims. The first it too allow anyone to easily access systems of this type by using generally accepted coding standards and techniques. The executable provides an interactive REPL environment with human readable qualities. The second is to go above and beyond what is reasonably capable with Nock (Urbit's runtime language). This tenchnology is open for anyone to use and lends itself quite nicely to app container implementations since it is side-effect free and runs on immutable data structures.
+This project has two aims. The first is to allow easy access to systems of this type by using generally accepted coding standards and techniques.
+The target executable provides an interactive REPL environment with human readable qualities.
+The second is to go above and beyond what is reasonably capable with Nock (Urbit's runtime language).
+This technology is open for anyone to use and lends itself nicely to app container implementations since it is side effect free and 
+runs on immutable data structures.
 
 As of writing no further work is being done on the system as it has met its first goal to implement a basic runtime structure.
 
@@ -32,7 +37,8 @@ To see all expressions use the -noisy command line parameter.
 KCon
 ====
 
-The basic runtime language follows from Nock that takes primitives to be numbers and pairs. Pairs being pairs of numbers or other pairs. One critism of Nock is its use of arbitrarily large integers for a number base. KCon on the other hand uses only bytes (0-255). This enables KCon to run without arithmetic operators (Nock is liberally supplied with infinitely many more arithmetic operators by supporting increment).
+The basic runtime language follows from Nock in that it takes primitives to be numbers and pairs. Pairs being pairs of numbers or other pairs.
+One critism of Nock is its use of unbounded integers for a number base. KCon on the other hand uses only bytes (0-255). This enables KCon to run without arithmetic operators (Nock is liberally supplied with infinitely many more arithmetic operators by supporting increment).
 
 We write bytes base 10 and pairs use square bracket notation.
 
@@ -52,7 +58,9 @@ Then type any expression to see the value. It will then be named ***it*** for fu
 	20
 	>>> 20
 	20
-	>>[twenty twenty]
+	>>> [twenty twenty]
+	[20 20]
+	>>> it
 	[20 20]
 
 It would be nice to see the named expression by name. We can do that with:
@@ -75,7 +83,7 @@ Several names are already defined in KCon. These can be listed:
 	>>> qt
 	0
 
-Since the data is immutable and within KCon it's impossible to decide if two elements are **identical** we rely on the implementation to optimize for shared elements.
+Since the data is immutable and within KCon it's impossible to decide if two elements are identical we rely on the implementation to optimize for shared elements.
 This can be seen with the names turned on but it's an artefact of the implementation. Logically the data tree doesn't recombine but KCon can't decide that.
 
 KCon accepts multi-line input:
@@ -84,12 +92,12 @@ KCon accepts multi-line input:
 	... 2]
 	[1 2]
 
-KCon provides operators that act on expressions to yield another expression.
+KCon provides operators that act on expressions to yield other expressions.
 
 	>>> :help
-	Evaluate an expression of the form <name>|byte|[<expr> <expr>+]|<reader><expr>|<expr><macro> and define 'it' as its value
-	Or process an operator on an expression of the form <op><expr> where 'it' is the current state and define 'it' as its value
-	Or run a command
+	Evaluate an expression of the form <name>|byte|[<expr> <expr>+]|<reader><expr>|<expr><macro> and define 'it' as its value.
+	Or process an operator on an expression of the form <op><expr> and define 'it' as its value.
+	Or run a command.
 
 	Commands:
 	:def <name> <expr> - Define a named expression
@@ -140,8 +148,8 @@ The specification of KCon is the set of operators as defined by the help. The si
 	21
 
 The ***select*** operator **/** traverses a binary tree data expression and selects the relevant element. It has a non-standard path format.
-This path list has an even number of elements alternating between the number of tail traverses followed by head traverses.
-The tail traverses are multi-byte numbers constructed of lists of bytes. The n'th byte is the coefficient of 256<sup>n</sup> starting at n=0.
+A path list has an even number of elements alternating between the number of tail traverses followed by head traverses.
+The tail traverses are multi-byte numbers constructed of lists of bytes. The n<sup>th</sup> byte is the coefficient of 256<sup>n</sup> starting at n=0.
 The head traverses are simple bytes. Since writing out multi-byte numbers is a pain KCon provides a *reader* which is a special parser that generates data expressions.
 For 32-bit multi-byte numbers use the **#** reader:
 
@@ -165,7 +173,7 @@ We can then easily use the ***select*** operator:
 
 A path of `[#0 0]` acts like an identity function.
 
-The conditional operator ***if*** selects based on whether the test is a byte or a pair.
+The conditional operator ***if*** selects based on whether the test expression is a byte or a pair.
 
 	>>> ?[[twenty twenty] 0 1]
 	0
@@ -174,11 +182,15 @@ The conditional operator ***if*** selects based on whether the test is a byte or
 
 These are the 3 basic operators that reduce expressions based on selection. In implementation terms they don't allocate new cells and aren't recursive.
 The next operators reduce expressions by building new ones and are interpreters since their behaviour is modified by parameters.
-**@** is called the ***reduce*** operator it takes an environment, an instruction code and some parameters:
+**@** is called the ***reduce*** operator. It takes an environment, an instruction code and some parameters:
 
 	>>> :def nums [1 2 3]
+	>>> qt
+	0
 	>>> @[nums qt 21]
 	21
+	>>> sel
+	1
 	>>> @[nums sel tl]
 	[2 3]
 
@@ -189,7 +201,7 @@ It's common to need constant expressions using the ***quote*** operator so inste
 	>>> [1 2 3]'
 	[qt 1 2 3]
 
-Analogously the ***evaluate*** operator **\*** delegates to **@** but can create pairs as well:
+Analogously the ***evaluate*** operator **\*** delegates to **@** but can create pairs as well for which ***@*** is not defined:
 
 	>>> *[nums [qt 21] [sel tl]]
 	[[2 3] 21]
@@ -197,16 +209,18 @@ Analogously the ***evaluate*** operator **\*** delegates to **@** but can create
 Notice how it evaluates in reverse order. This increases performance as the list of arguments is evaluated from head to tail but the results are built up tail to head.
 Also since **\*** delegates to **@** it is not recursive, again, for performance reasons.
 
-This leaves one operator which is recursive to explain but fortunately its tail recursive. The ***execute*** operator **!** takes a statement and an environment.
-It then **executes** the statement in that environment resulting in a new environment and a continuation.
-Continuations are built into KCon which necessarily uses CPS (continuation passing style).
+This leaves the one recursive operator to explain but fortunately its tail recursive. The ***execute*** operator **!** takes a statement and an environment.
+It then *executes* the statement in that environment resulting in a new environment and a continuation.
+Continuations are built into KCon which necessarily uses [CPS](http://en.wikipedia.org/wiki/Continuation-passing_style) (continuation passing style).
 
-The simplest form in the **EXIT** statement:
+The simplest form is the **EXIT** statement:
 
+	>>> EXIT
+	0
 	>>> ![EXIT 21]
 	21
 
-Then we have the conditional form that selects 1 of two continuations based on whether the test element is a pair of not:
+Then we have the conditional form that selects one of two continuations based on whether the test element is a pair of not:
 
 	>>> ![IF [twenty twenty] [[[sel tl] EXIT'] [[sel hd] EXIT']] nums]
 	[2 3]
@@ -223,12 +237,12 @@ It's interesting for debugging purposes to see each step being executed:
 
 That's all that is needed for functional programming.
 However, there is one more operator ***GRAFT*** which is redundant but allows tree manipulations without having to formally write out a recursive algorithm.
-It takes a data expression (the tree), a path and an element. This result is a new tree with the element attached at the path location:
+It takes a data expression (the tree), a path and an element. The result is a new tree with the element attached at the path location:
 	
 	>>>	 +[nums [3 4] [#2 0]]
 	[1 2 3 4]
 
-Inexecute mode it takes a continuation:
+In *execute* mode it takes a continuation:
 	
 	>>> :def env [sel #0 0]
 	>>> ![GRAFT nums [3 4] [#2 0] [env EXIT']]
@@ -242,12 +256,13 @@ OhNo (Not that language)
 ========================
 
 All this is very unweildy so the OhNo interprerer defines a new shell command ***fn*** that parses a function definition and outputs an expression implementing it.
-The choses runtime structure is to pass a **heap** object into every function call and back out again with the result.
-Since KCon requires CPS the order of execution is known so updates to this **heap** structure are well defined. This allows for imperative programming.
+The chosen runtime structure is to pass a *heap* object into every function call and back out again with the result.
+Since KCon requires CPS the order of execution is known so updates to this *heap* structure are well defined. This allows for imperative programming.
 We haven't yet seen function recursion but this is possible.
-**Currently fn is not implemented but the ideas here show what to do**
 
-The goal of this section is to define a function that calculates fibonacci numbers and threads a **heap** throughout.
+*Currently fn is not implemented but the ideas here show what to do*.
+
+The goal of this section is to define a function that calculates Fibonacci numbers and threads a *heap* throughout.
 We'd like to be able to write continuations at the end of expressions so there is a macro for arranging arguments.
 
 	>>> [1 2 3 4 @]
@@ -281,27 +296,27 @@ And a lookup function:
 	>>> ![lookup1 [memory EXITENV inc_table #3 nil]]
 	[memory [4 0 0 0] nil]
 
-This is what a function call looks like. We call `lookup1` passing in the argument `#3`, the lookup table, the continuation `EXITENV` and the heap.
-We get out the heap and the result. The element `nil` is the call stack terminator.
+This is what a function call looks like. We call `lookup1` passing in the argument `#3`, the lookup table `inc_table`, the continuation `EXITENV` and the heap.
+We get out the *heap* and the result. The element `nil` is the call stack terminator.
 From here we can define `inc` formally:
 
 	>>> :def inc [pop1 v0 inc_table' heap lookup1' kont @]
 	>>> ![inc [memory EXITVAL #3 nil]]
 	[4 0 0 0]
 
-`EXITVAL` removes the call stack and heap leaving just the return value.
+`EXITVAL` removes the call stack and *heap* leaving just the return value.
 `kont` references the passed in continuation on the stack.
-`heap` references the passed in heap on the stack
-`pop1` removes the one argument from the stack (ie takes a tail part of the stack).
+`heap` references the passed in *heap* on the stack.
+`pop1` removes the one argument from the stack (i.e. selects a tail part of the stack).
 
-From here we can alter the heap.
+From here we can alter the *heap*.
 
 	>>> :def mem2 [#0 1 #2 1]
 	>>> :def setheap [[pop2 heap kont]' v1 v0 stk GRAFT']
 	>>> ![setheap [memory EXITENV 21 mem2 nil]]
 	[[0 0 21 0] nil]
 
-Here we set the heap at index 2 with the value `21`.
+Here we set the *heap* at index 2 with the value `21`.
 
 Putting this altogether we can define `fib` with a little help from `add` and `sub` defined using lookup tables and `lookup2`.
 
@@ -341,8 +356,34 @@ This is what `fib` looks like:
 	[memory [13 0 0 0] nil]
 
 The full source for this is available in the file `test.ohno`.
+It's not glamourous but has some structure as an intermediate format for high-level code.
+Each line represents a continuation of the previous with the exception of the first line.
+The naming convention is to use a prefix of `_` for the depth of the continuation as the stack grows with the evaluation of each expression.
+Finally all the intermediate values and the 2 formal arguments are removed with `______pop2`.
+`r0` and `r1` reference the intermediate values on the stack. `call` sets up the stack for a function call.
 
 For the brave without names this becomes:
 
 	>>> fib
 	[[1 [1 0 0 0] 0] [0 2 ...
+
+Viper *(Virtual processes Erlang style)*
+========================================
+
+A possible use case would be to create an app container that runs steps of the ***execute*** operator.
+After a predefined number of steps it switches to another process.
+A process would take as input its state and a request message.
+The result would be a new state and response message.
+
+	(state[n], request) -> (state[n+1], response)
+
+States can be stored as a transaction log (as could the requests) or the states can be stored as diffs from previous states.
+It would be interesting to have a set of pre-defined apps such a *key/value pair store* or *email server*.
+Interestingly since the base image must be an immutable structure it would be shared with other processes.
+A decent memory manager could optimize for this and only load data expressions as they are referenced to reduce memory overhead.
+From a security perspective it is relatively easy to verify that no malicious code could run since all processes would be side effect free.
+Indeed even asking the time is not permitted as that would break referential integrity.
+To refefence time it must be passed in as part of the request or the response could be a request for a *clock* service and the *state* a continuation.
+
+Dynamic languages can be supported since ***?*** can decide if a data expression is a byte or a pair the only two types.
+We have already seen that a *heap* can be modeled so it would be a rich environment to work in.
