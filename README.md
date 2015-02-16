@@ -202,13 +202,13 @@ It's common to need constant expressions using the ***quote*** operator so inste
 	>>> [1 2 3]'
 	[qt 1 2 3]
 
-Analogously the ***evaluate*** operator **\*** delegates to **@** but can create pairs as well for which ***@*** is not defined:
+Analogously the ***evaluate*** operator __*__ delegates to **@** but can create pairs as well for which ***@*** is not defined:
 
 	>>> *[nums [qt 21] [sel tl]]
 	[[2 3] 21]
 
 Notice how it evaluates in reverse order. This increases performance as the list of arguments is evaluated from head to tail but the results are built up tail to head.
-Also since **\*** delegates to **@** it is not recursive, again, for performance reasons.
+Also since __*__ delegates to **@** it is not recursive, again, for performance reasons.
 
 This leaves the one recursive operator to explain but fortunately its tail recursive. The ***execute*** operator **!** takes a statement and an environment.
 It then *executes* the statement in that environment resulting in a new environment and a continuation.
