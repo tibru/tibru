@@ -309,14 +309,14 @@ From here we can define `inc` formally:
 	>>> ![inc [memory EXITVAL #3 nil]]
 	[4 0 0 0]
 
-To implement arithmetic on larger numbers the size of the lookup tables would be too big.
-Using lookup tables on bytes only and then using a multi-byte addition algorithm would allow the creation of a generic unbounded add function.
-Similarly for other arithmetic operators and comparisons.
-
 `EXITVAL` removes the call stack and *heap* leaving just the return value.
 `kont` references the passed in continuation on the stack.
 `heap` references the passed in *heap* on the stack.
 `pop1` removes the one argument from the stack (i.e. selects a tail part of the stack).
+
+To implement arithmetic on larger numbers the size of the lookup tables would be too big.
+Using lookup tables on bytes only and then using a multi-byte addition algorithm would allow the creation of a generic unbounded add function.
+Similarly for other arithmetic operators and comparisons.
 
 From here we can alter the *heap*.
 
@@ -327,7 +327,7 @@ From here we can alter the *heap*.
 
 Here we set the *heap* at index 2 with the value `21`.
 
-Putting this altogether we can define `fib` with a little help from `add` and `sub` defined using lookup tables and `lookup2`.
+Putting this altogether we can define `fib` with a little help from `add`, `sub` and `lt` defined using lookup tables and `lookup2`.
 
 	>>> :def lookup2 [1' v1 1' v2 1' #2' sel' env [kont' heap' tl pop3' hd [hd tl]']']
 
