@@ -27,10 +27,11 @@ To run a script
 
 	./bin/kcon <script name>
 
+To show all the other command arguments available.
+
 	./bin/kcon -help
 
-Shows all the other command arguments available.
-If you run a script rather than from the REPL then you'll only see the last expression evaluated.
+If you run a script rather than use the REPL environment then you'll only see the last expression evaluated.
 To see all expressions use the -noisy command line parameter.
 
 
