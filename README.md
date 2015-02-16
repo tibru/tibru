@@ -48,7 +48,7 @@ We write bytes base 10 and pairs use square bracket notation.
 	>>> [0 [1 2]]
 	[0 1 2]
 
-Pairs are written right associatively so [0 [1 2]] is equivalent to [0 1 2]. Within the KCon environemnt we can assign names to elements.
+Pairs are written right associatively so [0 [1 2]] is equivalent to [0 1 2]. Within the KCon environment we can assign names to elements.
 
 	>>> :def twenty 20
 	>>> :def primes [2 3 5 7 11]
@@ -64,7 +64,7 @@ Then type any expression to see the value. It will then be named ***it*** for fu
 	>>> it
 	[20 20]
 
-It would be nice to see the named expression by name. We can do that with:
+It would be nice to see the named expressions by name. We can do that with:
 
 	>>> :names on
 	>>> it
