@@ -396,3 +396,5 @@ To refefence time it must be passed in as part of the request or the response co
 
 Dynamic languages can be supported since ***?*** can decide if a data expression is a byte or a pair the only two types.
 We have already seen that a *heap* can be modeled so it would be a rich environment to work in.
+
+The ***+*** operator appears costly to implement but a special memory manager can optimize away the tree rebuilds by storing the data expressions in two forms: those that recombine and those that don't. Any part of this tree that is non-recombining can be altered in place. Since the operator ***+*** works at the top level no part of the original tree can be referenced elsewhere, this is the beauty of CPS. So long as the *heap* is used in a strict way it would always be non-recombining. A language compiler can enforce this.
