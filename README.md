@@ -223,6 +223,8 @@ The simplest form is the **EXIT** statement:
 
 Then we have the conditional form that selects one of two continuations based on whether the test element is a pair of not:
 
+	>>> IF
+	1
 	>>> ![IF [twenty twenty] [[[sel tl] EXIT'] [[sel hd] EXIT']] nums]
 	[2 3]
 	>>> ![IF twenty [[[sel tl] EXIT'] [[sel hd] EXIT']] nums]
@@ -246,6 +248,8 @@ It takes a data expression (the tree), a path and an element. The result is a ne
 In *execute* mode it takes a continuation:
 	
 	>>> :def env [sel #0 0]
+	>>> GRAFT
+	2
 	>>> ![GRAFT nums [3 4] [#2 0] [env EXIT']]
 	1.	[[env qt nil] 1 2 3 4]
 	2.	[nil 1 2 3 4]
