@@ -309,6 +309,10 @@ From here we can define `inc` formally:
 	>>> ![inc [memory EXITVAL #3 nil]]
 	[4 0 0 0]
 
+To implement arithmetic on larger numbers the size of the lookup tables would be too big.
+Using lookup tables on bytes only and then using a multi-byte addition algorithm would allow the creation of a generic unbounded add function.
+Similarly for other arithmetic operators and comparisons.
+
 `EXITVAL` removes the call stack and *heap* leaving just the return value.
 `kont` references the passed in continuation on the stack.
 `heap` references the passed in *heap* on the stack.
