@@ -173,6 +173,8 @@ We can then easily use the ***select*** operator:
 	[2 3]
 
 A path of `[#0 0]` acts like an identity function.
+This looks inefficient but a smart memory manager can tag contiguous cells in memory to allow O(1) lookups (see later notes on __*__).
+In addition four byte sequences can be compacted into single words converting the 32-bit multi-byte number into a first class 32-bit number.
 
 The conditional operator ***if*** selects based on whether the test expression is a byte or a pair.
 
@@ -209,6 +211,8 @@ Analogously the ***evaluate*** operator __*__ delegates to **@** but can create 
 
 Notice how it evaluates in reverse order. This increases performance as the list of arguments is evaluated from head to tail but the results are built up tail to head.
 Also since __*__ delegates to **@** it is not recursive, again, for performance reasons.
+The cells created by __*__ will be in reverse order and uninterrupted by allocations from **@** (which allocates none).
+This means __*__ produces potentially contiguous lists in memory (see note on **/**).
 
 This leaves the one recursive operator to explain but fortunately its tail recursive. The ***execute*** operator **!** takes a statement and an environment.
 It then *executes* the statement in that environment resulting in a new environment and a continuation.
