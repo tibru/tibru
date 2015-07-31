@@ -178,9 +178,13 @@ In addition four byte sequences can be compacted into single words converting th
 
 The conditional operator ***if*** selects based on whether the test expression is a byte or a pair.
 
-	>>> ?[[twenty twenty] 0 1]
+	>>> T
+	[0 0]
+	>>> ?[T 0 1]
 	0
-	>>> ?[twenty 0 1]
+	>>> F
+	0
+	>>> ?[F 0 1]
 	1
 
 These are the 3 basic operators that reduce expressions based on selection. In implementation terms they don't allocate new cells and aren't recursive.
@@ -214,7 +218,7 @@ Also since __*__ delegates to **@** it is not recursive, again, for performance 
 The cells created by __*__ will be in reverse order and uninterrupted by allocations from **@** (which allocates none).
 This means __*__ produces potentially contiguous lists in memory (see note on **/**).
 
-This leaves the one recursive operator to explain but fortunately its tail recursive. The ***execute*** operator **!** takes a statement and an environment.
+This leaves the one recursive operator to explain but fortunately it's tail recursive. The ***execute*** operator **!** takes a statement and an environment.
 It then *executes* the statement in that environment resulting in a new environment and a continuation.
 Continuations are built into KCon which necessarily uses [CPS](http://en.wikipedia.org/wiki/Continuation-passing_style) (continuation passing style).
 
@@ -229,15 +233,15 @@ Then we have the conditional form that selects one of two continuations based on
 
 	>>> IF
 	1
-	>>> ![IF [twenty twenty] [[[sel tl] EXIT'] [[sel hd] EXIT']] nums]
+	>>> ![IF T [[[sel tl] EXIT'] [[sel hd] EXIT']] nums]
 	[2 3]
-	>>> ![IF twenty [[[sel tl] EXIT'] [[sel hd] EXIT']] nums]
+	>>> ![IF F [[[sel tl] EXIT'] [[sel hd] EXIT']] nums]
 	1
 
 It's interesting for debugging purposes to see each step being executed:
 
 	>>> :trace 32
-	>>> ![IF twenty [[[sel tl] EXIT'] [[sel hd] EXIT']] nums]
+	>>> ![IF F [[[sel tl] EXIT'] [[sel hd] EXIT']] nums]
 	1.	[[[sel hd] qt EXIT] nums]
 	2.	[EXIT 1]
 	1
@@ -398,7 +402,7 @@ From a security perspective it is relatively easy to verify that no malicious co
 Indeed even asking the time is not permitted as that would break referential integrity.
 To refefence time it must be passed in as part of the request or the response could be a request for a *clock* service and the *state* a continuation.
 
-Dynamic languages can be supported since ***?*** can decide if a data expression is a byte or a pair the only two types.
+Dynamic languages can be supported since ***?*** can decide if a data expression is a byte or a pair, the only two types.
 We have already seen that a *heap* can be modeled so it would be a rich environment to work in.
 
 The ***+*** operator appears costly to implement but a special memory manager can optimize away the tree rebuilds by storing the data expressions in two forms: those that recombine and those that don't. Any part of this tree that is non-recombining can be altered in place. Since the operator ***+*** works at the top level no part of the original tree can be referenced elsewhere, this is the beauty of CPS. So long as the *heap* is used in a strict way it would always be non-recombining. A language compiler can enforce this.
