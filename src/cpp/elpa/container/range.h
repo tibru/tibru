@@ -20,7 +20,7 @@ private:
     const const_iterator _end;
 public:
     basic_valrange( const T& n ) : _begin(), _end( n ) {}
-    basic_valrange( const T& begin, const T& end ) : _begin( begin ), _end( end ) {}
+    basic_valrange( const T& b, const T& e ) : _begin( b ), _end( e ) {}
 
     const_iterator begin() const { return _begin; }
     const_iterator end() const { return _end; }
@@ -47,16 +47,16 @@ private:
     const const_iterator _begin;
     const const_iterator _end;
 public:
-    basic_range( const Iter& begin, const Iter& end ) : _begin( begin ), _end( end ) {}
+    basic_range( const Iter& b, const Iter& e ) : _begin( b ), _end( e ) {}
 
     const_iterator begin() const { return _begin; }
     const_iterator end() const { return _end; }
 };
 
 template<class Iter>
-inline auto range( const Iter& begin, const Iter& end ) -> basic_range<Iter>
+inline auto range( const Iter& b, const Iter& e ) -> basic_range<Iter>
 {
-    return basic_range<Iter>( begin, end );
+    return basic_range<Iter>( b, e );
 }
 
 } } //namespace

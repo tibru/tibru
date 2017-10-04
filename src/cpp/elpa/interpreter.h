@@ -10,7 +10,7 @@ namespace elpa
 
 struct IllegalOp;
 
-#define MetaInterpreter template<class System, template<class> class SchemeT, template<class System, template<class> class SchemeT> class AllocatorT>
+#define MetaInterpreter template<class MSystem, template<class> class MSchemeT, template<class MSystem2, template<class> class MSchemeT2> class MAllocatorT>
 
 template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT>
 class InterpreterBase

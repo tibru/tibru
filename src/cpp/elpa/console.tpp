@@ -52,7 +52,7 @@ auto Console<InterpreterT>::run( size_t ncells, const std::vector< std::string >
 template<MetaInterpreter class InterpreterT>
 auto Console<InterpreterT>::go( int argc, const char* argv[] ) -> int
 {
-    bool run_tests = false;
+    bool testing = false;
     size_t ncells = 0;
     std::string mode = "";
     bool noisy = false;
@@ -64,7 +64,7 @@ auto Console<InterpreterT>::go( int argc, const char* argv[] ) -> int
         if( arg.length() > 1 && arg[0] == '-' )
         {
             if( arg == "-tests" )
-                run_tests = true;
+                testing = true;
             else if( arg.substr(0,5) == "-mem=" )
             {
                 for( auto c : arg.substr(5) )
@@ -107,7 +107,7 @@ auto Console<InterpreterT>::go( int argc, const char* argv[] ) -> int
     if( filenames.size() == 0 )
         repl = true;
 
-    if( run_tests )
+    if( testing )
     {
         try
         {

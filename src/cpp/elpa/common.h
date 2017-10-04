@@ -24,8 +24,8 @@ class Error<Type,AnyType> : public std::exception
 {
     std::string _message;
 public:
-    Error( const std::string& message )
-    	: _message( message ) {}
+    Error( const std::string& msg )
+    	: _message( msg ) {}
 
 	const char* what() const throw() { return ("\nError: "s  + _message).c_str(); }
 	const std::string& message() const { return _message; }
@@ -34,8 +34,8 @@ public:
 template<class Type, class SubType>
 struct Error : Error<Type>
 {
-	Error( const std::string& message )
-    	: Error<Type>( message ) {}
+	Error( const std::string& msg )
+    	: Error<Type>( msg ) {}
 };
 
 struct Assertion;

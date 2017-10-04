@@ -176,9 +176,9 @@ public:
         return *this;
     }
 
-    operator bool() const { return _is; }
+    operator bool() const { return bool(_is); }
     void putback( char c ) { _is.putback( c ); }
-    bool get( char& c ) { return _is.get( c ); }
+    bool get( char& c ) { return bool(_is.get( c )); }
 };
 
 template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT>

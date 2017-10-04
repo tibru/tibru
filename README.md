@@ -120,20 +120,20 @@ KCon provides operators that act on expressions to yield other expressions.
 	:trace [<limit>|off] - Turn tracing on or off for ! operator
 
 	Operators:
-	![[f x] v]        -> ![*[v f] *[v x]]
-	![0 x]            -> x
-	![1 c [k1 k2] v]  -> ![?[c k1 k2] v]
-	![2 v e r k]      -> ![v +[e r k]]
-	*[v [[x y] .. z]] -> [@[v z] @[v [x y]]]
-	*[v e]            -> @[v e]
-	@[v 0 x]          -> .x
-	@[v 1 r]          -> /[v r]
-	.x                -> x
-	/[v [t1 ..] h1]   -> head{h1}( tail{t1 + 256*t2 ...}(v) )
-	/[v [t1 ..] h1 r] -> /[head{h1}( tail{t1 + 256*t2 ...}(v) ) r]
-	?[[a b] x y]      -> x
-	?[a x y]          -> y
-	+[v e r]          -> e++v|r where e++v|r := append e onto v at r
+	![[f x] v]            -> !*[v [f x]]
+	![0 x]                -> x
+	![1 c [k1 k2] v]      -> ![?[c k1 k2] v]
+	![2 v e r k]          -> ![v +[e r k]]
+	*[v [[x y] z0 .. zn]] -> [@[v zn] .. @[v z0] @[v [x y]]]
+	*[v e]                -> @[v e]
+	@[v 0 x]              -> .x
+	@[v 1 r]              -> /[v r]
+	.x                    -> x
+	/[v [t1 ..] h1]       -> head{h1}( tail{t1 + 256*t2 ...}(v) )
+	/[v [t1 ..] h1 r]     -> /[head{h1}( tail{t1 + 256*t2 ...}(v) ) r]
+	?[[a b] x y]          -> x
+	?[a x y]              -> y
+	+[v e r]              -> e++v|r where e++v|r := append e onto v at r
 
 	Readers:
 	# - Convert unsigned integer into [b1 b2 b3 b3] format e.g. #1000 -> [232 3 0 0]
@@ -281,7 +281,12 @@ We'd like to be able to write continuations at the end of expressions so there i
 	>>> [1 2 3 4 @]
 	[1 4 2 3]
 
-You must be running the ./bin/ohno shell command to have this macro available.
+You must be running the ./bin/ohno shell command to have this macro available. The source can be found in src/cpp/ohno/test.ohno.
+
+To see it in action run
+
+	./bin/ohno test.ohno
+
 Let's start with arithmetic.
 
 	>>> :def inc_table [#1 #2 #3 #4 #5 #6 #7 #8 #9 #10 nil]
@@ -289,8 +294,8 @@ Let's start with arithmetic.
 And a lookup function:
 
 	>>> :names on
-	>>> :def env [1 #0 0]
-	>>> :def stk [1 #0 0]
+	>>> :def env [sel #0 0]
+	>>> :def stk [sel #0 0]
 	>>> :def hd [sel #0 1]
 	>>> :def tl [sel #1 0]
 	>>> :def heap [sel #0 1]

@@ -10,7 +10,7 @@ namespace elpa {
 
 struct OutOfMemory {};
 
-#define MetaAllocator template<class System, template<class> class SchemeT>
+#define MetaAllocator template<class MSystem, template<class> class MSchemeT>
 
 /** Auto register roots with allocator instance **/
 
@@ -73,7 +73,7 @@ public:
             return *this;
         }
 
-        auto_root( Allocator& alloc, const T& root=T() ) : ref( alloc, root ) { this->alloc.add_root( this->addr() ); }
+        auto_root( Allocator& alc, const T& root=T() ) : ref( alc, root ) { this->alloc.add_root( this->addr() ); }
         auto_root( const auto_root_ref<T>& r ) : ref( r ) { this->alloc.add_root( this->addr() ); }
         ~auto_root() { this->alloc.del_root( this->addr() ); }
         auto_root& operator=( const T& t ) { (T&) *this = t; return *this; }

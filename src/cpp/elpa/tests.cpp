@@ -78,9 +78,9 @@ struct Tester
 
     static void test_istream()
     {TEST
-    	Allocator a( 1024 );
+    	Allocator alloc( 1024 );
 
-        Defns defns( a );
+        Defns defns( alloc );
         Readers readers = {
             {'$', []( Allocator& a, std::istream& is ) -> elem_t {
                 uint8_t l = 0;
@@ -102,7 +102,7 @@ struct Tester
             } }
         };
 
-        auto parse = [&]( std::string s ) { return Tester::parse( a, s, defns, readers, macros ); };
+        auto parse = [&]( std::string s ) { return Tester::parse( alloc, s, defns, readers, macros ); };
         defns["x"] = parse( "0" );
         defns["y"] = parse( "[x 1 x]" );
         defns["z"] = parse( "[y 2 x]" );
@@ -110,7 +110,7 @@ struct Tester
 
         auto test_i = [&]( std::string in, std::string out, std::string named_out="" )
         {
-        	auto r = print( parse( in ), Defns(a) );
+        	auto r = print( parse( in ), Defns(alloc) );
         	test( r == out, "Unamed parse of '"s + in + "' incorrect.\nExpected " + out + "\nFound: " + r );
 
             if( named_out != "" )

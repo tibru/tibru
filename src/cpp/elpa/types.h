@@ -9,7 +9,7 @@ namespace elpa {
 const uintptr_t TAG_MASK = 2 * sizeof(void*) - 1;
 const uintptr_t ADDR_MASK = ~TAG_MASK;
 
-#define MetaScheme template<class System>
+#define MetaScheme template<class MSystem>
 
 template<class System>
 struct SimpleScheme
@@ -27,10 +27,10 @@ struct SimpleScheme
     {
         value_t _val;
     public:
-        byte_t( value_t val=0, value_t tag=0 ) : _val( (tag << 8) | val )
+        byte_t( value_t val=0, value_t tg=0 ) : _val( (tg << 8) | val )
         {
             System::assert( val < 256, "Byte value too big" );
-            System::assert( tag < 256, "Byte tag too big" );
+            System::assert( tg < 256, "Byte tag too big" );
         }
 
         static byte_t from_bits( value_t val ) { byte_t b; b._val = val; return b; }
@@ -102,8 +102,8 @@ struct SimpleScheme
         const elem_t _head;
         const elem_t _tail;
     public:
-        Cell( elem_t head, elem_t tail )
-            : _head( head ), _tail( tail ) {}
+        Cell( elem_t hd, elem_t tl )
+            : _head( hd ), _tail( tl ) {}
 
         elem_t head() const { return _head; }
         elem_t tail() const { return _tail; }

@@ -281,19 +281,19 @@ auto elpa_istream<System, SchemeT, AllocatorT>::_parse_elems( std::vector< std::
             //trailing macro
             while( true )
             {
-                char c = '\0';
-                while( _is.get( c ) && isspace( c ) && (c != '\n') )
+                char d = '\0';
+                while( _is.get( d ) && isspace( d ) && (d != '\n') )
                     ;
 
-                if( _macros.find( c ) == _macros.end() )
+                if( _macros.find( d ) == _macros.end() )
                 {
                     if( _is )
-                        _is.putback( c );
+                        _is.putback( d );
 
                     return tail;
                 }
 
-                tail = _parse_macro( c, tail, names );
+                tail = _parse_macro( d, tail, names );
             }
         }
 	}
@@ -311,7 +311,9 @@ template<class System, MetaScheme class SchemeT, MetaAllocator class AllocatorT>
 auto elpa_istream<System, SchemeT, AllocatorT>::_reverse_and_reduce( elem_t e, const std::vector< std::string >& names  ) -> elem_t
 {
     if( e.is_byte() )
+    {
         return e;
+    }
 
 	auto pname = names.rbegin();
 

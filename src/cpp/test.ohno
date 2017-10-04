@@ -1,8 +1,8 @@
 :trace off
 :names on
 
-:def env [1 #0 0]
-:def stk [1 #0 0]
+:def env [sel #0 0]
+:def stk [sel #0 0]
 :def hd [sel #0 1]
 :def tl [sel #1 0]
 :def heap [sel #0 1]
